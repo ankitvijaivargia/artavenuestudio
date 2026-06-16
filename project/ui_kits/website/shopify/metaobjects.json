@@ -1,0 +1,78 @@
+{
+  "_comment": "Art Avenue — Shopify metaobject definitions. Apply via Admin GraphQL metaobjectDefinitionCreate or CLI. Entries are created once in Content → Metaobjects and referenced by products (see metafields.json aa.materials / aa.finishes / aa.upholstery / aa.craft_technique / aa.project_types). Products never store this copy inline.",
+
+  "definitions": [
+    {
+      "type": "material",
+      "name": "Material",
+      "displayNameKey": "name",
+      "access": { "storefront": "PUBLIC_READ" },
+      "fieldDefinitions": [
+        { "key": "name", "name": "Name", "type": "single_line_text_field", "required": true },
+        { "key": "family", "name": "Family", "type": "single_line_text_field", "description": "textile · wood · stone · metal · leather", "validations": [{ "name": "choices", "value": ["textile", "wood", "stone", "metal", "leather"] }] },
+        { "key": "description", "name": "Description", "type": "multi_line_text_field" },
+        { "key": "care_ref", "name": "Care Guide", "type": "single_line_text_field" },
+        { "key": "sample_available", "name": "Sample Available", "type": "boolean" },
+        { "key": "image", "name": "Swatch / Image", "type": "file_reference" },
+        { "key": "sustainability_note", "name": "Sustainability Note", "type": "multi_line_text_field" }
+      ],
+      "seed": ["Wool", "Cotton", "Chenille", "Linen", "Leather", "Velvet", "Teak", "Mango Wood", "Marble", "Travertine", "Brass"]
+    },
+    {
+      "type": "finish",
+      "name": "Finish",
+      "displayNameKey": "name",
+      "access": { "storefront": "PUBLIC_READ" },
+      "fieldDefinitions": [
+        { "key": "name", "name": "Name", "type": "single_line_text_field", "required": true },
+        { "key": "type", "name": "Type", "type": "single_line_text_field", "description": "wood · metal · paint · stone", "validations": [{ "name": "choices", "value": ["wood", "metal", "paint", "stone"] }] },
+        { "key": "swatch", "name": "Swatch", "type": "file_reference" },
+        { "key": "material_ref", "name": "Material", "type": "metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "material" }] },
+        { "key": "description", "name": "Description", "type": "multi_line_text_field" }
+      ],
+      "seed": ["Natural Oil", "Walnut", "Dark Walnut", "Black", "Aged Brass", "Antique Bronze", "Matte Paint", "Honed Stone"]
+    },
+    {
+      "type": "upholstery",
+      "name": "Upholstery",
+      "displayNameKey": "name",
+      "access": { "storefront": "PUBLIC_READ" },
+      "fieldDefinitions": [
+        { "key": "name", "name": "Name", "type": "single_line_text_field", "required": true },
+        { "key": "collection", "name": "Collection", "type": "single_line_text_field" },
+        { "key": "performance", "name": "Performance Fabric", "type": "boolean" },
+        { "key": "composition", "name": "Composition", "type": "single_line_text_field" },
+        { "key": "swatch", "name": "Swatch", "type": "file_reference" },
+        { "key": "com_accepted", "name": "COM Accepted", "type": "boolean", "description": "Customer's own material" }
+      ],
+      "seed": ["Belgian Linen", "Performance Weave", "Aniline Leather", "Cotton Velvet", "Boucle"]
+    },
+    {
+      "type": "craft_technique",
+      "name": "Craft Technique",
+      "displayNameKey": "name",
+      "access": { "storefront": "PUBLIC_READ" },
+      "fieldDefinitions": [
+        { "key": "name", "name": "Name", "type": "single_line_text_field", "required": true },
+        { "key": "description", "name": "Description", "type": "multi_line_text_field" },
+        { "key": "durability", "name": "Durability", "type": "single_line_text_field" },
+        { "key": "best_for", "name": "Best For", "type": "single_line_text_field" },
+        { "key": "lead_time", "name": "Lead Time", "type": "single_line_text_field" },
+        { "key": "image", "name": "Image", "type": "file_reference" }
+      ],
+      "seed": ["Hand Knotted", "Hand Tufted", "Flat Weave", "Printed", "Block Print", "Embroidery", "Tufting", "Woven"]
+    },
+    {
+      "type": "project_type",
+      "name": "Project Type",
+      "displayNameKey": "name",
+      "access": { "storefront": "PUBLIC_READ" },
+      "fieldDefinitions": [
+        { "key": "name", "name": "Name", "type": "single_line_text_field", "required": true },
+        { "key": "description", "name": "Description", "type": "multi_line_text_field" },
+        { "key": "enquiry_routing", "name": "Enquiry Routing", "type": "single_line_text_field", "description": "CRM queue / owner for this project type" }
+      ],
+      "seed": ["Residential", "Hospitality", "Commercial", "Retail", "Designer Projects"]
+    }
+  ]
+}

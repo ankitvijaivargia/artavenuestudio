@@ -1,0 +1,8 @@
+/* Art Avenue — Webfonts
+ * SUBSTITUTION NOTE: No brand font files were supplied. These are Google Fonts
+ * chosen to match the intended luxury-editorial direction:
+ *   - Cormorant Garamond  → high-contrast elegant serif (headlines / display)
+ *   - Jost                → refined geometric sans (body, UI, eyebrows)
+ * Replace with licensed brand faces for production if/when available.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');

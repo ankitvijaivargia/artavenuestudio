@@ -1,0 +1,44 @@
+{
+  "_comment": "Art Avenue — preset registry. A product's aa.preset seeds these defaults; any explicit aa.* metafield overrides (deep-merge on modules). Mirrors PRESETS in parts.jsx. moduleOrder omitted = template default order.",
+
+  "presets": {
+    "luxury-furniture": {
+      "fulfillment": "made-to-order", "visibility": "ecommerce", "size_mode": "multi",
+      "modules": { "material": true, "finish": true, "upholstery": true, "samples": true, "customization": true, "assembly": true, "completeRoom": true, "faq": true, "related": true, "delivery": true },
+      "moduleOrder": ["assembly", "whyLove", "customization", "completeRoom", "faq", "related"]
+    },
+    "luxury-rug": {
+      "fulfillment": "made-to-order", "visibility": "ecommerce", "size_mode": "multi",
+      "modules": { "guides": true, "specs": true, "construction": true, "material": true, "craft": true, "rooms": true, "related": true, "samples": true },
+      "moduleOrder": ["whyLove", "customization", "guides", "specs", "construction", "material", "craft", "rooms", "consult", "related"]
+    },
+    "luxury-cushion": {
+      "fulfillment": "made-to-order", "visibility": "ecommerce",
+      "modules": { "samples": true, "whyLove": true, "customization": true, "pairs": true },
+      "moduleOrder": ["whyLove", "customization", "pairs"]
+    },
+    "custom-product":        { "fulfillment": "custom", "visibility": "price-on-request", "cta_primary": "request-pricing" },
+    "project-product":       { "fulfillment": "project", "visibility": "project-only", "cta_primary": "project-enquiry" },
+    "in-stock-product":      { "fulfillment": "in-stock", "visibility": "ecommerce", "cta_primary": "add-to-cart" },
+    "made-to-order-product": { "fulfillment": "made-to-order", "visibility": "ecommerce", "cta_primary": "add-to-cart" }
+  },
+
+  "productTypeToPreset": {
+    "Furniture": "luxury-furniture",
+    "Rug": "luxury-rug",
+    "Cushion": "luxury-cushion",
+    "Lighting": "in-stock-product",
+    "Decor": "in-stock-product",
+    "Wall Art": "made-to-order-product"
+  },
+
+  "presetToTemplate": {
+    "luxury-furniture": "product",
+    "luxury-rug": "product.rug",
+    "luxury-cushion": "product.cushion",
+    "custom-product": "product.custom",
+    "project-product": "product.project",
+    "in-stock-product": "product",
+    "made-to-order-product": "product"
+  }
+}

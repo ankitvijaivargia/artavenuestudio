@@ -1,0 +1,114 @@
+{
+  "_comment": "Art Avenue — example product records (the data model in action). Each shows the aa.* metafields a merchant sets. Anything not set is inherited from the preset. These map 1:1 to the prototype's demo SKUs. Import via Admin API productUpdate.metafields or matrixify/CSV.",
+
+  "products": [
+    {
+      "title": "Marwar Lounge Chair",
+      "productType": "Furniture",
+      "_resolves": "luxury-furniture preset → made-to-order / ecommerce / Add to Cart, full module set",
+      "metafields": {
+        "aa.preset": "luxury-furniture",
+        "aa.lifecycle": "active",
+        "aa.materials": ["material/teak", "material/mango-wood"],
+        "aa.finishes": ["finish/natural-oil", "finish/walnut"],
+        "aa.upholstery": ["upholstery/belgian-linen", "upholstery/performance-weave", "upholstery/aniline-leather"]
+      }
+    },
+    {
+      "title": "Aravalli Hand-Knotted Rug",
+      "productType": "Rug",
+      "_resolves": "luxury-rug preset → made-to-order / ecommerce; 8 reorderable sections",
+      "metafields": {
+        "aa.preset": "luxury-rug",
+        "aa.lifecycle": "active",
+        "aa.craft_technique": "craft_technique/hand-knotted",
+        "aa.materials": ["material/wool", "material/cotton", "material/chenille"],
+        "aa.module_order": ["whyLove", "specs", "material", "construction", "craft", "rooms", "consult", "related"]
+      }
+    },
+    {
+      "title": "Konkan Jute Rug",
+      "productType": "Rug",
+      "_resolves": "in-stock single fixed size; lean module set",
+      "metafields": {
+        "aa.preset": "in-stock-product",
+        "aa.size_mode": "fixed",
+        "aa.fixed_size": "5 × 8 ft | 54000",
+        "aa.commerce_badge": "in-stock",
+        "aa.modules": { "construction": false, "craft": false, "guides": false }
+      }
+    },
+    {
+      "title": "Bespoke Atelier Rug",
+      "productType": "Rug",
+      "_resolves": "custom-product → price-on-request → Request Pricing; size_mode mto",
+      "metafields": {
+        "aa.preset": "custom-product",
+        "aa.size_mode": "mto",
+        "aa.commerce_badge": "customizable",
+        "aa.craft_technique": "craft_technique/hand-knotted"
+      }
+    },
+    {
+      "title": "Sanganeri Block-Print Cushion",
+      "productType": "Cushion",
+      "_resolves": "luxury-cushion preset; technique-driven content via metaobject",
+      "metafields": {
+        "aa.preset": "luxury-cushion",
+        "aa.craft_technique": "craft_technique/block-print",
+        "aa.materials": ["material/cotton", "material/linen"]
+      }
+    },
+    {
+      "title": "The Verandah Contract Sofa",
+      "productType": "Furniture",
+      "_resolves": "project-product → project-only → Start a Project Enquiry; no cart",
+      "metafields": {
+        "aa.preset": "project-product",
+        "aa.commerce_badge": "project",
+        "aa.project_types": ["project_type/hospitality"],
+        "aa.modules": { "related": false, "completeRoom": false }
+      }
+    },
+    {
+      "title": "Brass Meridian Pendant",
+      "productType": "Lighting",
+      "_resolves": "in-stock, single size, no upholstery/assembly",
+      "metafields": {
+        "aa.preset": "in-stock-product",
+        "aa.size_mode": "single",
+        "aa.commerce_badge": "in-stock",
+        "aa.materials": ["material/brass"],
+        "aa.modules": { "upholstery": false, "assembly": false, "samples": false }
+      }
+    },
+    {
+      "title": "Coming Soon — Thar Wool Rug",
+      "productType": "Rug",
+      "_resolves": "lifecycle coming-soon → cart removed, primary = Notify Me, banner shown",
+      "metafields": { "aa.preset": "luxury-rug", "aa.lifecycle": "coming-soon" }
+    },
+    {
+      "title": "Seasonal Aravalli Festive Rug",
+      "productType": "Rug",
+      "_resolves": "lifecycle seasonal → still shopable, seasonal notice",
+      "metafields": { "aa.preset": "luxury-rug", "aa.lifecycle": "seasonal" }
+    },
+    {
+      "title": "Discontinued Kashi Sofa",
+      "productType": "Furniture",
+      "_resolves": "lifecycle discontinued → cart removed, consult CTA, page kept for SEO",
+      "metafields": { "aa.preset": "luxury-furniture", "aa.lifecycle": "discontinued" }
+    }
+  ],
+
+  "leadPayloadExample": {
+    "_comment": "Every lead — consult, pricing, samples, custom, project, trade — emits this shape to /leads (Shopify Flow → CRM).",
+    "leadType": "Request Samples",
+    "product": "Aravalli Hand-Knotted Rug",
+    "sku": "AA-AHKR-RG",
+    "url": "https://artavenue.com/products/aravalli-hand-knotted-rug",
+    "customer": { "name": "", "email": "", "phone": "" },
+    "message": "Material sample"
+  }
+}

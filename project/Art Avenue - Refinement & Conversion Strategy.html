@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Art Avenue — Refinement & Conversion Strategy</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0; background: var(--aa-clay);
+    font-family: var(--font-sans); color: var(--text-primary);
+    font-size: 15px; line-height: 1.7;
+  }
+  .page {
+    background: var(--surface-page); width: 860px; max-width: 100%;
+    margin: 28px auto; padding: 88px 92px;
+    box-shadow: var(--shadow-raised);
+  }
+  .page + .page { margin-top: 0; }
+
+  /* type */
+  .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase; color: var(--text-accent); display: inline-flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
+  h1 { font-family: var(--font-serif); font-weight: 500; font-size: 58px; line-height: 1.04;
+    letter-spacing: var(--tracking-tight); margin: 20px 0 0; }
+  h2 { font-family: var(--font-serif); font-weight: 500; font-size: 34px; line-height: 1.1;
+    letter-spacing: var(--tracking-tight); margin: 0 0 6px; }
+  h3 { font-family: var(--font-serif); font-weight: 500; font-size: 23px; margin: 30px 0 8px; }
+  h4 { font-family: var(--font-sans); font-weight: 600; font-size: 13px; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--text-secondary); margin: 22px 0 8px; }
+  p { margin: 0 0 14px; color: var(--text-secondary); max-width: 64ch; }
+  .lead { font-size: 18px; font-weight: 300; line-height: 1.65; color: var(--text-secondary); }
+  strong { color: var(--text-primary); font-weight: 600; }
+  em { color: var(--text-accent); }
+  a { color: var(--text-accent); }
+  ul, ol { margin: 0 0 16px; padding-left: 0; list-style: none; }
+  li { position: relative; padding-left: 22px; margin-bottom: 9px; color: var(--text-secondary); max-width: 64ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 11px; width: 6px; height: 1px; background: var(--accent); }
+  ol { counter-reset: n; }
+  ol > li { padding-left: 30px; }
+  ol > li::before { counter-increment: n; content: counter(n,decimal-leading-zero); top: 0; width: auto; height: auto;
+    font-family: var(--font-serif); font-style: italic; color: var(--accent); font-size: 15px; }
+
+  .sectnum { font-family: var(--font-serif); font-style: italic; font-size: 17px; color: var(--accent); }
+  .divider { height: 1px; background: var(--border-hairline); margin: 26px 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-strong); }
+
+  /* two-col */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; }
+  .cols.tri { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* callout */
+  .callout { background: var(--surface-accent-tint); border-left: 2px solid var(--accent);
+    padding: 20px 24px; margin: 20px 0; }
+  .callout h4 { margin-top: 0; color: var(--text-accent); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .panel { border: 1px solid var(--border-hairline); padding: 22px 24px; background: var(--surface-raised); }
+
+  /* friction table */
+  .audit { width: 100%; border-collapse: collapse; margin: 8px 0 4px; }
+  .audit th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600; padding: 0 0 10px; border-bottom: 1px solid var(--border-strong); }
+  .audit td { vertical-align: top; padding: 13px 16px 13px 0; border-bottom: 1px solid var(--border-hairline);
+    font-size: 14px; color: var(--text-secondary); }
+  .audit td:first-child { font-family: var(--font-serif); font-size: 16px; color: var(--text-primary); width: 26%; }
+
+  /* priority matrix */
+  .matrix { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--border-hairline);
+    border: 1px solid var(--border-hairline); margin-top: 10px; }
+  .matrix > div { background: var(--surface-page); padding: 22px 22px 26px; }
+  .matrix h4 { margin: 0 0 14px; display: flex; align-items: center; gap: 9px; color: var(--text-primary); }
+  .matrix .tag { font-size: 10px; letter-spacing: .1em; }
+  .matrix li { font-size: 13.5px; padding-left: 18px; }
+  .matrix li::before { top: 10px; }
+
+  .pill { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 99px; }
+  .pill.must { background: var(--aa-charcoal); color: var(--aa-ivory); }
+  .pill.should { background: var(--surface-accent-tint); color: var(--text-accent); }
+  .pill.nice { background: transparent; color: var(--text-muted); border: 1px solid var(--border-strong); }
+
+  .kv { display: grid; grid-template-columns: 150px 1fr; gap: 6px 18px; margin: 4px 0 14px; }
+  .kv dt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding-top: 3px; }
+  .kv dd { margin: 0; color: var(--text-secondary); font-size: 14.5px; }
+
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px;
+    background: var(--surface-stone); padding: 2px 6px; border-radius: 3px; color: var(--aa-bronze-deep); }
+  .codeblock { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; line-height: 1.7;
+    background: var(--surface-dark); color: #d9cdb8; padding: 18px 22px; border-radius: var(--radius-sm);
+    overflow-x: auto; margin: 12px 0 18px; white-space: pre-wrap; word-break: break-word; }
+  .codeblock .c { color: #8f8674; }
+
+  .foot { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--text-faint); margin-top: 56px; padding-top: 16px;
+    border-top: 1px solid var(--border-hairline); }
+
+  /* cover */
+  .cover { background: var(--surface-dark); color: var(--text-on-dark); min-height: 1000px;
+    display: flex; flex-direction: column; justify-content: space-between; padding: 92px; }
+  .cover h1 { color: var(--text-on-dark); }
+  .cover .eyebrow { color: var(--accent-soft); }
+  .cover .eyebrow::before { background: var(--accent-soft); }
+  .cover .lead { color: var(--text-on-dark-muted); max-width: 50ch; margin-top: 26px; }
+  .cover .mark { font-family: var(--font-serif); font-weight: 500; font-size: 22px; letter-spacing: .18em; text-transform: uppercase; }
+  .cover .tag { font-size: 9px; letter-spacing: .42em; text-transform: uppercase; color: var(--accent-soft); margin-top: 6px; }
+  .cover .meta { display: flex; gap: 48px; font-size: 12px; letter-spacing: .04em; color: var(--text-on-dark-muted); }
+  .cover .meta b { display: block; color: var(--text-on-dark); font-weight: 500; margin-bottom: 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; width: 100%; padding: 54px 60px; page-break-after: always; }
+    .cover { min-height: 92vh; }
+    @page { size: A4; margin: 0; }
+  }
+  @media (max-width: 900px) {
+    .page { padding: 48px 28px; }
+    .cols, .cols.tri, .matrix { grid-template-columns: 1fr; }
+    h1 { font-size: 40px; }
+    .cover { padding: 48px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div>
+    <div class="mark">Art Avenue</div>
+    <div class="tag">Design House · Est. India</div>
+  </div>
+  <div>
+    <div class="eyebrow">Refinement &amp; Conversion Optimization</div>
+    <h1>Refining a finished<br><em style="color:#EBD9BE">design into a<br>store that sells.</em></h1>
+    <p class="lead">An evidence-based plan to lift conversion, order value and designer enquiries — adapting the strongest merchandising and UX patterns from Anthropologie, Urban Outfitters and Good Earth, while keeping Art Avenue more premium than all three.</p>
+  </div>
+  <div class="meta">
+    <div><b>Scope</b>Product · Collection · Rugs · Navigation · Mobile · Conversion</div>
+    <div><b>Platform</b>Shopify · Prestige Theme</div>
+    <div><b>Status</b>Refinement — design direction preserved</div>
+  </div>
+</section>
+
+<!-- EXEC SUMMARY -->
+<section class="page">
+  <div class="eyebrow">Executive Summary</div>
+  <h1 style="font-size:42px">The design is right. Now make it effortless to buy, and easy to ask.</h1>
+  <div class="divider"></div>
+  <p class="lead">The approved Art Avenue design already delivers the hard part — a calm, editorial, unmistakably premium brand world. This refinement does not touch that. It threads <strong>high-intent actions</strong> (WhatsApp consultation, sample requests, customization, consultation booking) and <strong>confidence-building merchandising</strong> (rug size guidance, material storytelling, shop-by-room, trust cues) through the existing screens so visitors convert without ever feeling sold to.</p>
+  <div class="cols" style="margin-top:24px">
+    <div>
+      <h4>The thesis</h4>
+      <p>Luxury furniture is a <strong>considered, high-ticket, consultative</strong> purchase. Our references win not by pushing "Buy now" but by removing doubt — about size, material, delivery and fit — and by making it easy to talk to a human. Every recommendation here serves that.</p>
+    </div>
+    <div>
+      <h4>What changes — and what doesn't</h4>
+      <ul>
+        <li><strong>Unchanged:</strong> palette, type, spacing, photography direction, brand voice.</li>
+        <li><strong>Added:</strong> consultative CTAs, rug size guide, merchandising rails, trust modules.</li>
+        <li><strong>Principle:</strong> adapt the <em>behaviour</em> of best-in-class stores, never their look.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <h4>The four signature additions</h4>
+    <p><strong>1 · "Speak with a Design Consultant" (WhatsApp)</strong> on every product page — sticky on mobile, pre-filled with product context. <strong>2 · "Request Fabric / Finish Sample"</strong> on furniture &amp; upholstery. <strong>3 · "Need Help Choosing a Rug Size?"</strong> → an interactive Rug Size Guide on rug products and collections. <strong>4 · Shop-by-{Room, Size, Material, Colour}</strong> merchandising to cut decision fatigue.</p>
+  </div>
+  <div class="foot"><span>Art Avenue Design House</span><span>Refinement &amp; Conversion Strategy</span></div>
+</section>
+
+<!-- 1. AUDIT -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 01</span><h2>Audit of the current design</h2></div>
+  <p>Assessed against the live prototype (homepage, collection, product, trade, mobile, cart &amp; checkout). The verdict: <strong>visually excellent, conversion-incomplete.</strong> Strengths to protect, and friction to resolve.</p>
+
+  <h4>Strengths to preserve</h4>
+  <div class="cols">
+    <ul>
+      <li>Genuine luxury restraint — whitespace, serif display, single bronze accent.</li>
+      <li>Editorial storytelling (atelier, featured collection, brand statement).</li>
+      <li>Strong, immersive imagery slots and full-bleed rhythm.</li>
+    </ul>
+    <ul>
+      <li>A real Trade program — a key, under-served B2B channel.</li>
+      <li>Clean, considered mobile flow with sticky actions and a swipe gallery.</li>
+      <li>Consistent, reusable component system (fast to extend without drift).</li>
+    </ul>
+  </div>
+
+  <h4>Friction points &amp; opportunities</h4>
+  <table class="audit">
+    <thead><tr><th>Area</th><th>Friction observed</th><th>Refinement</th></tr></thead>
+    <tbody>
+      <tr><td>Product page</td><td>No human/consultative path; sample &amp; customization buried; gallery is stacked, not browsable.</td><td>WhatsApp consultant + sample/customization CTAs near price; sticky action bar; gallery with thumbnails &amp; zoom.</td></tr>
+      <tr><td>Rugs</td><td>Sold like any product — size is the #1 reason for hesitation &amp; returns.</td><td>Rug Size Guide + Shop-by-Size/Room/Colour/Pattern/Material.</td></tr>
+      <tr><td>Collection</td><td>Filters functional but flat; little storytelling or lifestyle merchandising; no quick-view.</td><td>Editorial intro, merchandising blocks, quick-add, sticky mobile filter bar (built), saved scroll.</td></tr>
+      <tr><td>Navigation</td><td>Mega-menu lists categories but lacks Shop-by-Style/Room/Material, best-sellers, designer picks.</td><td>Restructured mega-menu with cross-cutting entry points + a featured visual.</td></tr>
+      <tr><td>Trust &amp; lead-gen</td><td>Trust cues exist on PDP but not surfaced site-wide; no consultation booking; no recently-viewed.</td><td>Trust strip, consultation booking, recently-viewed, shop-the-look.</td></tr>
+      <tr><td>Mobile</td><td>Strong base; WhatsApp not reachable; filters &amp; search could be more thumb-first.</td><td>Persistent WhatsApp affordance, refined bottom-sheet filters, prominent search.</td></tr>
+    </tbody>
+  </table>
+  <div class="foot"><span>Section 01 — Audit</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 2. REFERENCE PRINCIPLES -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 02</span><h2>Principles from the references — adapted, never copied</h2></div>
+  <p>We study the <em>behaviour</em> these brands have proven, then translate it up into Art Avenue's quieter, more premium register. No visual borrowing.</p>
+
+  <h3>Anthropologie</h3>
+  <div class="cols">
+    <div><h4>What works</h4><ul>
+      <li>Lifestyle-led merchandising — products shown in styled rooms, not on white.</li>
+      <li>Editorial "shop the look" and curated edits that sell whole vignettes.</li>
+      <li>Generous, immersive collection headers that set a mood.</li>
+    </ul></div>
+    <div><h4>Adapt to Art Avenue</h4><ul>
+      <li>Lean harder on in-room photography in grids; interleave one lifestyle block per ~6 products.</li>
+      <li>"Shop the Look" module on PDP and room pages — but understated, captioned in italic serif.</li>
+      <li>Keep headers calm: one image, one line, generous air — more restraint than Anthropologie.</li>
+    </ul></div>
+  </div>
+
+  <h3>Urban Outfitters</h3>
+  <div class="cols">
+    <div><h4>What works</h4><ul>
+      <li>Frictionless discovery — fast filters, quick-add, infinite-feeling browse.</li>
+      <li>Strong mobile-first interaction patterns and visible social proof.</li>
+      <li>Persistent, low-effort actions (save, quick view).</li>
+    </ul></div>
+    <div><h4>Adapt to Art Avenue</h4><ul>
+      <li>Add quick-view &amp; save-for-later — but slow, elegant transitions, never snappy/loud.</li>
+      <li>Social proof as "Customer Homes" / designer credits, not star-rating clutter.</li>
+      <li>Adopt the speed; reject the density. We show fewer, better things.</li>
+    </ul></div>
+  </div>
+
+  <h3>Good Earth India</h3>
+  <div class="cols">
+    <div><h4>What works</h4><ul>
+      <li>Craft &amp; provenance storytelling — the maker, the material, the place.</li>
+      <li>Heritage framing that justifies premium price through meaning.</li>
+      <li>Collections as narratives, not SKUs.</li>
+    </ul></div>
+    <div><h4>Adapt to Art Avenue</h4><ul>
+      <li>Material library + per-product "Materials" and "Craftsmanship" storytelling (already begun — deepen it).</li>
+      <li>Name and narrate collections (e.g. "The Marwar Collection") as we do — extend across all.</li>
+      <li>This is our closest cousin in spirit; out-craft it with cleaner typography and more air.</li>
+    </ul></div>
+  </div>
+  <div class="callout"><h4>Guardrail</h4><p>Art Avenue must read as the most expensive room in the building. Where a reference is busy, we are quiet. Where it shouts a discount, we offer a consultation. Where it shows fifty products, we show twelve and tell their story.</p></div>
+  <div class="foot"><span>Section 02 — Principles</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 3. PRODUCT PAGE -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 03</span><h2>Product page enhancements</h2></div>
+  <p>The PDP is where consideration becomes commitment. Goal: <strong>remove every doubt, and make the human one tap away.</strong></p>
+
+  <h3>High-intent action stack (near price, above the fold)</h3>
+  <p>Beneath price and finish selection, a clear hierarchy of actions — primary purchase, then consultative paths:</p>
+  <ul>
+    <li><strong>Add to Cart</strong> — primary, charcoal.</li>
+    <li><strong>Speak with a Design Consultant</strong> — WhatsApp (see §05). Secondary, with WhatsApp glyph; <em>sticky on mobile</em>.</li>
+    <li><strong>Request Fabric / Finish Sample</strong> — on furniture &amp; upholstery. Sends finish + product context.</li>
+    <li><strong>Request Customization</strong> — dimensions, finishes, COM.</li>
+    <li><strong>Book a Design Consultation</strong> — for room-scale or trade intent.</li>
+  </ul>
+  <div class="callout"><h4>New CTA — Request Fabric / Finish Sample</h4>
+    <p>On every furniture &amp; upholstery PDP. Lets a buyer feel the material before committing thousands — the single biggest confidence lever for high-ticket, made-to-order furniture. Pre-fills the selected wood finish &amp; upholstery, captures shipping address (or routes to WhatsApp), and is positioned as a <em>complimentary concierge courtesy</em>, not a transaction.</p>
+  </div>
+
+  <h3>Gallery &amp; material understanding</h3>
+  <div class="cols">
+    <ul>
+      <li>Lifestyle image first, then detail, then material macro, then scale/in-room shot.</li>
+      <li>Thumbnail rail (desktop) + swipe with dots (mobile, built); pinch/hover zoom on detail shots.</li>
+      <li>Optional short looping clip of the material/finish (no autoplay sound, respects reduced-motion).</li>
+    </ul>
+    <ul>
+      <li><strong>Materials block</strong> — named materials with macro imagery and a one-line origin story.</li>
+      <li><strong>Dimensions</strong> — labelled line drawing + a "Will it fit?" note and seat-height callouts.</li>
+      <li><strong>Care</strong> — concise, reassuring, linked to the Material Library.</li>
+    </ul>
+  </div>
+
+  <h3>Delivery, trust &amp; cross-sell</h3>
+  <ul>
+    <li><strong>Delivery confidence</strong> — secure insured delivery, assembly help on select pieces, lead time, international freight, hand-crating — stated near the buy box, not buried in an accordion.</li>
+    <li><strong>Trust row</strong> — Handcrafted in India · Made to order · Customization available · Secure international shipping.</li>
+    <li><strong>Pair With</strong> (built) + <strong>Shop the Look</strong> (the room this piece lives in) — raises AOV.</li>
+    <li><strong>Recently Styled Spaces</strong> (built) + <strong>Designer Notes</strong> — provenance &amp; aspiration.</li>
+  </ul>
+  <div class="foot"><span>Section 03 — Product Page</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 4. RUGS -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 04</span><h2>Rug collection experience</h2></div>
+  <p>Size is the number-one source of hesitation and the number-one driver of regret in rug purchases. A guided, confident size experience is the highest-leverage improvement in the catalogue.</p>
+
+  <h3>"Need Help Choosing a Rug Size?" — the Rug Size Guide</h3>
+  <div class="kv">
+    <dt>Entry points</dt><dd>Persistent CTA on every rug PDP (near price) and a banner on rug collection pages; linked from the mega-menu and footer.</dd>
+    <dt>Format</dt><dd>Slide-in drawer / modal on PDP (stays in context) + a dedicated, linkable full page for SEO and sharing.</dd>
+    <dt>Mobile</dt><dd>Full-height sheet, one room per swipe, large diagrams, thumb-reachable size chips.</dd>
+  </div>
+  <h4>Contents</h4>
+  <div class="cols tri">
+    <ul><li><strong>Living Room</strong> — all-legs-on, front-legs-on, floating layouts.</li><li><strong>Dining</strong> — table + chairs-pulled-out clearance rule.</li></ul>
+    <ul><li><strong>Bedroom</strong> — under-bed, runners-either-side, foot-of-bed.</li><li><strong>Runners</strong> — hallways, kitchen, bedside.</li></ul>
+    <ul><li>Recommended sizes per layout (in ft &amp; cm).</li><li>Placement rules + <strong>common mistakes to avoid</strong> ("rug too small" is the cardinal sin).</li></ul>
+  </div>
+  <p>Each layout pairs a clean room diagram with a recommended size and a one-line rationale, then deep-links to <em>"Shop this size"</em>. The guide converts browsing into a confident, filtered selection.</p>
+
+  <h3>Rug merchandising — reduce decision fatigue</h3>
+  <p>On rug collection pages, lead with cross-cutting entry points before the grid:</p>
+  <div class="cols tri">
+    <ul><li><strong>Shop by Size</strong> (8×10, 9×12, runners, round…)</li></ul>
+    <ul><li><strong>Shop by Room</strong> · <strong>Shop by Colour</strong></li></ul>
+    <ul><li><strong>Shop by Pattern</strong> · <strong>Shop by Material</strong></li></ul>
+  </div>
+  <p>Present as a quiet row of labelled image tiles (reusing the existing <code>CollectionTile</code>), so a buyer self-selects into a confident, small set rather than scrolling a wall of rugs.</p>
+  <div class="foot"><span>Section 04 — Rugs</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 5. WHATSAPP SPEC -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 05</span><h2>WhatsApp enquiry system — specification</h2></div>
+  <p>A premium, <strong>consultative</strong> channel — not a support widget. Positioned as access to a design consultant, the way a private gallery offers a personal advisor.</p>
+
+  <h3>Placement</h3>
+  <ul>
+    <li><strong>PDP, near Add to Cart</strong> — secondary button: <em>"Speak with a Design Consultant"</em> with a discreet WhatsApp glyph.</li>
+    <li><strong>Mobile</strong> — included in the sticky bottom action bar so it is always visible without scrolling.</li>
+    <li><strong>Site-wide</strong> — an understated floating affordance (bottom-right, bronze, small) on collection &amp; content pages; never a bouncing bubble.</li>
+    <li><strong>Trade &amp; consultation pages</strong> — primary path alongside the form.</li>
+  </ul>
+
+  <h3>Pre-filled message</h3>
+  <p>Tapping opens WhatsApp with a context-rich, polite message already composed:</p>
+  <div class="codeblock">Hello Art Avenue, I'd like to speak with a design consultant about:
+
+• Product: {{ product.title }}
+• SKU: {{ product.sku }}
+• Link: {{ product.url }}
+
+{{ customer_message — default: "I would like more information about this piece." }}</div>
+
+  <h3>Implementation</h3>
+  <div class="kv">
+    <dt>Link format</dt><dd><code>https://wa.me/&lt;NUMBER&gt;?text=&lt;URL-encoded message&gt;</code> (international format, no "+", no spaces).</dd>
+    <dt>Context</dt><dd>Inject product title, SKU and canonical URL at render; URL-encode the whole <code>text</code> param.</dd>
+    <dt>Number</dt><dd>Single WhatsApp Business number (or click-to-chat). <strong>Please provide it</strong> — currently a placeholder.</dd>
+    <dt>Tone</dt><dd>Consultative copy, serif framing, generous spacing. No "Chat with us!", no emoji, no notification badges.</dd>
+    <dt>Tracking</dt><dd>Tag the link with a UTM / event so WhatsApp-sourced enquiries are measurable.</dd>
+  </div>
+  <div class="callout"><h4>Why it converts</h4><p>High-ticket, made-to-order buyers want reassurance from a person before committing. A frictionless, pre-contextualised WhatsApp tap collapses "I have a question" into a live, qualified lead — and feels like service, not sales.</p></div>
+  <div class="foot"><span>Section 05 — WhatsApp</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 6. COLLECTION -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 06</span><h2>Collection page improvements</h2></div>
+  <p>Make discovery effortless and the browse feel curated, not catalogued.</p>
+  <div class="cols">
+    <div>
+      <h4>Storytelling &amp; merchandising</h4>
+      <ul>
+        <li>Editorial intro paragraph + immersive header per collection (built — extend copy).</li>
+        <li>One <strong>lifestyle / "Shop the Look"</strong> block every ~6 products to break the grid and raise AOV.</li>
+        <li><strong>Room Inspiration</strong> banner mid-grid (built) and related collections at the foot (built).</li>
+      </ul>
+      <h4>Filtering &amp; sorting</h4>
+      <ul>
+        <li>Sticky filter sidebar (desktop, built); persistent applied-filter chips with one-tap clear.</li>
+        <li>Cross-cutting entry rows: Shop by Room / Style / Material (and Size/Colour/Pattern for rugs).</li>
+        <li>Preserve scroll position on back — never lose a browser's place.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Quick exploration</h4>
+      <ul>
+        <li><strong>Quick view</strong> — open key details &amp; add-to-cart without leaving the grid (elegant, slow).</li>
+        <li><strong>Save / wishlist</strong> heart on cards (built) — persists for returning visitors.</li>
+        <li>Hover reveals a secondary lifestyle image (desktop).</li>
+      </ul>
+      <h4>Mobile browse</h4>
+      <ul>
+        <li>Bottom-sheet Filter &amp; Sort (built) with chip-based facets.</li>
+        <li>2-up grid with large imagery; lazy-load; "Load more" over pagination.</li>
+        <li>Keep WhatsApp affordance reachable throughout.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Section 06 — Collection</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 7. NAVIGATION -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 07</span><h2>Navigation improvements</h2></div>
+  <p>Help buyers reach the right product faster by adding cross-cutting routes alongside the category tree.</p>
+  <div class="cols">
+    <div>
+      <h4>Mega-menu structure (per category)</h4>
+      <ul>
+        <li><strong>By Type</strong> — the existing category columns.</li>
+        <li><strong>Shop by Room</strong> — Living, Dining, Bedroom, Study, Outdoor.</li>
+        <li><strong>Shop by Style / Material</strong> — and Size/Colour/Pattern for Rugs.</li>
+        <li><strong>Discover</strong> — New Arrivals · Best Sellers · Designer Favourites.</li>
+        <li><strong>Featured visual</strong> — one collection tile with image (built).</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Global nav</h4>
+      <ul>
+        <li>Persistent top-level: Furniture · Rugs · Lighting · Decor · Wall Art · Collections · Journal · Trade.</li>
+        <li>Prominent <strong>search</strong> (predictive, with imagery in results).</li>
+        <li>Account · Wishlist · Bag with live count (built).</li>
+        <li>Slim trust bar above the header (built): consultation · handcrafted · worldwide delivery.</li>
+      </ul>
+      <h4>Mobile</h4>
+      <ul><li>Drawer with accordion categories + the same cross-cutting routes (built); Trade &amp; account at the foot.</li></ul>
+    </div>
+  </div>
+  <div class="foot"><span>Section 07 — Navigation</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 8. MOBILE -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 08</span><h2>Mobile UX</h2></div>
+  <p>Mobile is the majority of luxury browse traffic. It must feel as considered as the showroom — fast, calm, thumb-first.</p>
+  <div class="cols">
+    <div>
+      <h4>Product</h4>
+      <ul>
+        <li>Swipe gallery with dots (built); sticky bottom bar with price + Add to Cart (built).</li>
+        <li><strong>Add WhatsApp to the sticky bar</strong> so the consultant is always one tap away.</li>
+        <li>Finish swatches, trust cues and accordions tuned for one-hand use (built).</li>
+      </ul>
+      <h4>Collection &amp; search</h4>
+      <ul>
+        <li>Bottom-sheet Filter/Sort (built); prominent, predictive search entry.</li>
+        <li>Large tap targets (≥44px), generous spacing, no hover-dependent actions.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <ul><li>Slide-in drawer (built); back affordance on deep screens (built).</li></ul>
+      <h4>WhatsApp accessibility</h4>
+      <ul><li>Reachable on every template — sticky on PDP, floating elsewhere — never obscuring content or the home indicator.</li></ul>
+      <h4>Performance</h4>
+      <ul>
+        <li>Compress &amp; lazy-load imagery; reserve aspect-ratio boxes to avoid layout shift.</li>
+        <li>Restrained motion only; respect <code>prefers-reduced-motion</code>; no parallax.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Section 08 — Mobile</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 9. CONVERSION -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 09</span><h2>Conversion optimization</h2></div>
+  <div class="cols tri">
+    <div>
+      <h4>Trust builders</h4>
+      <ul>
+        <li>Secure, insured delivery assurance</li>
+        <li>Handcrafted-in-India provenance</li>
+        <li>Material transparency &amp; care</li>
+        <li>Customization confidence</li>
+        <li>Easy, human consultation</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Lead generation</h4>
+      <ul>
+        <li>WhatsApp design consultant</li>
+        <li>Book a Design Consultation</li>
+        <li>Interior-design assistance</li>
+        <li>Trade programme enquiry (built)</li>
+        <li>Material sample request</li>
+      </ul>
+    </div>
+    <div>
+      <h4>High-intent placements</h4>
+      <ul>
+        <li><strong>PDP buy box:</strong> WhatsApp · Sample · Customization</li>
+        <li><strong>Sticky mobile bar:</strong> Add to Cart · WhatsApp</li>
+        <li><strong>Collection &amp; room pages:</strong> Book Consultation</li>
+        <li><strong>Footer &amp; nav:</strong> Trade · Consultation</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Additional high-converting features</h3>
+  <div class="cols">
+    <ul>
+      <li><strong>Recently viewed</strong> — quiet rail, aids return-to-purchase.</li>
+      <li><strong>Save for later / wishlist</strong> — persistent, syncs to account.</li>
+      <li><strong>Shop the Look / room galleries</strong> — raises AOV, sells vignettes.</li>
+      <li><strong>Material Library</strong> — provenance hub, links from PDPs.</li>
+    </ul>
+    <ul>
+      <li><strong>Design consultation booking</strong> — calendar or WhatsApp-led.</li>
+      <li><strong>Designer recommendations</strong> — curated "designer favourites".</li>
+      <li><strong>Considered</strong>, later: product comparison, rug visualizer (only if fast &amp; genuinely useful).</li>
+    </ul>
+  </div>
+  <div class="callout"><h4>Avoid</h4><p>Gimmicks, countdown timers, discount pop-ups, heavy animation, anything that slows the page or cheapens the brand. Speed and calm <em>are</em> the luxury.</p></div>
+  <div class="foot"><span>Section 09 — Conversion</span><span>Art Avenue</span></div>
+</section>
+
+<!-- 10. PRIORITY -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 10</span><h2>Priority ranking</h2></div>
+  <p>Sequenced by impact-to-effort. Build the Must-Haves first — they carry most of the conversion lift.</p>
+  <div class="matrix">
+    <div>
+      <h4><span class="pill must">Must have</span></h4>
+      <ul>
+        <li>WhatsApp "Design Consultant" CTA (PDP + sticky mobile)</li>
+        <li>Request Fabric / Finish Sample (furniture &amp; upholstery)</li>
+        <li>"Need Help Choosing a Rug Size?" + Rug Size Guide</li>
+        <li>PDP trust + delivery confidence near buy box</li>
+        <li>Rug Shop-by-Size / Room / Material</li>
+        <li>Mobile WhatsApp accessibility</li>
+      </ul>
+    </div>
+    <div>
+      <h4><span class="pill should">Should have</span></h4>
+      <ul>
+        <li>Quick view &amp; save-for-later on collections</li>
+        <li>Mega-menu Shop-by-Room/Style/Material + designer picks</li>
+        <li>Shop the Look on PDP &amp; room pages</li>
+        <li>Request Customization &amp; Book Consultation flows</li>
+        <li>Predictive search with imagery</li>
+        <li>Recently viewed rail</li>
+      </ul>
+    </div>
+    <div>
+      <h4><span class="pill nice">Nice to have</span></h4>
+      <ul>
+        <li>Material Library hub</li>
+        <li>Designer recommendation engine</li>
+        <li>Product comparison</li>
+        <li>Rug visualizer (AR / in-room)</li>
+        <li>Looping material clips on PDP</li>
+        <li>Account-synced wishlist</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><h4>Suggested build order</h4><p>① WhatsApp CTA + Fabric/Finish Sample (every PDP) → ② Rug Size Guide + rug merchandising → ③ Collection quick-view &amp; mega-menu routes → ④ Shop-the-Look, consultation booking, recently-viewed. Each ships independently and compounds.</p></div>
+  <div class="foot"><span>Section 10 — Priority</span><span>Art Avenue</span></div>
+</section>
+
+<!-- SHOPIFY -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Appendix</span><h2>Shopify · Prestige implementation plan</h2></div>
+  <p>The design maps cleanly onto Prestige's section architecture — most of it is theme settings and existing sections; only a few items need light custom Liquid/CSS. Our design tokens drop straight into Prestige's typography &amp; colour settings.</p>
+
+  <h4>Foundations → theme settings</h4>
+  <div class="kv">
+    <dt>Colours</dt><dd>Set Prestige colour schemes from <code>tokens/colors.css</code>: page = ivory <code>#FAF6EF</code>, text = charcoal <code>#2B2824</code>, accent = bronze <code>#9C7C4E</code>, dark scheme = espresso <code>#221F1B</code>.</dd>
+    <dt>Type</dt><dd>Heading = Cormorant Garamond, Body = Jost (Prestige supports custom fonts; upload licensed faces or use the Google Fonts substitutes documented in the system).</dd>
+    <dt>Shape</dt><dd>Corner radius → near-square; buttons → letterspaced uppercase; hairline borders.</dd>
+  </div>
+
+  <h4>Templates → Prestige sections</h4>
+  <table class="audit">
+    <thead><tr><th>Our screen</th><th>Prestige building blocks</th></tr></thead>
+    <tbody>
+      <tr><td>Homepage</td><td>Image-with-text (hero), Collection-list (Signature/Rooms), Image-with-text (Atelier), Featured-collection (New Arrivals), Slideshow/Image-banner (Featured), Rich-text/Newsletter, Blog-posts (Journal).</td></tr>
+      <tr><td>Collection</td><td>Native collection template + Prestige filtering (Search &amp; Discovery); custom blocks for editorial intro &amp; merchandising rows.</td></tr>
+      <tr><td>Product</td><td>Native product section (gallery, buy buttons, blocks) + <strong>custom blocks</strong>: WhatsApp CTA, Sample request, Materials, Rug-size launcher.</td></tr>
+      <tr><td>Trade / Consultation</td><td>Page template + a Shopify Form (or Form app) — fields per our spec.</td></tr>
+      <tr><td>Rug Size Guide</td><td>Page + custom section/snippet; PDP launcher via a drawer snippet.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Custom work (minimise it)</h4>
+  <ul>
+    <li><strong>WhatsApp CTA</strong> — a small product-block snippet building the <code>wa.me</code> link from <code>{{ product.title }}</code>, <code>{{ product.selected_variant.sku }}</code>, <code>{{ shop.url }}{{ product.url }}</code>. URL-encode the text param.</li>
+    <li><strong>Fabric/Finish Sample &amp; Customization</strong> — product-form variant, a linked Form page, or WhatsApp (your choice) — gate by product type/tag (e.g. <code>furniture</code>, <code>upholstery</code>).</li>
+    <li><strong>Rug Size Guide</strong> — a snippet rendered in a drawer on products tagged <code>rug</code>, plus a standalone page.</li>
+    <li><strong>Merchandising rows / Shop-by-*</strong> — linked-collection tiles, no code.</li>
+  </ul>
+  <div class="kv">
+    <dt>Maintainability</dt><dd>Everything above lives in theme settings + a handful of Liquid blocks — editable by your team, upgrade-safe.</dd>
+    <dt>Performance</dt><dd>Use Prestige's native lazy-load &amp; responsive images; keep custom JS minimal; no render-blocking widgets.</dd>
+    <dt>Handoff</dt><dd>This design system (tokens, components, screen specs) is the source of truth; it can be bundled for your developer on request.</dd>
+  </div>
+  <div class="callout"><h4>What I need from you to wire it up</h4><p>① Your WhatsApp Business number. ② Confirmation of how Sample/Customization should behave (WhatsApp vs form vs cart). ③ Access route for the dev (or ask me for the downloadable handoff package). I cannot publish to your store directly, but with these I can produce copy-paste-ready Liquid snippets and a step-by-step Prestige setup.</p></div>
+  <div class="foot"><span>Appendix — Shopify</span><span>Art Avenue Design House</span></div>
+</section>
+
+</body>
+</html>

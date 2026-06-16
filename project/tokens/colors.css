@@ -1,0 +1,62 @@
+/* Art Avenue — Color System
+ * Warm, quiet luxury. Ivory canvas, stone neutrals, muted bronze accent,
+ * deep warm charcoal ink. No pure black, no pure white in surfaces.
+ */
+:root {
+  /* ---- Base neutrals (warm greige scale, light → deep) ---- */
+  --aa-warm-white: #FCFAF6;
+  --aa-ivory:      #FAF6EF; /* primary page background */
+  --aa-canvas:     #F4EEE3; /* alternating section background */
+  --aa-stone:      #EAE1D3; /* raised surface / stone beige */
+  --aa-sand:       #DCD1BD; /* deeper neutral fill */
+  --aa-clay:       #C9BCA4; /* quiet muted fill */
+
+  /* ---- Hairlines & borders ---- */
+  --aa-border:        #DCD2C1;
+  --aa-border-strong: #C3B7A1;
+
+  /* ---- Ink (warm charcoal scale) ---- */
+  --aa-charcoal: #2B2824; /* primary text */
+  --aa-ink:      #46413A; /* secondary text */
+  --aa-stone-600:#766E61; /* muted / captions */
+  --aa-stone-400:#9C9384; /* disabled / faint */
+
+  /* ---- Bronze accent ---- */
+  --aa-bronze:      #9C7C4E; /* primary accent */
+  --aa-bronze-deep: #7B6038; /* pressed / hover accent */
+  --aa-bronze-soft: #B89A6E; /* lighter accent */
+  --aa-bronze-tint: #ECE1CE; /* accent wash background */
+
+  /* ---- Dark surface (footer / contrast sections) ---- */
+  --aa-espresso: #221F1B; /* deep warm near-black surface */
+  --aa-espresso-soft: #36322B;
+
+  --aa-white: #FFFFFF;
+
+  /* ===== Semantic aliases ===== */
+  --surface-page:        var(--aa-ivory);
+  --surface-alt:         var(--aa-canvas);
+  --surface-raised:      var(--aa-warm-white);
+  --surface-stone:       var(--aa-stone);
+  --surface-accent-tint: var(--aa-bronze-tint);
+  --surface-dark:        var(--aa-espresso);
+  --surface-dark-soft:   var(--aa-espresso-soft);
+
+  --text-primary:   var(--aa-charcoal);
+  --text-secondary: var(--aa-ink);
+  --text-muted:     var(--aa-stone-600);
+  --text-faint:     var(--aa-stone-400);
+  --text-accent:    var(--aa-bronze-deep);
+  --text-on-dark:   var(--aa-ivory);
+  --text-on-dark-muted: #B7AE9E;
+
+  --border-hairline: var(--aa-border);
+  --border-strong:   var(--aa-border-strong);
+  --border-on-dark:  rgba(250, 246, 239, 0.16);
+
+  --accent:      var(--aa-bronze);
+  --accent-deep: var(--aa-bronze-deep);
+  --accent-soft: var(--aa-bronze-soft);
+
+  --focus-ring: 0 0 0 2px var(--aa-ivory), 0 0 0 3px var(--aa-bronze);
+}

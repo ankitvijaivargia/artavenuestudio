@@ -1,0 +1,52 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Eyebrows & Badges" subtitle="Section labels and product cues" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-page); color: var(--text-primary); }
+  .wrap { padding: 28px 32px; display: grid; gap: 24px; }
+  .group { display: grid; gap: 14px; }
+  .lbl { font-size: 11px; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-muted); }
+  .rowflex { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .darkbar { background: var(--surface-dark); padding: 14px 18px; border-radius: var(--radius-xs); display: inline-flex; gap: 16px; }
+</style>
+</head>
+<body>
+  <div id="root" class="wrap"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script type="text/babel">
+    const { Eyebrow, Badge } = window.ArtAvenueDesignSystem_70ed11;
+    function Demo() {
+      return (
+        <>
+          <div className="group">
+            <div className="lbl">Eyebrow</div>
+            <div className="rowflex">
+              <Eyebrow rule>Signature Collections</Eyebrow>
+              <Eyebrow tone="muted" rule>The Atelier</Eyebrow>
+              <span className="darkbar"><Eyebrow tone="on-dark">Trade &amp; Design</Eyebrow></span>
+            </div>
+          </div>
+          <div className="group">
+            <div className="lbl">Badge</div>
+            <div className="rowflex">
+              <Badge variant="solid">Best Seller</Badge>
+              <Badge variant="tint">New Arrival</Badge>
+              <Badge variant="outline">Made to Order</Badge>
+              <Badge variant="accent">Limited</Badge>
+              <Badge variant="outline" dot>In Stock</Badge>
+            </div>
+          </div>
+        </>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+  </script>
+</body>
+</html>

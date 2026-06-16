@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Art Avenue — Product Architecture & Configuration</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css" />
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--aa-clay); font-family: var(--font-sans); color: var(--text-primary); font-size: 15px; line-height: 1.7; }
+  .page { background: var(--surface-page); width: 860px; max-width: 100%; margin: 28px auto; padding: 88px 92px; box-shadow: var(--shadow-raised); }
+  .page + .page { margin-top: 0; }
+  .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--text-accent); display: inline-flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
+  h1 { font-family: var(--font-serif); font-weight: 500; font-size: 56px; line-height: 1.04; letter-spacing: var(--tracking-tight); margin: 20px 0 0; }
+  h2 { font-family: var(--font-serif); font-weight: 500; font-size: 34px; line-height: 1.1; letter-spacing: var(--tracking-tight); margin: 0 0 6px; }
+  h3 { font-family: var(--font-serif); font-weight: 500; font-size: 23px; margin: 30px 0 8px; }
+  h4 { font-family: var(--font-sans); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); margin: 22px 0 8px; }
+  p { margin: 0 0 14px; color: var(--text-secondary); max-width: 64ch; }
+  .lead { font-size: 18px; font-weight: 300; line-height: 1.65; color: var(--text-secondary); }
+  strong { color: var(--text-primary); font-weight: 600; }
+  em { color: var(--text-accent); }
+  a { color: var(--text-accent); }
+  ul, ol { margin: 0 0 16px; padding-left: 0; list-style: none; }
+  li { position: relative; padding-left: 22px; margin-bottom: 9px; color: var(--text-secondary); max-width: 64ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 11px; width: 6px; height: 1px; background: var(--accent); }
+  .sectnum { font-family: var(--font-serif); font-style: italic; font-size: 17px; color: var(--accent); }
+  .divider { height: 1px; background: var(--border-hairline); margin: 26px 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border-strong); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; }
+  .cols.tri { grid-template-columns: 1fr 1fr 1fr; }
+  .callout { background: var(--surface-accent-tint); border-left: 2px solid var(--accent); padding: 20px 24px; margin: 20px 0; }
+  .callout h4 { margin-top: 0; color: var(--text-accent); }
+  .callout p:last-child { margin-bottom: 0; }
+  table.tbl { width: 100%; border-collapse: collapse; margin: 10px 0 6px; }
+  table.tbl th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 0 14px 10px 0; border-bottom: 1px solid var(--border-strong); vertical-align: bottom; }
+  table.tbl td { vertical-align: top; padding: 12px 14px 12px 0; border-bottom: 1px solid var(--border-hairline); font-size: 13.5px; color: var(--text-secondary); }
+  table.tbl td:first-child { font-family: var(--font-serif); font-size: 16px; color: var(--text-primary); }
+  .config td:first-child { width: 22%; }
+  .qa td:first-child { width: 16%; }
+  .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
+  .chip { font-size: 12px; padding: 7px 13px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-secondary); background: var(--surface-raised); }
+  .chip.on { border-color: var(--accent); color: var(--text-accent); background: var(--surface-accent-tint); }
+  .dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-hairline); display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .matrix { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--border-hairline); border: 1px solid var(--border-hairline); margin-top: 10px; }
+  .matrix > div { background: var(--surface-page); padding: 22px 22px 26px; }
+  .matrix h4 { margin: 0 0 14px; color: var(--text-primary); }
+  .matrix li { font-size: 13.5px; padding-left: 18px; }
+  .matrix li::before { top: 10px; }
+  .pill { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; }
+  .pill.must { background: var(--aa-charcoal); color: var(--aa-ivory); }
+  .pill.should { background: var(--surface-accent-tint); color: var(--text-accent); }
+  .pill.nice { background: transparent; color: var(--text-muted); border: 1px solid var(--border-strong); }
+  .kv { display: grid; grid-template-columns: 170px 1fr; gap: 6px 18px; margin: 4px 0 14px; }
+  .kv dt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding-top: 3px; }
+  .kv dd { margin: 0; color: var(--text-secondary); font-size: 14.5px; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; background: var(--surface-stone); padding: 2px 6px; border-radius: 3px; color: var(--aa-bronze-deep); }
+  .foot { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); margin-top: 50px; padding-top: 16px; border-top: 1px solid var(--border-hairline); }
+  .cover { background: var(--surface-dark); color: var(--text-on-dark); min-height: 1000px; display: flex; flex-direction: column; justify-content: space-between; padding: 92px; }
+  .cover h1 { color: var(--text-on-dark); }
+  .cover .eyebrow { color: var(--accent-soft); } .cover .eyebrow::before { background: var(--accent-soft); }
+  .cover .lead { color: var(--text-on-dark-muted); max-width: 52ch; margin-top: 26px; }
+  .cover .mark { font-family: var(--font-serif); font-weight: 500; font-size: 22px; letter-spacing: .18em; text-transform: uppercase; }
+  .cover .tag { font-size: 9px; letter-spacing: .42em; text-transform: uppercase; color: var(--accent-soft); margin-top: 6px; }
+  .cover .meta { display: flex; gap: 48px; font-size: 12px; color: var(--text-on-dark-muted); }
+  .cover .meta b { display: block; color: var(--text-on-dark); font-weight: 500; margin-bottom: 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  @media print { body { background: #fff; } .page { box-shadow: none; margin: 0; width: 100%; padding: 52px 58px; page-break-after: always; } .cover { min-height: 92vh; } @page { size: A4; margin: 0; } }
+  @media (max-width: 900px) { .page { padding: 48px 26px; } .cols, .cols.tri, .matrix { grid-template-columns: 1fr; } h1 { font-size: 38px; } .cover { padding: 48px 26px; } table.tbl, table.tbl tbody, table.tbl tr, table.tbl td { display: block; width: 100%; } table.tbl thead { display: none; } table.tbl td { padding: 4px 0; border: 0; } table.tbl tr { border-bottom: 1px solid var(--border-hairline); padding: 12px 0; } }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div>
+    <div class="mark">Art Avenue</div>
+    <div class="tag">Design House · Est. India</div>
+  </div>
+  <div>
+    <div class="eyebrow">Volume II · Product Architecture &amp; Configuration</div>
+    <h1>Choosing with<br><em style="color:#EBD9BE">confidence,<br>not hesitation.</em></h1>
+    <p class="lead">How every Art Avenue product is configured, explained and merchandised — a variant architecture and buying-decision framework that removes doubt about size, material and fit, lowers pre-purchase support, and lifts conversion and order value.</p>
+  </div>
+  <div class="meta">
+    <div><b>Companion to</b>Refinement &amp; Conversion Strategy (Vol. I)</div>
+    <div><b>Covers</b>Furniture · Rugs · Cushions · Decor · Lighting · Wall Art</div>
+    <div><b>Platform</b>Shopify · Prestige</div>
+  </div>
+</section>
+
+<!-- 1. PRODUCT ARCHITECTURE -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 01</span><h2>Revised product architecture</h2></div>
+  <p class="lead">A single, consistent configuration model across the catalogue — so every product page feels like the same calm, premium showroom assistant, regardless of category.</p>
+  <div class="divider"></div>
+
+  <h3>The configuration model</h3>
+  <p>Each product is assembled from a predictable stack, revealed through <strong>progressive disclosure</strong> — show the essential choice first, reveal complexity only when the customer asks for it.</p>
+  <ol>
+    <li><strong>Primary variant</strong> — the one decision that changes everything (size for rugs &amp; cushions; size/configuration for furniture). Always visible.</li>
+    <li><strong>Material &amp; finish</strong> — swatches with names and macro imagery; selecting updates the gallery and price.</li>
+    <li><strong>Refinements</strong> — backing, fill, upholstery grade — shown contextually, with a one-line "what this means".</li>
+    <li><strong>Decision support</strong> — size guide, sample request, WhatsApp consultant — adjacent to the choice they support.</li>
+    <li><strong>Customization escape hatch</strong> — "Need a custom size or finish?" → WhatsApp, for anything the variant matrix can't express.</li>
+  </ol>
+  <div class="callout"><h4>Principle — never overwhelm</h4><p>If a product has many options, group them, label them in plain language, and default to the most popular configuration. A buyer should be able to add to cart in one decision, or go deeper if they want to. Price and lead time update live with every choice.</p></div>
+
+  <h3>Live feedback on every change</h3>
+  <div class="cols">
+    <ul><li><strong>Price</strong> updates instantly per variant (cover-only vs cover + filler, size, top material).</li><li><strong>Gallery</strong> swaps to the selected finish/colour where imagery exists.</li></ul>
+    <ul><li><strong>Lead time / availability</strong> reflects the variant ("In stock" vs "Made to order · 3–4 weeks").</li><li><strong>Sample &amp; WhatsApp</strong> CTAs carry the selected configuration into their pre-fill.</li></ul>
+  </div>
+  <div class="foot"><span>Section 01 — Architecture</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 2. VARIANT STRATEGY -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 02</span><h2>Variant strategy by category</h2></div>
+
+  <h3>Furniture</h3>
+  <table class="tbl config">
+    <thead><tr><th>Option</th><th>Values (examples)</th><th>UI pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Size / Config</td><td>4 / 6 / 8 Seater · Small / Medium / Large · Custom Size</td><td>Segmented chips; "Custom" opens WhatsApp.</td></tr>
+      <tr><td>Finish</td><td>Natural Oak · Walnut · Dark Walnut · Black · Distressed</td><td>Named swatches w/ macro image; updates gallery + price.</td></tr>
+      <tr><td>Material</td><td>Mango · Teak · Oak Veneer · Marble Top</td><td>Swatches + "Wood Guide" link.</td></tr>
+      <tr><td>Upholstery</td><td>Fabric · Leather · Performance Fabric</td><td>Grade chips + swatch tray; "Request Fabric Sample".</td></tr>
+      <tr><td>Customization</td><td>—</td><td><em>"Need a Custom Size or Finish?"</em> → WhatsApp.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Rugs</h3>
+  <table class="tbl config">
+    <thead><tr><th>Option</th><th>Values (examples)</th><th>UI pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Size</td><td>3×5 · 4×6 · 5×8 · 6×9 · 8×10 · 9×12 · Custom</td><td>Size chips + <em>"Need Help Choosing a Rug Size?"</em> launcher.</td></tr>
+      <tr><td>Backing</td><td>With Backing · Without Backing</td><td>Toggle w/ one-line benefit ("grip &amp; protect floors").</td></tr>
+      <tr><td>Material (printed)</td><td>Cotton · Super-Soft Cotton Chenille</td><td>Two cards comparing feel · durability · best use.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><h4>Rug material explainer (required)</h4>
+    <p><strong>Cotton</strong> — crisp, breathable, easy-care; best for low-traffic &amp; layering. <strong>Super-Soft Cotton Chenille</strong> — plush underfoot, denser pile, more durable; best for living rooms &amp; bedrooms. Present as two side-by-side cards with a feel/durability/use-case line each, so the choice is obvious.</p>
+  </div>
+
+  <h3>Cushions</h3>
+  <table class="tbl config">
+    <thead><tr><th>Option</th><th>Values (examples)</th><th>UI pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Size</td><td>16×16 · 18×18 · 20×20 · 24×24</td><td>Size chips; live price.</td></tr>
+      <tr><td>Fill</td><td>Cover Only · Cover + Filler</td><td>Two options w/ benefit + dynamic price ("+ feather-down insert").</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Decor · Lighting · Wall Art</h3>
+  <table class="tbl config">
+    <thead><tr><th>Category</th><th>Typical variants</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Lighting</td><td>Finish (brass/black/stone) · Size · Bulb type</td><td>Add a fixture-type/installation note; voltage for export.</td></tr>
+      <tr><td>Decor</td><td>Size · Finish/colour · Set quantity</td><td>Often single-variant; keep it simple.</td></tr>
+      <tr><td>Wall Art</td><td>Size · Frame option · Medium</td><td>Frame as swatch; "framed vs unframed" line.</td></tr>
+    </tbody>
+  </table>
+  <div class="foot"><span>Section 02 — Variants</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 3. BUYING DECISION FRAMEWORK -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 03</span><h2>Buying decision framework</h2></div>
+  <p>Every high-ticket purchase clears five kinds of doubt. The PDP should answer each, in this order, before the customer has to ask.</p>
+  <table class="tbl">
+    <thead><tr><th>Confidence</th><th>What the customer needs</th><th>On-page solution</th></tr></thead>
+    <tbody>
+      <tr><td>Visual</td><td>"What does it really look like, at scale, in a room?"</td><td>Lifestyle-first gallery, craftsmanship macros, scale/in-room reference shot, finish-accurate imagery.</td></tr>
+      <tr><td>Material</td><td>"What is it made of, and will it last?"</td><td>Materials block + construction notes + care; Wood/Finish/Upholstery guides; <strong>Request Sample</strong>.</td></tr>
+      <tr><td>Size</td><td>"Will it fit my space?"</td><td>Dimension diagram, room-placement visual, size-comparison graphic; <strong>Rug Size Guide</strong>; "Will it fit?" note.</td></tr>
+      <tr><td>Trust</td><td>"Can I rely on the brand &amp; delivery?"</td><td>Delivery timeline, assembly &amp; delivery info, handcrafted process, warranty, returns — near the buy box.</td></tr>
+      <tr><td>Purchase</td><td>"What if I'm still unsure?"</td><td><strong>WhatsApp consultant</strong>, <strong>sample</strong>, <strong>customization</strong>, consultation booking.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><h4>The rule</h4><p>If a buyer would have to message you to ask it, the page should already answer it — or offer the one-tap WhatsApp path. Every answered question is a recovered conversion and a support request avoided.</p></div>
+  <div class="foot"><span>Section 03 — Decision Framework</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 4. CUSTOMER QUESTIONS AUDIT -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 04</span><h2>Customer questions audit</h2></div>
+  <p>By category: the questions, the hesitation, the abandonment trigger, and the fix.</p>
+
+  <h3>Furniture</h3>
+  <table class="tbl qa">
+    <thead><tr><th>Theme</th><th>Hesitation / abandonment</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr><td>Size &amp; fit</td><td>"Will it fit through my door / in my room?"</td><td>Dimensions + packaged size + room-placement visual + "Will it fit?" note.</td></tr>
+      <tr><td>Material feel</td><td>Can't judge fabric/wood online → delay.</td><td>Macro imagery, material story, <strong>Request Fabric/Finish Sample</strong>.</td></tr>
+      <tr><td>Lead time</td><td>"When will made-to-order arrive?"</td><td>Per-variant lead time + delivery estimator near price.</td></tr>
+      <tr><td>Durability</td><td>"Is it built to last?"</td><td>Construction/joinery notes, warranty, care.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Rugs</h3>
+  <table class="tbl qa">
+    <thead><tr><th>Theme</th><th>Hesitation / abandonment</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr><td>Size</td><td>#1 abandonment — fear of wrong size.</td><td><strong>Rug Size Guide</strong> + placement guide + per-room size recs.</td></tr>
+      <tr><td>Feel / pile</td><td>Cotton vs chenille unclear.</td><td>Material comparison cards (feel · durability · use).</td></tr>
+      <tr><td>Backing &amp; care</td><td>Slipping, cleaning concerns.</td><td>Backing toggle w/ benefit; care notes.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cushions</h3>
+  <table class="tbl qa">
+    <thead><tr><th>Theme</th><th>Hesitation / abandonment</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr><td>Cover vs filler</td><td>"Does the price include the insert?"</td><td>Explicit Fill option + dynamic price + benefit line.</td></tr>
+      <tr><td>Size &amp; styling</td><td>"Which size, how many?"</td><td>Size guide + styling combinations ("mix 20×20 + 18×18").</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Decor · Lighting · Wall Art</h3>
+  <table class="tbl qa">
+    <thead><tr><th>Theme</th><th>Hesitation / abandonment</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr><td>Scale</td><td>"How big is it actually?"</td><td>Scale reference shot + dimensions; hanging height for art.</td></tr>
+      <tr><td>Lighting fit</td><td>Bulb, voltage, install, drop length.</td><td>Spec block + install note; export voltage; "Pair With" shades.</td></tr>
+      <tr><td>Art framing</td><td>Framed vs unframed, medium.</td><td>Frame swatch + medium explainer + in-room hang visual.</td></tr>
+    </tbody>
+  </table>
+  <div class="foot"><span>Section 04 — Questions Audit</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 5 & 6. TRUST + CONVERSION -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 05 &amp; 06</span><h2>Missing trust signals &amp; conversion features</h2></div>
+  <div class="cols">
+    <div>
+      <h4>Missing trust signals</h4>
+      <ul>
+        <li><strong>Delivery estimator</strong> &amp; per-variant lead-time visibility.</li>
+        <li><strong>Warranty</strong> &amp; returns clarity on PDP.</li>
+        <li><strong>Handcrafted process</strong> explainer per product (not just homepage).</li>
+        <li><strong>Material transparency</strong> — origin, construction, care.</li>
+        <li><strong>Scale/room reference</strong> imagery as standard.</li>
+        <li>Customer Homes / designer credits as social proof.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Missing conversion features</h4>
+      <ul>
+        <li><strong>Sticky Add to Cart + WhatsApp</strong> (desktop &amp; mobile).</li>
+        <li><strong>Request Material Sample</strong> (furniture &amp; upholstery).</li>
+        <li><strong>Rug Size / Placement / Material guides.</strong></li>
+        <li><strong>Finish / Wood / Upholstery guides</strong> (furniture).</li>
+        <li><strong>Cushion size guide + styling combinations.</strong></li>
+        <li>Cross-sell: <strong>Frequently Styled Together · Complete the Room · Designer Recommendations.</strong></li>
+        <li>Shop by Room / Style / Material / Size on collections.</li>
+        <li>Recently viewed · save for later.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><h4>Cross-sell, the luxury way</h4><p>"Complete the Room" and "Frequently Styled Together" should read as a stylist's suggestion, not an upsell — italic serif captions, real room imagery, 3–4 considered pieces. This is the primary AOV lever.</p></div>
+  <div class="foot"><span>Section 05 &amp; 06 — Trust &amp; Conversion</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 7. SHOPIFY ROADMAP -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 07</span><h2>Shopify · Prestige implementation roadmap</h2></div>
+  <p>Maximise native Prestige; minimise custom code. Variants handle configuration; metafields carry the storytelling and decision-support content.</p>
+
+  <h4>Variant architecture</h4>
+  <ul>
+    <li>Model real, purchasable choices as <strong>variants</strong> (size, finish, material, backing, fill) — so price, image, inventory &amp; lead time are native.</li>
+    <li>Keep within Shopify's option limits; where a category needs many finishes, use a <strong>finish swatch metafield</strong> driving variant images rather than exploding the matrix.</li>
+    <li>"Custom size/finish" is <strong>not a variant</strong> — it's a WhatsApp/enquiry CTA.</li>
+  </ul>
+
+  <h4>Custom metafields (content &amp; logic)</h4>
+  <table class="tbl">
+    <thead><tr><th>Metafield</th><th>Type</th><th>Drives</th></tr></thead>
+    <tbody>
+      <tr><td><code>materials</code></td><td>rich text / list</td><td>Materials block + macro images.</td></tr>
+      <tr><td><code>dimensions</code></td><td>rich text / dimension set</td><td>Diagram, "Will it fit?", packaged size.</td></tr>
+      <tr><td><code>lead_time</code></td><td>single line / per-variant</td><td>Availability + delivery estimator.</td></tr>
+      <tr><td><code>care</code> · <code>warranty</code></td><td>rich text</td><td>Trust accordions.</td></tr>
+      <tr><td><code>finish_swatches</code></td><td>list (image + name)</td><td>Named finish/upholstery swatches.</td></tr>
+      <tr><td><code>guide_type</code></td><td>list (rug/wood/upholstery/cushion)</td><td>Which guides &amp; CTAs render.</td></tr>
+      <tr><td><code>room_scenes</code> · <code>styled_with</code></td><td>list / product refs</td><td>Shop-the-Look &amp; cross-sell.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Template &amp; UX changes</h4>
+  <div class="cols">
+    <ul>
+      <li><strong>Product:</strong> sticky buy bar (Add to Cart + WhatsApp + Sample), live-updating variant blocks, metafield-driven Materials/Dimensions/Care, guide launchers (drawer snippets).</li>
+      <li><strong>Collection:</strong> Shop-by-{Room/Style/Material/Size} tile rows, quick-view, merchandising blocks via Prestige sections.</li>
+    </ul>
+    <ul>
+      <li><strong>Mobile:</strong> sticky Add-to-Cart + WhatsApp; bottom-sheet variant pickers &amp; guides; large swatches; bottom-sheet filters.</li>
+      <li><strong>Performance:</strong> native responsive images, lazy-load, reserved aspect ratios; guides as lightweight snippets; minimal JS; respect reduced-motion.</li>
+    </ul>
+  </div>
+  <div class="kv">
+    <dt>Tagging</dt><dd>Use product type / tags (<code>rug</code>, <code>furniture</code>, <code>upholstery</code>, <code>cushion</code>) to conditionally render the right CTAs &amp; guides.</dd>
+    <dt>Maintainability</dt><dd>Merchandisers edit metafields &amp; collections — no code. Custom Liquid limited to the buy-bar, guide drawers &amp; WhatsApp link builder.</dd>
+  </div>
+  <div class="foot"><span>Section 07 — Shopify Roadmap</span><span>Art Avenue · Vol. II</span></div>
+</section>
+
+<!-- 8. PRIORITY -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 08</span><h2>Priority ranking</h2></div>
+  <div class="matrix">
+    <div>
+      <h4><span class="pill must">Must have</span></h4>
+      <ul>
+        <li>Variant architecture per category (size/finish/material/backing/fill)</li>
+        <li>Live price + lead-time + gallery on variant change</li>
+        <li>Sticky Add to Cart + WhatsApp (PDP, desktop &amp; mobile)</li>
+        <li>Request Fabric/Finish Sample (furniture &amp; upholstery)</li>
+        <li>Rug Size Guide + rug material explainer</li>
+        <li>Cushion fill option w/ dynamic price</li>
+        <li>Materials · Dimensions · Delivery near buy box (metafields)</li>
+      </ul>
+    </div>
+    <div>
+      <h4><span class="pill should">Should have</span></h4>
+      <ul>
+        <li>Wood / Finish / Upholstery guides</li>
+        <li>Rug Placement guide; Cushion size + styling combos</li>
+        <li>Delivery estimator &amp; warranty block</li>
+        <li>Shop by Room/Style/Material/Size on collections</li>
+        <li>Complete the Room / Frequently Styled Together</li>
+        <li>Quick view; "Need a custom size/finish?" → WhatsApp</li>
+        <li>Recently viewed · save for later</li>
+      </ul>
+    </div>
+    <div>
+      <h4><span class="pill nice">Nice to have</span></h4>
+      <ul>
+        <li>Material Library hub</li>
+        <li>Designer recommendation engine</li>
+        <li>Product comparison</li>
+        <li>Rug visualizer (in-room / AR)</li>
+        <li>Looping material clips</li>
+        <li>Account-synced wishlist</li>
+        <li>Size-comparison graphics generator</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><h4>Build order</h4><p>① Variant architecture + live feedback + sticky CTAs → ② Sample request + Rug Size Guide + material explainers + metafield content blocks → ③ Category guides + cross-sell + Shop-by-* → ④ Recently-viewed, comparison, visualizer. Each ships independently.</p></div>
+  <p style="margin-top:24px; font-size:13px; color:var(--text-faint)">Continues the <em>Refinement &amp; Conversion Strategy</em> (Vol. I). Together they specify a world-class luxury commerce experience optimised for confidence and conversion.</p>
+  <div class="foot"><span>Section 08 — Priority</span><span>Art Avenue Design House · Vol. II</span></div>
+</section>
+
+</body>
+</html>

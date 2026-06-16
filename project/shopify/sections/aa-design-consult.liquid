@@ -1,0 +1,104 @@
+{%- liquid
+  assign wa = section.settings.whatsapp_number | default: '919828060095' | replace: '+', '' | replace: ' ', '' | replace: '-', ''
+  assign t = product.type | downcase
+  assign tags = product.tags | join: ',' | downcase
+  assign is_rug = false
+  if t contains 'rug' or tags contains 'rug'
+    assign is_rug = true
+  endif
+  assign is_furniture = false
+  if t contains 'furnitur' or t contains 'sofa' or t contains 'chair' or t contains 'table' or t contains 'bed' or t contains 'uphol' or t contains 'seat' or t contains 'bench' or t contains 'sideboard' or t contains 'cabinet' or tags contains 'furniture' or tags contains 'upholstery'
+    assign is_furniture = true
+  endif
+  assign sku = product.selected_or_first_available_variant.sku
+  assign purl = shop.url | append: product.url
+  assign base_msg = 'Hello Art Avenue, I would like to speak with a design consultant about ' | append: product.title
+  if sku != blank
+    assign base_msg = base_msg | append: ' (SKU ' | append: sku | append: ')'
+  endif
+  assign base_msg = base_msg | append: '. ' | append: purl
+  assign sample_msg = 'Hello Art Avenue, I would like to request a fabric / finish sample for ' | append: product.title | append: '. I understand a sample fee of Rs 999 to Rs 2,999 applies depending on the material. ' | append: purl
+  assign custom_msg = 'Hello Art Avenue, I would like a custom size or finish for ' | append: product.title | append: '. ' | append: purl
+  assign rug_msg = 'Hello Art Avenue, I would like help choosing the right rug size for ' | append: product.title | append: '. My room is approximately ____ ft x ____ ft. ' | append: purl
+-%}
+<style>
+.aa-dc{--b:#9C7C4E;--bd:#7B6038;--c:#2B2824;--iv:#FAF6EF;--tint:#ECE1CE;--br:#DCD2C1;--ink:#46413A;--mu:#766E61;margin:22px 0 4px}
+.aa-dc__row{display:flex;flex-direction:column;gap:12px}
+.aa-dc__btn{display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:15px 22px;border:1px solid transparent;border-radius:3px;cursor:pointer;text-decoration:none;line-height:1;transition:background .3s,color .3s,border-color .3s;-webkit-appearance:none}
+.aa-dc__wa{background:var(--c);color:var(--iv)}
+.aa-dc__wa:hover{background:#1c1916;color:var(--iv)}
+.aa-dc__alt{background:transparent;color:var(--c);border-color:var(--br)}
+.aa-dc__alt:hover{background:var(--c);color:var(--iv);border-color:var(--c)}
+.aa-dc__wa svg{width:17px;height:17px;fill:var(--b);flex:none}
+.aa-dc__hint{font-family:inherit;font-size:12px;color:var(--mu);text-align:center;margin:2px 0 0;letter-spacing:.02em}
+.aa-dc__trust{list-style:none;margin:20px 0 0;padding:18px 0 0;border-top:1px solid var(--br);display:grid;gap:11px}
+.aa-dc__trust li{display:flex;gap:11px;align-items:center;font-family:inherit;font-size:14px;color:var(--ink)}
+.aa-dc__trust b{color:var(--bd);font-size:15px;line-height:1;flex:none;font-weight:400}
+.aa-dc-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(250,246,239,.97);border-top:1px solid var(--br);box-shadow:0 -8px 24px -16px rgba(43,40,36,.4)}
+.aa-dc-bar a,.aa-dc-bar button{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border-radius:3px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;-webkit-appearance:none;text-decoration:none}
+.aa-dc-bar__wa{width:54px;flex:none;background:transparent;border-color:#C3B7A1;color:var(--c)}
+.aa-dc-bar__wa svg{width:20px;height:20px;fill:#1c1916}
+.aa-dc-bar__atc{flex:1;background:var(--c);color:var(--iv);padding:15px}
+@media(max-width:749px){.aa-dc-bar{display:flex}}
+.aa-rg{position:fixed;inset:0;z-index:120;display:none}
+.aa-rg.is-open{display:block}
+.aa-rg__s{position:absolute;inset:0;background:rgba(34,31,27,.5)}
+.aa-rg__p{position:absolute;top:0;right:0;bottom:0;width:min(480px,92vw);background:var(--iv);overflow-y:auto;padding:30px 30px 60px;box-shadow:-30px 0 80px -32px rgba(43,40,36,.5);font-family:inherit;color:var(--c)}
+.aa-rg__x{position:absolute;top:18px;right:20px;background:none;border:none;font-size:26px;cursor:pointer;color:var(--c);line-height:1}
+.aa-rg__e{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--bd)}
+.aa-rg h3{font-size:28px;margin:10px 0 8px;font-weight:500}
+.aa-rg p{font-size:14px;line-height:1.6;color:var(--ink);margin:0 0 16px}
+.aa-rg__r{border-top:1px solid var(--br);padding:16px 0}
+.aa-rg__r h4{font-size:15px;margin:0 0 6px}
+.aa-rg__r p{margin:0}
+.aa-rg__z{display:inline-block;font-size:12px;letter-spacing:.04em;color:var(--bd);margin-top:6px;font-weight:600}
+.aa-rg__n{background:var(--tint);padding:14px 16px;border-radius:3px;margin-top:18px}
+.aa-rg__n strong{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--bd);margin-bottom:6px}
+</style>
+{%- capture wg -%}<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 3.5 8.5 3.5 15.5c0 2.4.7 4.7 1.9 6.7L3 29l7-1.8c1.9 1 4 1.6 6 1.6 7 0 12.5-5.5 12.5-12.5S23 3 16 3zm0 22.7c-1.9 0-3.7-.5-5.3-1.5l-.4-.2-4.2 1.1 1.1-4.1-.3-.4a10 10 0 01-1.6-5.6c0-5.7 4.6-10.3 10.3-10.3S26.3 9.8 26.3 15.5 21.7 25.7 16 25.7zm5.7-7.7c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-1.8-.9-3-1.6-4.2-3.6-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6 0-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6 2 .8 2.7.9 3.7.8.6-.1 1.8-.7 2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.2-.6-.4z"/></svg>{%- endcapture -%}
+<div class="aa-dc">
+  <div class="aa-dc__row">
+    <a class="aa-dc__btn aa-dc__wa" href="https://wa.me/{{ wa }}?text={{ base_msg | url_encode }}" target="_blank" rel="noopener">{{ wg }} Speak with a Design Consultant</a>
+    {%- if is_furniture -%}<a class="aa-dc__btn aa-dc__alt" href="https://wa.me/{{ wa }}?text={{ sample_msg | url_encode }}" target="_blank" rel="noopener">Request Fabric / Finish Sample · from ₹999</a>{%- endif -%}
+    {%- if is_rug -%}<button type="button" class="aa-dc__btn aa-dc__alt" onclick="document.getElementById('aa-rug-guide').classList.add('is-open');document.body.style.overflow='hidden'">Need Help Choosing a Rug Size?</button>{%- else -%}<a class="aa-dc__btn aa-dc__alt" href="https://wa.me/{{ wa }}?text={{ custom_msg | url_encode }}" target="_blank" rel="noopener">Need a Custom Size or Finish?</a>{%- endif -%}
+  </div>
+  <p class="aa-dc__hint">Replies within business hours &middot; complimentary, no obligation</p>
+  <ul class="aa-dc__trust">
+    <li><b>&#9670;</b> Handcrafted in India &middot; made to order</li>
+    <li><b>&#9670;</b> Safe, insured delivery &middot; assembly help on select pieces</li>
+    <li><b>&#9670;</b> Customization &amp; international shipping available</li>
+  </ul>
+</div>
+<div class="aa-dc-bar">
+  <a class="aa-dc-bar__wa" href="https://wa.me/{{ wa }}?text={{ base_msg | url_encode }}" target="_blank" rel="noopener" aria-label="WhatsApp a design consultant">{{ wg }}</a>
+  <button type="button" class="aa-dc-bar__atc" onclick="var f=document.querySelector('product-form form, form[action*=&quot;/cart/add&quot;]');if(f){if(f.requestSubmit){f.requestSubmit()}else{f.submit()}}">Add to Cart</button>
+</div>
+{%- if is_rug -%}
+<div id="aa-rug-guide" class="aa-rg">
+  <div class="aa-rg__s" onclick="this.parentNode.classList.remove('is-open');document.body.style.overflow=''"></div>
+  <div class="aa-rg__p">
+    <button class="aa-rg__x" aria-label="Close" onclick="document.getElementById('aa-rug-guide').classList.remove('is-open');document.body.style.overflow=''">&times;</button>
+    <div class="aa-rg__e">Rug Size Guide</div>
+    <h3>Choosing the right size</h3>
+    <p>The most common mistake is going too small. A rug should sit under the main furniture and anchor the arrangement &mdash; not float in the middle of the room.</p>
+    <div class="aa-rg__r"><h4>Living Room</h4><p>Front legs of the sofa and chairs rest on the rug; leave 20&ndash;25 cm of floor around the edges.</p><span class="aa-rg__z">Recommended &middot; 8&times;10 ft / 9&times;12 ft</span></div>
+    <div class="aa-rg__r"><h4>Dining Room</h4><p>The rug must extend ~60 cm beyond the table so chairs stay on it when pulled out.</p><span class="aa-rg__z">Recommended &middot; 8&times;10 ft (6-seat) &middot; 9&times;12 ft (8-seat)</span></div>
+    <div class="aa-rg__r"><h4>Bedroom</h4><p>Place two-thirds under the bed with a soft border either side to step onto, or use runners on each side.</p><span class="aa-rg__z">Recommended &middot; 8&times;10 ft (queen) &middot; 9&times;12 ft (king)</span></div>
+    <div class="aa-rg__r"><h4>Runners &amp; Hallways</h4><p>Leave 10&ndash;15 cm of floor on each side; for hallways choose a runner ~50 cm narrower than the corridor.</p><span class="aa-rg__z">Recommended &middot; 2.5&times;8 ft / 2.5&times;10 ft</span></div>
+    <div class="aa-rg__n"><strong>Common mistakes to avoid</strong>A rug too small for the seating &middot; a dining rug that traps chair legs &middot; no border in the bedroom. When in doubt, size up.</div>
+    <a class="aa-dc__btn aa-dc__wa" style="margin-top:22px" href="https://wa.me/{{ wa }}?text={{ rug_msg | url_encode }}" target="_blank" rel="noopener">{{ wg }} Ask a consultant for my room</a>
+  </div>
+</div>
+{%- endif -%}
+{% schema %}
+{
+  "name": "AA Consult & CTAs",
+  "tag": "section",
+  "class": "aa-dc-section",
+  "settings": [
+    { "type": "paragraph", "content": "WhatsApp consultant CTA, Fabric/Finish Sample (furniture), Rug Size Guide (rugs), trust row, and sticky mobile Add-to-Cart + WhatsApp bar. Category auto-detected from product type/tags." },
+    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number (digits, with country code)", "default": "919828060095" }
+  ],
+  "presets": [{ "name": "AA Consult & CTAs" }]
+}
+{% endschema %}

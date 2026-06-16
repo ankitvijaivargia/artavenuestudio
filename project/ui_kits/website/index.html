@@ -1,0 +1,72 @@
+<!-- @dsCard group="Website" viewport="1320x880" name="Art Avenue — Homepage" subtitle="Interactive: home · collection · product" -->
+<!-- @startingPoint section="Website" subtitle="Luxury furniture storefront — full clickable site" viewport="1320x880" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Art Avenue — Design House</title>
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--surface-page); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  @keyframes aaFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes aaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .aa-route { animation: aaRise var(--dur-slow) var(--ease-luxe); }
+  ::selection { background: var(--accent-soft); color: #fff; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+
+  <script type="text/babel" src="parts.jsx"></script>
+  <script type="text/babel" src="HomePage.jsx"></script>
+  <script type="text/babel" src="CollectionPage.jsx"></script>
+  <script type="text/babel" src="ProductPage.jsx"></script>
+  <script type="text/babel" src="RugProductPage.jsx"></script>
+  <script type="text/babel" src="CushionProductPage.jsx"></script>
+  <script type="text/babel" src="MaterialLibrary.jsx"></script>
+  <script type="text/babel" src="TradePage.jsx"></script>
+  <script type="text/babel" src="CustomBespokePage.jsx"></script>
+
+  <script type="text/babel" data-presets="react">
+    function App() {
+      const [route, setRoute] = React.useState({ name: "home", arg: null });
+      const navigate = (name, arg) => {
+        setRoute({ name, arg });
+        window.scrollTo({ top: 0, behavior: "auto" });
+      };
+
+      window.AAnavigate = navigate;
+
+      let page;
+      if (route.name === "collection") page = <window.AACollectionPage onNavigate={navigate} title={route.arg} />;
+      else if (route.name === "product") page = /rug/i.test(route.arg || "") ? <window.AARugProductPage onNavigate={navigate} name={route.arg} /> : /cushion/i.test(route.arg || "") ? <window.AACushionProductPage onNavigate={navigate} name={route.arg} /> : <window.AAProductPage onNavigate={navigate} name={route.arg} />;
+      else if (route.name === "trade") page = <window.AATradePage onNavigate={navigate} />;
+      else if (route.name === "custom") page = <window.AACustomBespokePage onNavigate={navigate} />;
+      else if (route.name === "library") page = <window.AAMaterialLibrary onNavigate={navigate} name={route.arg} />;
+      else page = <window.AAHomePage onNavigate={navigate} />;
+
+      return (
+        <React.Fragment>
+          <window.AAAnnounceBar />
+          <window.AAHeader onNavigate={navigate} transparent={route.name === "home"} />
+          <div className="aa-route" key={route.name + (route.arg || "")}>{page}</div>
+          <window.AAFooter onNavigate={navigate} />
+        </React.Fragment>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

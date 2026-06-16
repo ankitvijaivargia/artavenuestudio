@@ -1,0 +1,29 @@
+{
+  "_comment": "Art Avenue — Shopify metafield definitions. Namespace 'aa'. Apply via Admin GraphQL metafieldDefinitionCreate or Shopify CLI. Enum choices come from enums.json. Storefront reads these; merchants edit them — never the theme.",
+
+  "product": [
+    { "namespace": "aa", "key": "preset", "name": "Preset", "type": "single_line_text_field", "description": "Seeds fulfillment + visibility + module defaults. See presets.json.", "validations": [{ "name": "choices", "value": "enums.json#/preset" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "fulfillment", "name": "Fulfillment Type", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/fulfillment" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "visibility", "name": "Visibility Mode", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/visibility" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "lifecycle", "name": "Lifecycle State", "type": "single_line_text_field", "description": "active · coming-soon · seasonal · discontinued · archive", "validations": [{ "name": "choices", "value": "enums.json#/lifecycle" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "cta_primary", "name": "Primary CTA (override)", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/cta" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "cta_secondary", "name": "Secondary CTA (override)", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/cta" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "size_mode", "name": "Size Mode", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/size_mode" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "fixed_size", "name": "Fixed Size", "type": "single_line_text_field", "description": "Label + price when size_mode = fixed, e.g. '5 × 8 ft | 54000'.", "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "lead_time", "name": "Lead Time", "type": "single_line_text_field", "description": "Human label, e.g. '3–4 weeks'. Falls back to fulfillment default.", "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "modules", "name": "Modules (visibility map)", "type": "json", "description": "Per-module booleans, e.g. {\"construction\":true,\"care\":false}. Absent key = preset default.", "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "module_order", "name": "Module Order", "type": "list.single_line_text_field", "description": "Ordered module keys. Absent = preset default order.", "validations": [{ "name": "choices", "value": "enums.json#/module" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "commerce_badge", "name": "Collection Card Badge", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/commerce_badge" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "materials", "name": "Materials", "type": "list.metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "material" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "finishes", "name": "Finishes", "type": "list.metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "finish" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "upholstery", "name": "Upholstery", "type": "list.metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "upholstery" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "craft_technique", "name": "Craft Technique", "type": "metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "craft_technique" }], "ownerType": "PRODUCT" },
+    { "namespace": "aa", "key": "project_types", "name": "Project Types", "type": "list.metaobject_reference", "validations": [{ "name": "metaobject_definition", "value": "project_type" }], "ownerType": "PRODUCT" }
+  ],
+
+  "collection": [
+    { "namespace": "aa", "key": "collection_type", "name": "Collection Type", "type": "single_line_text_field", "validations": [{ "name": "choices", "value": "enums.json#/collection_type" }], "ownerType": "COLLECTION" },
+    { "namespace": "aa", "key": "force_badge", "name": "Force Card Badge", "type": "single_line_text_field", "description": "Override every card badge in this collection.", "validations": [{ "name": "choices", "value": "enums.json#/commerce_badge" }], "ownerType": "COLLECTION" },
+    { "namespace": "aa", "key": "enquiry_cta", "name": "Enquiry CTA", "type": "single_line_text_field", "description": "For project/trade collections — replaces Add to Cart on cards.", "validations": [{ "name": "choices", "value": "enums.json#/cta" }], "ownerType": "COLLECTION" }
+  ]
+}

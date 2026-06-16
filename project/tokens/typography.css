@@ -1,0 +1,47 @@
+/* Art Avenue — Typography
+ * Cormorant Garamond (serif display/editorial) + Jost (sans body/UI).
+ * Large editorial scale, generous line-height, restrained tracking.
+ */
+:root {
+  /* ---- Families ---- */
+  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-sans:  "Jost", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Fluid editorial scale ---- */
+  --text-display-1: clamp(3.5rem, 6.5vw, 6.25rem);  /* hero statements */
+  --text-display-2: clamp(2.75rem, 5vw, 4.5rem);    /* section openers */
+  --text-h1: clamp(2.25rem, 3.6vw, 3.25rem);
+  --text-h2: clamp(1.85rem, 2.8vw, 2.5rem);
+  --text-h3: clamp(1.4rem, 1.8vw, 1.75rem);
+  --text-h4: 1.25rem;
+  --text-body-lg: 1.1875rem; /* 19px — lead paragraphs */
+  --text-body:    1.0625rem; /* 17px — default body */
+  --text-sm:      0.9375rem; /* 15px */
+  --text-xs:      0.8125rem; /* 13px */
+  --text-eyebrow: 0.75rem;   /* 12px letterspaced label */
+
+  /* ---- Weights ---- */
+  --weight-light:   300;
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+
+  /* ---- Line height ---- */
+  --leading-display: 1.04;
+  --leading-tight:   1.12;
+  --leading-snug:    1.28;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.72; /* editorial body */
+
+  /* ---- Tracking ---- */
+  --tracking-eyebrow: 0.24em;
+  --tracking-caps:    0.14em;
+  --tracking-tight:  -0.015em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal:  0;
+
+  /* ---- Reading widths ---- */
+  --measure-narrow: 38ch;
+  --measure:        62ch;
+  --measure-wide:   74ch;
+}

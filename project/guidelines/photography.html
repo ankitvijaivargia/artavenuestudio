@@ -1,0 +1,29 @@
+<!-- @dsCard group="Brand" viewport="700x230" name="Photography direction" subtitle="Warm, editorial, lived-in — never catalog" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-page); color: var(--text-primary); }
+  .wrap { padding: 24px 28px; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 12px; align-items: stretch; }
+  .fig { position: relative; height: 150px; border-radius: var(--radius-xs); overflow: hidden;
+         background:
+           radial-gradient(120% 90% at 30% 20%, rgba(255,255,255,.5), transparent 60%),
+           linear-gradient(150deg, var(--aa-clay), var(--aa-sand) 55%, var(--aa-stone)); }
+  .fig.cool { background: linear-gradient(150deg, #c8bfaf, #b6a88f 60%, #9c8e74); }
+  .fig.dark { background: linear-gradient(150deg, #4a4036, #322b22); }
+  .fig .cap { position: absolute; left: 12px; bottom: 10px; font-family: var(--font-serif); font-style: italic; font-size: 14px; color: var(--aa-warm-white); text-shadow: 0 1px 6px rgba(0,0,0,.3); }
+  .note { grid-column: 1 / -1; margin-top: 4px; font-size: 12px; color: var(--text-muted); letter-spacing: .02em; line-height: 1.5; }
+  .note b { color: var(--text-secondary); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="fig"><span class="cap">Lived-in interiors</span></div>
+    <div class="fig cool"><span class="cap">Material close-ups</span></div>
+    <div class="fig dark"><span class="cap">The artisan's hand</span></div>
+    <div class="note"><b>Warm daylight, soft shadow, generous negative space.</b> Full-bleed where possible. Tones lean amber / sand — never cold or clinical. Show rooms that feel inhabited, not staged. (Tiles above are placeholders; drop in licensed photography.)</div>
+  </div>
+</body>
+</html>

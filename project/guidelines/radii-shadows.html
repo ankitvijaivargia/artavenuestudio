@@ -1,0 +1,25 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Radii, borders & shadows" subtitle="Near-square corners, hairlines, low shadow" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-alt); color: var(--text-primary); }
+  .wrap { padding: 26px 30px; display: flex; gap: 26px; align-items: center; }
+  .box { width: 96px; height: 76px; background: var(--surface-raised); border: 1px solid var(--border-hairline); display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box; }
+  .lbl { font-size: 11px; color: var(--text-muted); letter-spacing: .03em; }
+  .n { font-size: 11px; color: var(--text-secondary); margin-top: 8px; text-align: center; letter-spacing: .03em; }
+  .item { text-align: center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="item"><div class="box" style="border-radius:0"><span class="lbl">0px</span></div><div class="n">square · cards</div></div>
+    <div class="item"><div class="box" style="border-radius:2px"><span class="lbl">2px</span></div><div class="n">radius-xs</div></div>
+    <div class="item"><div class="box" style="border-radius:4px"><span class="lbl">4px</span></div><div class="n">radius-sm · inputs</div></div>
+    <div class="item"><div class="box" style="border:0; box-shadow:var(--shadow-soft)"><span class="lbl">soft</span></div><div class="n">shadow-soft</div></div>
+    <div class="item"><div class="box" style="border:0; box-shadow:var(--shadow-raised)"><span class="lbl">raised</span></div><div class="n">shadow-raised</div></div>
+  </div>
+</body>
+</html>

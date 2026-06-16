@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Art Avenue — Custom Shopify Theme Architecture</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--aa-clay); font-family: var(--font-sans); color: var(--text-primary); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  .page { background: var(--surface-page); width: 880px; max-width: 100%; margin: 28px auto; padding: 84px 88px; box-shadow: var(--shadow-raised); }
+  .page + .page { margin-top: 0; }
+  .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--text-accent); display: inline-flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
+  h1 { font-family: var(--font-serif); font-weight: 500; font-size: 52px; line-height: 1.05; letter-spacing: var(--tracking-tight); margin: 20px 0 0; }
+  h2 { font-family: var(--font-serif); font-weight: 500; font-size: 32px; line-height: 1.1; letter-spacing: var(--tracking-tight); margin: 0 0 6px; }
+  h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 28px 0 8px; }
+  h4 { font-family: var(--font-sans); font-weight: 600; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-secondary); margin: 20px 0 8px; }
+  p { margin: 0 0 13px; color: var(--text-secondary); max-width: 68ch; }
+  .lead { font-size: 18px; font-weight: 300; line-height: 1.6; color: var(--text-secondary); }
+  strong { color: var(--text-primary); font-weight: 600; }
+  em { color: var(--text-accent); font-style: italic; }
+  ul, ol { margin: 0 0 15px; padding-left: 0; list-style: none; }
+  li { position: relative; padding-left: 22px; margin-bottom: 8px; color: var(--text-secondary); max-width: 68ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 11px; width: 6px; height: 1px; background: var(--accent); }
+  .sectnum { font-family: var(--font-serif); font-style: italic; font-size: 16px; color: var(--accent); }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border-strong); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; }
+  .callout { background: var(--surface-accent-tint); border-left: 2px solid var(--accent); padding: 18px 22px; margin: 18px 0; }
+  .callout h4 { margin-top: 0; color: var(--text-accent); }
+  .callout p:last-child { margin-bottom: 0; }
+  table.tbl { width: 100%; border-collapse: collapse; margin: 8px 0 6px; }
+  table.tbl th { text-align: left; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; padding: 0 14px 9px 0; border-bottom: 1px solid var(--border-strong); }
+  table.tbl td { vertical-align: top; padding: 11px 14px 11px 0; border-bottom: 1px solid var(--border-hairline); font-size: 13px; color: var(--text-secondary); }
+  table.tbl td:first-child { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--aa-bronze-deep); white-space: nowrap; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; background: var(--surface-stone); padding: 2px 6px; border-radius: 3px; color: var(--aa-bronze-deep); }
+  pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; line-height: 1.65; background: var(--surface-dark); color: #d9cdb8; padding: 20px 24px; border-radius: var(--radius-sm); overflow-x: auto; margin: 12px 0 16px; }
+  pre .c { color: #9a8f78; }
+  pre .k { color: #cdb98c; }
+  .foot { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border-hairline); }
+  .cover { background: var(--surface-dark); color: var(--text-on-dark); min-height: 1000px; display: flex; flex-direction: column; justify-content: space-between; padding: 88px; }
+  .cover h1 { color: var(--text-on-dark); }
+  .cover .eyebrow { color: var(--accent-soft); } .cover .eyebrow::before { background: var(--accent-soft); }
+  .cover .lead { color: var(--text-on-dark-muted); max-width: 52ch; margin-top: 24px; }
+  .cover .mark { font-family: var(--font-serif); font-weight: 500; font-size: 22px; letter-spacing: .18em; text-transform: uppercase; }
+  .cover .tag { font-size: 9px; letter-spacing: .42em; text-transform: uppercase; color: var(--accent-soft); margin-top: 6px; }
+  .cover .meta { display: flex; gap: 44px; font-size: 12px; color: var(--text-on-dark-muted); flex-wrap: wrap; }
+  .cover .meta b { display: block; color: var(--text-on-dark); font-weight: 500; margin-bottom: 4px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .toc { columns: 2; column-gap: 48px; margin-top: 18px; }
+  .toc div { break-inside: avoid; padding: 9px 0; border-bottom: 1px solid var(--border-hairline); font-size: 14px; color: var(--text-secondary); display: flex; gap: 12px; }
+  .toc span { font-family: var(--font-serif); font-style: italic; color: var(--accent); }
+  @media print { body { background: #fff; } .page { box-shadow: none; margin: 0; width: 100%; padding: 50px 56px; page-break-after: always; } .cover { min-height: 92vh; } @page { size: A4; margin: 0; } pre, table, .callout { page-break-inside: avoid; } }
+  @media (max-width: 920px) { .page { padding: 44px 24px; } .cols, .toc { grid-template-columns: 1fr; columns: 1; } h1 { font-size: 38px; } .cover { padding: 44px 24px; } }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div><div class="mark">Art Avenue</div><div class="tag">Design House · Est. India</div></div>
+  <div>
+    <div class="eyebrow">Volume III · Technical Architecture</div>
+    <h1>A flagship store,<br><em style="color:#EBD9BE">built from<br>the ground up.</em></h1>
+    <p class="lead">The complete engineering blueprint for Art Avenue as a custom Shopify Online Store 2.0 theme — modular, metafield-driven, performance-obsessed, and maintainable by a luxury DTC product team.</p>
+  </div>
+  <div class="meta">
+    <div><b>Stack</b>OS 2.0 · Liquid · GitHub · CLI</div>
+    <div><b>CSS</b>Cascade layers · tokens</div>
+    <div><b>JS</b>Web components · minimal</div>
+    <div><b>Targets</b>Core Web Vitals · scale</div>
+  </div>
+</section>
+
+<!-- CONTENTS / PRINCIPLES -->
+<section class="page">
+  <div class="eyebrow">Architecture at a glance</div>
+  <h1 style="font-size:40px">Twelve systems, one coherent build.</h1>
+  <div class="divider" style="height:1px;background:var(--border-hairline);margin:24px 0"></div>
+  <p class="lead">Everything below serves four non-negotiables: <strong>luxury perception, conversion, performance, and maintainability.</strong> Content lives in metafields and metaobjects — never hardcoded. UI lives in small, reusable sections and snippets. The brand's design tokens are the single source of visual truth.</p>
+  <div class="toc">
+    <div><span>01</span> Theme architecture &amp; principles</div>
+    <div><span>02</span> Folder structure</div>
+    <div><span>03</span> Section architecture</div>
+    <div><span>04</span> Snippet architecture</div>
+    <div><span>05</span> Metafield &amp; metaobject structure</div>
+    <div><span>06</span> Product template architecture</div>
+    <div><span>07</span> Collection template architecture</div>
+    <div><span>08</span> Navigation architecture</div>
+    <div><span>09</span> Search architecture</div>
+    <div><span>10</span> GitHub workflow</div>
+    <div><span>11</span> Deployment workflow</div>
+    <div><span>12</span> Scalability &amp; performance</div>
+  </div>
+  <div class="callout"><h4>Guiding principle</h4><p>Merchandisers edit data (metafields, metaobjects, menus, section settings); developers ship components (sections, snippets, tokens). The two never collide. This is what keeps a luxury catalogue fast to run and cheap to evolve.</p></div>
+  <div class="foot"><span>Art Avenue · Vol. III</span><span>Technical Architecture</span></div>
+</section>
+
+<!-- 01 THEME ARCHITECTURE -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 01</span><h2>Theme architecture &amp; principles</h2></div>
+  <ul>
+    <li><strong>Online Store 2.0</strong> — JSON templates with <em>sections everywhere</em>, app blocks, and theme blocks. Every page is composed, not coded.</li>
+    <li><strong>Metafield-driven</strong> — all editorial &amp; spec content (materials, dimensions, care, guides, FAQs) comes from metafields/metaobjects with dynamic sources, so nothing is hardcoded in Liquid.</li>
+    <li><strong>Component model</strong> — one concern per section, one partial per snippet; sections own their `{% schema %}`, their scoped CSS asset, and their optional web-component JS.</li>
+    <li><strong>Design tokens first</strong> — a single `tokens.css` mirrors the Art Avenue design system (ivory/stone/bronze/charcoal, Cormorant Garamond + Jost, spacing, radii, motion). Every component reads tokens; no raw hex in components.</li>
+    <li><strong>App-light</strong> — avoid script-injecting apps; prefer native OS 2.0 + Storefront APIs to protect performance and luxury polish.</li>
+  </ul>
+  <h3>CSS architecture</h3>
+  <p>Cascade layers keep specificity predictable and overrides safe:</p>
+  <pre><span class="c">/* base.css — load order via @layer */</span>
+@layer tokens, base, layout, components, utilities;
+
+@layer tokens   { <span class="c">/* tokens.css — custom properties only */</span> }
+@layer base     { <span class="c">/* reset, typography, color schemes */</span> }
+@layer layout   { <span class="c">/* container, grid, section spacing */</span> }
+@layer components { <span class="c">/* per-component css, loaded per section */</span> }
+@layer utilities { <span class="c">/* spacing/visibility helpers */</span> }</pre>
+  <p>Critical CSS (tokens + base + layout) is inlined in <code>&lt;head&gt;</code>; component CSS loads per section via <code>{{ 'aa-product-gallery.css' | asset_url | stylesheet_tag }}</code> so a page only ships the CSS it uses.</p>
+  <h3>JavaScript strategy</h3>
+  <ul>
+    <li><strong>Web components</strong>, one behaviour each: <code>&lt;aa-cart-drawer&gt;</code>, <code>&lt;aa-predictive-search&gt;</code>, <code>&lt;aa-sticky-atc&gt;</code>, <code>&lt;aa-rug-guide&gt;</code>, <code>&lt;aa-variant-picker&gt;</code>, <code>&lt;aa-quick-view&gt;</code>.</li>
+    <li>All <code>defer</code>, section-scoped, hydrated on interaction/visibility. No framework, no jQuery.</li>
+    <li>Cart &amp; quick-view use the <strong>Section Rendering API</strong> for HTML-over-the-wire updates.</li>
+  </ul>
+  <div class="foot"><span>Section 01 — Theme</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 02 FOLDER STRUCTURE -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 02</span><h2>Folder structure</h2></div>
+  <pre>art-avenue-theme/
+├── <span class="k">assets/</span>
+│   ├── tokens.css            <span class="c"># design-system custom properties</span>
+│   ├── base.css              <span class="c"># @layer reset + type + schemes</span>
+│   ├── aa-*.css              <span class="c"># one file per component/section</span>
+│   ├── aa-*.js               <span class="c"># web components (defer)</span>
+│   ├── icons.svg             <span class="c"># sprite (Phosphor-light set)</span>
+│   └── fonts/                <span class="c"># Cormorant Garamond, Jost (woff2)</span>
+├── <span class="k">config/</span>
+│   ├── settings_schema.json  <span class="c"># theme settings (tokens exposed)</span>
+│   └── settings_data.json
+├── <span class="k">layout/</span>
+│   ├── theme.liquid          <span class="c"># head, critical CSS, schemes</span>
+│   └── password.liquid
+├── <span class="k">locales/</span>  en.default.json · en.default.schema.json · …
+├── <span class="k">sections/</span> <span class="c"># modular sections (.liquid + schema)</span>
+├── <span class="k">snippets/</span> <span class="c"># reusable partials</span>
+├── <span class="k">blocks/</span>   <span class="c"># OS 2.0 theme blocks (shared)</span>
+├── <span class="k">templates/</span>
+│   ├── index.json
+│   ├── product.json · product.furniture.json · product.rug.json
+│   │   product.cushion.json · product.lighting.json · product.wall-art.json
+│   ├── collection.json · collection.rugs.json
+│   ├── page.trade.json · page.rug-size-guide.json · page.material-library.json
+│   ├── search.json · cart.json · blog.json · article.json
+│   └── customers/…
+├── shopify.theme.toml        <span class="c"># CLI environments</span>
+└── .github/workflows/ci.yml  <span class="c"># Theme Check + Lighthouse</span></pre>
+  <div class="callout"><h4>Naming convention</h4><p>Every custom file is prefixed <code>aa-</code> (sections, snippets, assets) so brand code is instantly distinguishable from any future vendor code, and search/replace stays surgical.</p></div>
+  <div class="foot"><span>Section 02 — Folders</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 03 SECTIONS -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 03</span><h2>Section architecture</h2></div>
+  <p>Modular, reorderable, each with settings &amp; blocks so merchandisers compose pages in the editor. Grouped by domain:</p>
+  <div class="cols">
+    <div>
+      <h4>Global &amp; layout</h4>
+      <ul><li><code>aa-header</code> (mega-menu blocks)</li><li><code>aa-footer</code> (newsletter, columns, trust)</li><li><code>aa-announcement</code></li><li><code>aa-section-spacer</code></li></ul>
+      <h4>Home &amp; editorial</h4>
+      <ul><li><code>aa-hero</code> · <code>aa-collection-grid</code></li><li><code>aa-craft-story</code> (image + text)</li><li><code>aa-shop-by-room</code> · <code>aa-featured-collection</code></li><li><code>aa-trade-band</code> · <code>aa-journal-feed</code></li><li><code>aa-ugc-gallery</code> (Customer Homes)</li><li><code>aa-brand-statement</code></li></ul>
+    </div>
+    <div>
+      <h4>Product</h4>
+      <ul><li><code>aa-main-product</code> (blocks: gallery, title, price, variant-picker, qty, buy-buttons, sticky-atc, whatsapp, sample, customization, trust, accordion)</li><li><code>aa-materials</code> · <code>aa-dimensions</code></li><li><code>aa-guides</code> (rug/wood/upholstery/cushion)</li><li><code>aa-complete-the-room</code> · <code>aa-pair-with</code></li><li><code>aa-designer-recs</code> · <code>aa-faqs</code></li><li><code>aa-recently-viewed</code></li></ul>
+      <h4>Collection &amp; discovery</h4>
+      <ul><li><code>aa-collection-banner</code> · <code>aa-collection-grid</code></li><li><code>aa-facets</code> (sticky filters + sort)</li><li><code>aa-shop-by</code> (size/room/colour/material)</li><li><code>aa-merch-block</code> (lifestyle interrupt)</li></ul>
+    </div>
+  </div>
+  <h3>Section conventions</h3>
+  <pre>{% comment %} sections/aa-hero.liquid {% endcomment %}
+&lt;section class="aa-hero color-{{ section.settings.color_scheme }}"&gt; … &lt;/section&gt;
+{{ 'aa-hero.css' | asset_url | stylesheet_tag }}
+{% schema %}
+{ "name": "AA Hero", "tag": "section",
+  "settings": [ { "type": "color_scheme", "id": "color_scheme", "default": "scheme-1" }, … ],
+  "blocks": [ … ], "presets": [ { "name": "AA Hero" } ] }
+{% endschema %}</pre>
+  <div class="foot"><span>Section 03 — Sections</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 04 SNIPPETS -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 04</span><h2>Snippet architecture</h2></div>
+  <p>Snippets are pure, parameterised partials — rendered with explicit args (<code>{% render %}</code>, never <code>include</code>) for isolated scope.</p>
+  <table class="tbl">
+    <thead><tr><th>Snippet</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td>aa-product-card</td><td>Editorial 4:5 card — image, badge, name, price, save. Used in every grid/rail.</td></tr>
+      <tr><td>aa-collection-tile</td><td>Full-bleed category tile with scrim + CTA.</td></tr>
+      <tr><td>aa-price</td><td>Money formatting, compare-at, "from", per-variant.</td></tr>
+      <tr><td>aa-image</td><td>Responsive <code>image_url</code> + srcset + aspect-ratio box (no CLS).</td></tr>
+      <tr><td>aa-swatches</td><td>Finish/upholstery swatches from variant + metaobject.</td></tr>
+      <tr><td>aa-badge</td><td>New / Made to Order / Best Seller / Handcrafted.</td></tr>
+      <tr><td>aa-eyebrow</td><td>Letterspaced section label.</td></tr>
+      <tr><td>aa-whatsapp-cta</td><td>Builds <code>wa.me</code> link with title + SKU + URL pre-fill.</td></tr>
+      <tr><td>aa-trust-row</td><td>Handcrafted · delivery &amp; assembly · customization · shipping.</td></tr>
+      <tr><td>aa-accordion</td><td>Materials / craftsmanship / dimensions / delivery.</td></tr>
+      <tr><td>aa-icon</td><td>Inline SVG sprite reference.</td></tr>
+      <tr><td>aa-metafield-rte</td><td>Safely renders rich-text metafields.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><h4>Rule</h4><p>If markup appears in two sections, it becomes a snippet. Snippets take data as arguments and read tokens for style — they never query global state.</p></div>
+  <div class="foot"><span>Section 04 — Snippets</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 05 METAFIELDS -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 05</span><h2>Metafield &amp; metaobject structure</h2></div>
+  <p>Namespace <code>aa</code> for all definitions. Content is structured, validated, and surfaced via dynamic sources — editable by merchandisers, never in code.</p>
+  <h4>Product metafields</h4>
+  <table class="tbl">
+    <thead><tr><th>Key</th><th>Type → drives</th></tr></thead>
+    <tbody>
+      <tr><td>aa.materials</td><td>list.metaobject(material) → Materials block + macros</td></tr>
+      <tr><td>aa.dimensions</td><td>dimension set / rich text → diagram + "will it fit"</td></tr>
+      <tr><td>aa.lead_time</td><td>single line → availability + delivery estimator</td></tr>
+      <tr><td>aa.care · aa.warranty</td><td>rich text → trust accordion</td></tr>
+      <tr><td>aa.delivery</td><td>rich text → delivery &amp; assembly block</td></tr>
+      <tr><td>aa.designer_notes</td><td>rich text → editorial commentary</td></tr>
+      <tr><td>aa.styled_with</td><td>list.product → Complete the Room / Pair With</td></tr>
+      <tr><td>aa.room_scenes</td><td>list.file → Recently Styled Spaces</td></tr>
+      <tr><td>aa.faqs</td><td>list.metaobject(faq) → FAQ accordion</td></tr>
+      <tr><td>aa.guide_type</td><td>list.single (rug/wood/upholstery/cushion) → which guide CTA renders</td></tr>
+    </tbody>
+  </table>
+  <div class="cols">
+    <div>
+      <h4>Variant metafields</h4>
+      <ul><li><code>aa.swatch</code> → metaobject(finish) colour/texture</li><li><code>aa.backing</code> → rug backing label</li><li><code>aa.fill</code> → cover-only / cover+fill</li></ul>
+      <h4>Collection metafields</h4>
+      <ul><li><code>aa.intro</code> (rich text) · <code>aa.hero</code> (file)</li><li><code>aa.shop_by</code> → list.metaobject(shop_by_tile)</li></ul>
+    </div>
+    <div>
+      <h4>Metaobjects (reusable content)</h4>
+      <ul><li><code>material</code> — name, macro image, origin, care</li><li><code>finish</code> — name, swatch colour/image</li><li><code>room</code> — name, image, linked collection</li><li><code>guide</code> — rug size / placement / wood / upholstery</li><li><code>faq</code> — question, answer</li><li><code>designer</code> — name, studio, portrait, picks</li></ul>
+    </div>
+  </div>
+  <div class="foot"><span>Section 05 — Metafields</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 06 PRODUCT TEMPLATES -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 06</span><h2>Product template architecture</h2></div>
+  <p>One template <strong>suffix per product type</strong>, assigned in admin (or by automation). Each composes <code>aa-main-product</code> with the right blocks plus type-specific guide sections — all reading metafields.</p>
+  <table class="tbl">
+    <thead><tr><th>Template</th><th>Adds (beyond core PDP)</th></tr></thead>
+    <tbody>
+      <tr><td>product.furniture</td><td>size/finish/material/upholstery variants · Fabric/Finish Sample · Wood &amp; Finish &amp; Upholstery guides · customization CTA</td></tr>
+      <tr><td>product.rug</td><td>size + backing + material variants · Rug Size + Placement + Material guides</td></tr>
+      <tr><td>product.cushion</td><td>size + cover/fill variants (live price) · Cushion size guide · styling suggestions</td></tr>
+      <tr><td>product.lighting</td><td>finish + size + bulb/voltage spec · install note</td></tr>
+      <tr><td>product.wall-art</td><td>size + frame + medium variants · hang-height visual</td></tr>
+    </tbody>
+  </table>
+  <h3>Core PDP block order (aa-main-product)</h3>
+  <pre>gallery → vendor → title → price → variant-picker → quantity
+→ buy-buttons → <span class="k">sticky-atc</span> → <span class="k">whatsapp-cta</span> → <span class="k">sample/customization</span>
+→ trust-row → delivery → accordion(materials · craft · dimensions · care)</pre>
+  <p>Below the buy area, page-level sections: <code>aa-guides</code> → <code>aa-complete-the-room</code> → <code>aa-designer-recs</code> → <code>aa-faqs</code> → <code>aa-recently-viewed</code>. Sticky ATC + WhatsApp are persistent on mobile via <code>&lt;aa-sticky-atc&gt;</code>.</p>
+  <div class="callout"><h4>Variant strategy</h4><p>Real purchasable choices = native variants (price/image/inventory/lead-time). Many finishes → drive variant images from an <code>aa.swatch</code> metaobject rather than exploding the matrix. "Custom size/finish" is <em>not</em> a variant — it's the WhatsApp/enquiry CTA.</p></div>
+  <div class="foot"><span>Section 06 — Product</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 07 COLLECTION -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 07</span><h2>Collection template architecture</h2></div>
+  <ul>
+    <li><strong>collection.json</strong> — banner (metafield hero + intro) → <code>aa-shop-by</code> row → <code>aa-facets</code> (sticky sidebar / mobile bottom-sheet) + grid → <code>aa-merch-block</code> interrupts → related collections.</li>
+    <li><strong>collection.rugs.json</strong> — adds Shop by Size / Room / Colour / Pattern / Material and a Rug Size Guide entry banner.</li>
+    <li><strong>Filtering</strong> — Shopify native storefront filters (Search &amp; Discovery), driven by product options, tags &amp; metafields; URL-encoded, server-rendered, crawlable.</li>
+    <li><strong>Sort</strong> — featured, newest, price; preserved on back-navigation.</li>
+    <li><strong>Quick view</strong> — <code>&lt;aa-quick-view&gt;</code> via Section Rendering API; save-for-later via localStorage + customer metafield when logged in.</li>
+  </ul>
+  <h3>Merchandising</h3>
+  <p>One lifestyle / "Shop the Look" interrupt every ~6 products; <code>aa-shop-by</code> tiles let buyers self-select into a confident subset before scrolling the grid — the core discovery + decision-fatigue lever.</p>
+  <div class="foot"><span>Section 07 — Collection</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 08 NAV -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 08</span><h2>Navigation architecture</h2></div>
+  <ul>
+    <li><strong>Source</strong> — Shopify navigation linklists for structure; a <code>menu_feature</code> metaobject supplies each mega-menu's imagery, designer picks &amp; promo tile (no hardcoding).</li>
+    <li><strong>Mega-menu (aa-header blocks)</strong> — per top-level item: By Type columns · Shop by Room · Shop by Style/Material · Discover (New / Best Sellers / Designer Favourites) · one featured visual.</li>
+    <li><strong>Cross-cutting routes</strong> — Room / Style / Material / Size resolve to filtered collection URLs, reused on collection pages.</li>
+    <li><strong>Mobile</strong> — <code>&lt;aa-nav-drawer&gt;</code> accordion mirroring the same linklists; Trade &amp; account pinned; persistent search &amp; WhatsApp.</li>
+    <li><strong>Utility</strong> — predictive search, account, wishlist, cart (live count); slim trust bar above header.</li>
+  </ul>
+  <div class="foot"><span>Section 08 — Navigation</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 09 SEARCH -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 09</span><h2>Search architecture</h2></div>
+  <ul>
+    <li><strong>Predictive search</strong> — <code>&lt;aa-predictive-search&gt;</code> against the Predictive Search API; results show product imagery, collections, pages &amp; articles with the brand's editorial card.</li>
+    <li><strong>Full results</strong> — <code>search.json</code> reuses <code>aa-facets</code> + grid, so filtering/sorting matches collections exactly.</li>
+    <li><strong>Relevance</strong> — synonyms, redirects &amp; boosts managed in Search &amp; Discovery (e.g. "dhurrie" → rugs, "couch" → sofas).</li>
+    <li><strong>Filters in search</strong> — type, material, room, price; same filter snippet as collections.</li>
+    <li><strong>Empty &amp; zero-results</strong> — curated "explore" tiles + WhatsApp consultant prompt, never a dead end.</li>
+  </ul>
+  <div class="foot"><span>Section 09 — Search</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 10 GITHUB -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 10</span><h2>GitHub workflow</h2></div>
+  <p>Shopify's GitHub integration binds themes to branches; the repo is the source of truth.</p>
+  <table class="tbl">
+    <thead><tr><th>Branch</th><th>Bound theme</th></tr></thead>
+    <tbody>
+      <tr><td>main</td><td>Production (the live theme) — protected, PR-only</td></tr>
+      <tr><td>staging</td><td>Staging theme — QA &amp; stakeholder review</td></tr>
+      <tr><td>feat/*</td><td>Unpublished preview themes per feature (CLI-pushed)</td></tr>
+    </tbody>
+  </table>
+  <pre><span class="c"># branch → build → preview → review → merge</span>
+git checkout -b feat/rug-size-guide
+shopify theme dev          <span class="c"># local hot-reload</span>
+shopify theme push -u -t "feat-rug-size-guide"  <span class="c"># preview theme</span>
+<span class="c"># open PR → CI runs → review preview link → squash-merge to main</span></pre>
+  <ul>
+    <li><strong>Branch protection</strong> on <code>main</code>: required PR review + green CI before merge.</li>
+    <li><strong>Editor changes</strong> (merchandiser JSON template/settings edits) sync back to the bound branch — pull regularly to avoid drift: <code>shopify theme pull</code>.</li>
+    <li><strong>Conventional commits</strong> + CHANGELOG; one feature per PR.</li>
+  </ul>
+  <div class="foot"><span>Section 10 — GitHub</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 11 DEPLOYMENT -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 11</span><h2>Deployment workflow</h2></div>
+  <pre><span class="c"># shopify.theme.toml — environments</span>
+[environments.development]
+store = "art-avenue.myshopify.com"
+theme = "&lt;dev-theme-id&gt;"
+[environments.staging]
+store = "art-avenue.myshopify.com"
+theme = "&lt;staging-theme-id&gt;"</pre>
+  <ul>
+    <li><strong>Local</strong> — <code>shopify theme dev</code> for hot-reload against a dev theme.</li>
+    <li><strong>Promote</strong> — merge to <code>main</code>; GitHub integration deploys to the live theme automatically (no manual upload).</li>
+    <li><strong>Rollback</strong> — revert the commit (or restore a prior theme version); Git history = deploy history.</li>
+    <li><strong>Secrets/config</strong> — no secrets in theme; storefront tokens via app proxy if ever needed.</li>
+  </ul>
+  <h3>CI — <code>.github/workflows/ci.yml</code></h3>
+  <pre><span class="k">- Theme Check</span>      <span class="c"># Liquid lint, schema, a11y, perf hints</span>
+<span class="k">- Prettier/ESLint</span>  <span class="c"># liquid + js + css formatting</span>
+<span class="k">- Lighthouse CI</span>    <span class="c"># perf/SEO/a11y budgets on preview URL</span>
+<span class="k">- Broken-link &amp; image-weight checks</span></pre>
+  <div class="callout"><h4>Quality gate</h4><p>A PR cannot merge unless Theme Check passes and Lighthouse meets budgets (LCP, CLS, TBT). Performance is enforced, not hoped for.</p></div>
+  <div class="foot"><span>Section 11 — Deployment</span><span>Art Avenue · Vol. III</span></div>
+</section>
+
+<!-- 12 SCALABILITY -->
+<section class="page">
+  <div class="sec-head"><span class="sectnum">Section 12</span><h2>Scalability &amp; performance</h2></div>
+  <div class="cols">
+    <div>
+      <h4>Core Web Vitals</h4>
+      <ul>
+        <li>Inline critical CSS; defer the rest via per-section assets.</li>
+        <li>Responsive <code>image_url</code> + <code>srcset</code> + <code>loading="lazy"</code> + reserved aspect ratios (zero CLS).</li>
+        <li><code>preconnect</code> + <code>font-display:swap</code>; self-host woff2 for Cormorant + Jost.</li>
+        <li>Defer all JS; hydrate components on view/interaction.</li>
+        <li>Budget: LCP &lt; 2.5s, CLS &lt; 0.1, INP &lt; 200ms on 4G mobile.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Scale &amp; maintainability</h4>
+      <ul>
+        <li>Metafields/metaobjects = no redeploy to add content.</li>
+        <li>Template suffixes scale to new product types without touching core.</li>
+        <li>Tokens make a palette/type change a one-file edit.</li>
+        <li>Section presets let merchandisers build new pages unaided.</li>
+        <li>i18n-ready via <code>locales/</code> for international buyers.</li>
+        <li>App-light keeps third-party JS — the usual perf tax — near zero.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><h4>The throughline</h4><p>Speed and calm <em>are</em> the luxury. This architecture makes the fast path the default: small components, structured content, enforced budgets, and a Git-backed workflow a product team can run for years.</p></div>
+  <p style="margin-top:22px;font-size:13px;color:var(--text-faint)">Continues the Art Avenue strategy set — Vol. I (Refinement &amp; Conversion), Vol. II (Product Architecture), Vol. III (Technical Architecture). Design direction, UX and conversion strategy remain as approved.</p>
+  <div class="foot"><span>Section 12 — Scalability</span><span>Art Avenue Design House · Vol. III</span></div>
+</section>
+
+</body>
+</html>

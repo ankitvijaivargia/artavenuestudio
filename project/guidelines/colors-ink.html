@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Ink — warm charcoal" subtitle="Primary, secondary, muted & faint text" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; font-family: var(--font-sans); background: var(--surface-page); color: var(--text-primary); }
+  .wrap { padding: 22px 26px; }
+  .row { display: flex; gap: 14px; }
+  .sw { flex: 1; }
+  .chip { height: 76px; border-radius: var(--radius-xs); border: 1px solid var(--border-hairline); }
+  .name { font-size: 12px; letter-spacing: .04em; margin-top: 10px; color: var(--text-secondary); }
+  .hex { font-size: 11px; color: var(--text-muted); margin-top: 2px; letter-spacing: .03em; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <div class="sw"><div class="chip" style="background:var(--aa-charcoal)"></div><div class="name">charcoal · primary</div><div class="hex">#2B2824</div></div>
+      <div class="sw"><div class="chip" style="background:var(--aa-ink)"></div><div class="name">ink · secondary</div><div class="hex">#46413A</div></div>
+      <div class="sw"><div class="chip" style="background:var(--aa-stone-600)"></div><div class="name">stone-600 · muted</div><div class="hex">#766E61</div></div>
+      <div class="sw"><div class="chip" style="background:var(--aa-stone-400)"></div><div class="name">stone-400 · faint</div><div class="hex">#9C9384</div></div>
+    </div>
+  </div>
+</body>
+</html>

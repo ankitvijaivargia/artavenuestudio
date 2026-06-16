@@ -1,0 +1,81 @@
+{%- comment -%}
+  Art Avenue — representative theme snippets (BLUEPRINT reference). Each maps to a window.AA* helper.
+  Shown together for review; in the repo these are separate files under snippets/.
+{%- endcomment -%}
+
+{%- comment -%} ========== snippets/aa-price.liquid  (AAPriceTag) ========== {%- endcomment -%}
+{%- comment -%} respects visibility: hidden price → "Price on request" / "Project pricing" {%- endcomment -%}
+{%- if show_price -%}
+  <div class="aa-price">{{ product.price | money }}</div>
+{%- else -%}
+  {%- if visibility == 'project-only' -%}
+    <div class="aa-price aa-price--enquire">Project pricing <span>Quoted per project</span></div>
+  {%- else -%}
+    <div class="aa-price aa-price--enquire">Price on request <span>Shared on enquiry</span></div>
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} ========== snippets/aa-cta.liquid  (AACtaButtons) ========== {%- endcomment -%}
+{%- comment -%} primary/secondary are CTA keys from enums.json#/labels/cta {%- endcomment -%}
+<div class="aa-cta">
+  {%- assign P = primary | aa_cta -%}
+  {%- if P.kind == 'cart' and show_cart -%}
+    {%- form 'product', product -%}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <button type="submit" class="btn btn--primary">{{ P.label }}</button>
+    {%- endform -%}
+  {%- else -%}
+    <a class="btn btn--primary" href="{{ P.leadType | aa_lead_url: product }}">{{ P.label }}</a>
+  {%- endif -%}
+  {%- if secondary -%}
+    {%- assign S = secondary | aa_cta -%}
+    <a class="btn btn--secondary" href="{{ S.leadType | aa_lead_url: product }}">{{ S.label }}</a>
+  {%- endif -%}
+</div>
+
+{%- comment -%} ========== snippets/aa-lifecycle-banner.liquid  (AALifecycleBanner) ========== {%- endcomment -%}
+{%- assign LB = state | aa_lifecycle -%}
+{%- if LB.banner -%}
+  <div class="aa-lifecycle aa-lifecycle--{{ state }}">
+    <span class="aa-lifecycle__label">{{ LB.label }}</span>
+    <p>{{ LB.banner }}</p>
+  </div>
+{%- endif -%}
+
+{%- comment -%} ========== snippets/aa-sample-request.liquid  (AASampleRequest — dedicated, NOT a CTA) ========== {%- endcomment -%}
+<div class="aa-samples">
+  <strong>Request a sample</strong>
+  <span>Feel the material in your own light · from ₹999</span>
+  {%- for m in product.metafields.aa.materials.value -%}
+    <a href="{{ 'samples' | aa_lead_url: product, message: m.name }}">Request {{ m.name }} Sample</a>
+  {%- endfor -%}
+</div>
+
+{%- comment -%} ========== snippets/module-material.liquid  (a metaobject-driven module) ========== {%- endcomment -%}
+<section class="module module--material">
+  <h2>Material &amp; texture</h2>
+  <div class="grid">
+    {%- for m in product.metafields.aa.materials.value -%}
+      <article>
+        {%- if m.image %}<img src="{{ m.image | image_url: width: 600 }}" alt="{{ m.name }}">{% endif -%}
+        <h3>{{ m.name }}</h3>
+        <p>{{ m.description }}</p>
+        {%- if m.sample_available -%}<a href="{{ 'samples' | aa_lead_url: product, message: m.name }}">Request sample</a>{%- endif -%}
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+{%- comment -%} ========== snippets/lead-form.liquid  (unified lead payload → CRM via Flow) ========== {%- endcomment -%}
+{%- comment -%} type ∈ enums.json#/lead_type. Emits the §7 payload identically for every origin. {%- endcomment -%}
+<form class="aa-lead" action="/contact#contact_form" method="post" data-lead-type="{{ type }}">
+  <input type="hidden" name="contact[lead_type]"   value="{{ type }}">
+  <input type="hidden" name="contact[product]"     value="{{ product.title }}">
+  <input type="hidden" name="contact[sku]"         value="{{ product.selected_or_first_available_variant.sku }}">
+  <input type="hidden" name="contact[page_url]"    value="{{ canonical_url }}">
+  <input  name="contact[name]"  placeholder="Name"  required>
+  <input  name="contact[email]" type="email" placeholder="Email" required>
+  <input  name="contact[phone]" type="tel"   placeholder="Phone">
+  <textarea name="contact[body]" placeholder="Your message"></textarea>
+  <button type="submit">Send enquiry</button>
+</form>

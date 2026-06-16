@@ -1,0 +1,80 @@
+{%- comment -%}
+  Art Avenue — sections/main-product.liquid (BLUEPRINT)
+  The product page is a resolver + an ordered render of module snippets. No design lives here;
+  every decision comes from aa.* metafields, the preset, and the lifecycle state.
+
+  Resolution pipeline (last wins):
+    preset defaults  →  product metafield overrides  →  lifecycle composition
+  Mirrors the prototype:  AAPreset(name, overrides)  then  AACommerce(cfg, AALifecycle(state)).
+{%- endcomment -%}
+
+{%- assign p = product -%}
+{%- assign preset = p.metafields.aa.preset | default: 'made-to-order-product' -%}
+
+{%- comment -%} 1) Preset defaults (render returns JSON; parse it). presets.json is mirrored into snippets/aa-presets.liquid {%- endcomment -%}
+{%- capture preset_json -%}{%- render 'aa-presets', key: preset -%}{%- endcapture -%}
+{%- assign D = preset_json | parse_json -%}
+
+{%- comment -%} 2) Overrides — explicit metafields beat preset defaults {%- endcomment -%}
+{%- assign fulfillment = p.metafields.aa.fulfillment | default: D.fulfillment -%}
+{%- assign visibility  = p.metafields.aa.visibility  | default: D.visibility -%}
+{%- assign lifecycle   = p.metafields.aa.lifecycle   | default: 'active' -%}
+{%- assign size_mode   = p.metafields.aa.size_mode   | default: D.size_mode -%}
+{%- assign cta_primary = p.metafields.aa.cta_primary -%}
+{%- assign cta_secondary = p.metafields.aa.cta_secondary -%}
+
+{%- comment -%} 3) Visibility → price/cart/CTA defaults (from enums.json#/labels/visibility) {%- endcomment -%}
+{%- assign V = visibility | aa_visibility -%}            {%- comment -%} custom filter or render 'aa-visibility' {%- endcomment -%}
+{%- assign show_price = V.price -%}
+{%- assign show_cart  = V.cart -%}
+{%- assign primary    = cta_primary   | default: V.primary -%}
+{%- assign secondary  = cta_secondary | default: V.secondary -%}
+
+{%- comment -%} 4) Lifecycle composition — non-shopable removes cart + swaps primary CTA {%- endcomment -%}
+{%- assign L = lifecycle | aa_lifecycle -%}
+{%- if L.shopable == false -%}
+  {%- assign show_cart = false -%}
+  {%- assign primary = L.primary | default: primary -%}
+{%- endif -%}
+
+<section class="aa-product" data-preset="{{ preset }}" data-fulfillment="{{ fulfillment }}" data-visibility="{{ visibility }}" data-lifecycle="{{ lifecycle }}">
+
+  {%- render 'aa-gallery', product: p -%}
+
+  <div class="aa-buybox">
+    {%- render 'aa-title', product: p -%}
+    {%- render 'aa-price', product: p, show_price: show_price, visibility: visibility -%}
+    {%- render 'aa-fulfillment-bar', type: fulfillment -%}
+    {%- render 'aa-lifecycle-banner', state: lifecycle -%}
+
+    {%- comment -%} Buy-box modules in a fixed buy-flow order; each gated by aa.modules {%- endcomment -%}
+    {%- render 'aa-size', product: p, mode: size_mode -%}
+    {%- if p.metafields.aa.modules.value.finish     %}{% render 'module-finish', product: p %}{% endif -%}
+    {%- if p.metafields.aa.modules.value.material    %}{% render 'module-material', product: p %}{% endif -%}
+    {%- if p.metafields.aa.modules.value.upholstery  %}{% render 'module-upholstery', product: p %}{% endif -%}
+    {%- if p.metafields.aa.modules.value.samples     %}{% render 'aa-sample-request', product: p %}{% endif -%}
+
+    {%- comment -%} Primary + secondary CTA — fully data-driven, cart gated {%- endcomment -%}
+    {%- render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart -%}
+    {%- if p.metafields.aa.modules.value.delivery %}{% render 'module-delivery', fulfillment: fulfillment %}{% endif -%}
+  </div>
+</section>
+
+{%- comment -%} 5) Section modules — ORDER from aa.module_order, fallback to preset order. Each gated by aa.modules. {%- endcomment -%}
+{%- assign order = p.metafields.aa.module_order.value | default: D.moduleOrder -%}
+{%- assign mods = p.metafields.aa.modules.value | default: D.modules -%}
+{%- for key in order -%}
+  {%- assign on = mods[key] -%}
+  {%- if on -%}
+    {%- render 'module', key: key, product: p, fulfillment: fulfillment, visibility: visibility -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- comment -%}
+  snippets/module.liquid is a thin dispatcher:
+    {% case key %}{% when 'specs' %}{% render 'module-specifications' … %}{% when 'related' %} … {% endcase %}
+  Add a module = add a snippet + a when-branch + an enum entry. No edit to main-product.liquid.
+
+  OS 2.0: each module can ALSO be a theme block, so merchants drag-reorder in the editor;
+  aa.module_order covers headless / bulk / programmatic ordering.
+{%- endcomment -%}

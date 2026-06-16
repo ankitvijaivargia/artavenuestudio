@@ -1,0 +1,60 @@
+{
+  "_comment": "Art Avenue — controlled vocabularies (single source of truth for every enum). Mirrors the window.AA* prototype. Used as validation choice-lists on the metafield definitions in metafields.product.json.",
+  "preset": [
+    "luxury-furniture", "luxury-rug", "luxury-cushion",
+    "custom-product", "project-product", "in-stock-product", "made-to-order-product"
+  ],
+  "fulfillment": ["in-stock", "made-to-order", "custom", "project"],
+  "visibility": ["ecommerce", "consultation", "price-on-request", "project-only"],
+  "lifecycle": ["active", "coming-soon", "seasonal", "discontinued", "archive"],
+  "size_mode": ["multi", "fixed", "single", "custom", "mto"],
+  "commerce_badge": ["in-stock", "made-to-order", "customizable", "project"],
+  "cta": [
+    "add-to-cart", "request-pricing", "consult", "customize", "project-enquiry", "notify"
+  ],
+  "module": [
+    "material", "finish", "upholstery", "backing", "construction", "craft", "origin",
+    "care", "installation", "customization", "specifications", "samples", "delivery",
+    "lead-time", "related", "complete-the-room", "consultation", "guides", "rooms",
+    "whyLove", "completeRoom", "faq", "pairs", "specs", "completeRoom"
+  ],
+  "lead_type": ["consultation", "pricing", "samples", "custom", "project", "trade"],
+  "collection_type": ["standard", "made-to-order", "in-stock", "project", "trade"],
+  "project_type": ["residential", "hospitality", "commercial", "retail", "designer-projects"],
+
+  "labels": {
+    "fulfillment": {
+      "in-stock": { "label": "In Stock", "lead": "Ships in 3–5 days", "icon": "package" },
+      "made-to-order": { "label": "Made to Order", "lead": "Crafted in 3–4 weeks", "icon": "hammer" },
+      "custom": { "label": "Custom Order", "lead": "Timeline set at consultation", "icon": "pencil-ruler" },
+      "project": { "label": "Project Enquiry", "lead": "Planned to your project schedule", "icon": "buildings" }
+    },
+    "visibility": {
+      "ecommerce": { "price": true, "cart": true, "primary": "add-to-cart", "secondary": "consult" },
+      "consultation": { "price": true, "cart": false, "primary": "consult", "secondary": "customize" },
+      "price-on-request": { "price": false, "cart": false, "primary": "request-pricing", "secondary": "consult", "priceLabel": "Price on request" },
+      "project-only": { "price": false, "cart": false, "primary": "project-enquiry", "secondary": "consult", "priceLabel": "Project pricing" }
+    },
+    "lifecycle": {
+      "active": { "label": "Active", "shopable": true },
+      "coming-soon": { "label": "Coming Soon", "shopable": false, "primary": "notify", "banner": "Arriving soon — register your interest and we'll tell you the moment it's available." },
+      "seasonal": { "label": "Seasonal", "shopable": true, "banner": "A seasonal piece, available for a limited time." },
+      "discontinued": { "label": "Discontinued", "shopable": false, "primary": "consult", "banner": "This piece has been discontinued. Speak with a consultant about current alternatives." },
+      "archive": { "label": "Archived", "shopable": false, "hidden": true, "banner": "This piece is archived and no longer available." }
+    },
+    "cta": {
+      "add-to-cart": { "label": "Add to Cart", "icon": "shopping-bag-open", "kind": "cart" },
+      "request-pricing": { "label": "Request Pricing", "icon": "tag", "kind": "lead", "leadType": "pricing" },
+      "consult": { "label": "Speak with a Design Consultant", "icon": "chat-teardrop-dots", "kind": "lead", "leadType": "consultation" },
+      "customize": { "label": "Customize This Piece", "icon": "pencil-ruler", "kind": "lead", "leadType": "custom" },
+      "project-enquiry": { "label": "Start a Project Enquiry", "icon": "buildings", "kind": "lead", "leadType": "project" },
+      "notify": { "label": "Notify Me When Available", "icon": "bell", "kind": "lead", "leadType": "consultation" }
+    },
+    "commerce_badge": {
+      "in-stock": "In Stock",
+      "made-to-order": "Made to Order",
+      "customizable": "Customizable",
+      "project": "Made for Projects"
+    }
+  }
+}
