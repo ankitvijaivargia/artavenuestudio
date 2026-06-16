@@ -1,0 +1,17 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-fulfillment-bar.liquid  (AAFulfillment)
+  Lead-time messaging. Params: type (fulfillment), lead_time (override)
+{%- endcomment -%}
+{%- capture f_label -%}{%- render 'aa-fulfillment', key: type, attr: 'label' -%}{%- endcapture -%}
+{%- capture f_lead -%}{%- render 'aa-fulfillment', key: type, attr: 'lead' -%}{%- endcapture -%}
+{%- capture f_icon -%}{%- render 'aa-fulfillment', key: type, attr: 'icon' -%}{%- endcapture -%}
+{%- assign f_label = f_label | strip -%}
+{%- if f_label != blank -%}
+  <div class="aa-fulfillment">
+    <i class="ph ph-{{ f_icon | strip }} icon" aria-hidden="true"></i>
+    <div>
+      <strong>{{ f_label }}</strong>
+      <span> · {{ lead_time | default: f_lead | strip }}</span>
+    </div>
+  </div>
+{%- endif -%}

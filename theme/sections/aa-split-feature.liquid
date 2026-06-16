@@ -1,0 +1,55 @@
+{%- comment -%} Art Avenue — image + text split (craft story / editorial) {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="aa-section {% if s.bg == 'alt' %}aa-surface-alt{% elsif s.bg == 'dark' %}aa-surface-dark{% endif %}">
+  <div class="aa-container">
+    <div class="aa-split {% if s.reverse %}aa-split--reverse{% endif %}">
+      <div class="aa-card__media aa-fig aa-fig--{{ s.tone | default: 'espresso' }}" style="aspect-ratio:{{ s.ratio | default: '4/5' }}">
+        {%- if s.image != blank -%}<img src="{{ s.image | image_url: width: 1200 }}" alt="{{ s.heading | escape }}" width="{{ s.image.width | default: 1200 }}" height="{{ s.image.height | default: 1500 }}">{%- endif -%}
+      </div>
+      <div>
+        {%- if s.eyebrow != blank -%}<p class="aa-eyebrow {% if s.bg == 'dark' %}aa-eyebrow--on-dark{% endif %}">{{ s.eyebrow }}</p>{%- endif -%}
+        <h2 class="aa-h1" style="margin-top:14px{% if s.bg == 'dark' %};color:var(--text-on-dark){% endif %}">{{ s.heading }}</h2>
+        {%- if s.body != blank -%}<div class="aa-lead rte" style="margin-top:14px{% if s.bg == 'dark' %};color:var(--text-on-dark-muted){% endif %}">{{ s.body }}</div>{%- endif -%}
+        {%- if section.blocks.size > 0 -%}
+          <ul style="list-style:none;margin:var(--space-lg) 0 0;padding:0;display:grid;gap:14px">
+            {%- for block in section.blocks -%}
+              <li style="display:flex;gap:12px;align-items:baseline;color:{% if s.bg == 'dark' %}var(--text-on-dark-muted){% else %}var(--text-secondary){% endif %}" {{ block.shopify_attributes }}>
+                <i class="ph ph-circle" style="font-size:7px;color:var(--accent);transform:translateY(-3px)"></i>{{ block.settings.text }}
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+        {%- if s.cta_label != blank -%}<a class="aa-btn {% if s.bg == 'dark' %}aa-btn--on-dark{% else %}aa-btn--secondary{% endif %}" style="margin-top:var(--space-lg)" href="{{ s.cta_link }}">{{ s.cta_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "AA Split Feature",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "select", "id": "tone", "label": "Placeholder tone", "options": [
+      { "value": "espresso", "label": "Espresso" }, { "value": "clay", "label": "Clay" }, { "value": "olive", "label": "Olive" }, { "value": "bronze", "label": "Bronze" }, { "value": "stone", "label": "Stone" }, { "value": "sand", "label": "Sand" }
+    ], "default": "espresso" },
+    { "type": "text", "id": "ratio", "label": "Image ratio", "default": "4/5" },
+    { "type": "checkbox", "id": "reverse", "label": "Image on right", "default": false },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Atelier" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Made slowly, by hand, to last." },
+    { "type": "richtext", "id": "body", "label": "Body" },
+    { "type": "text", "id": "cta_label", "label": "Button" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "select", "id": "bg", "label": "Background", "options": [
+      { "value": "page", "label": "Page" }, { "value": "alt", "label": "Alt" }, { "value": "dark", "label": "Dark" }
+    ], "default": "alt" }
+  ],
+  "blocks": [
+    { "type": "point", "name": "Bullet", "settings": [ { "type": "text", "id": "text", "label": "Text" } ] }
+  ],
+  "presets": [{ "name": "AA Split Feature", "blocks": [
+    { "type": "point", "settings": { "text": "Workshops across India, partnered for generations" } },
+    { "type": "point", "settings": { "text": "Solid wood, hand-knotted wool, cast brass & stone" } },
+    { "type": "point", "settings": { "text": "Made to order — never mass-produced" } }
+  ]}]
+}
+{% endschema %}

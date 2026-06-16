@@ -1,0 +1,28 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-module.liquid  (module dispatcher)
+  Thin router: key -> module-<key>.liquid. Adding a module = add a `when`
+  branch here + a module-<key>.liquid snippet + an enum entry. The product
+  section (aa-main-product.liquid) is never edited.
+  Params: key, product, fulfillment, visibility, labels
+{%- endcomment -%}
+{%- case key -%}
+  {%- when 'material' -%}{% render 'module-material', product: product %}
+  {%- when 'finish' -%}{% render 'module-finish', product: product %}
+  {%- when 'upholstery' -%}{% render 'module-upholstery', product: product %}
+  {%- when 'construction' -%}{% render 'module-construction', product: product %}
+  {%- when 'craft' -%}{% render 'module-craft', product: product %}
+  {%- when 'care' -%}{% render 'module-care', product: product %}
+  {%- when 'specs', 'specifications' -%}{% render 'module-specifications', product: product %}
+  {%- when 'delivery', 'lead-time' -%}{% render 'module-delivery', fulfillment: fulfillment %}
+  {%- when 'related' -%}{% render 'module-related', product: product %}
+  {%- when 'complete-the-room', 'completeRoom' -%}{% render 'module-complete-room', product: product %}
+  {%- when 'pairs' -%}{% render 'module-pairs', product: product %}
+  {%- when 'consultation', 'consult' -%}{% render 'module-consultation', product: product %}
+  {%- when 'guides' -%}{% render 'module-guides', product: product %}
+  {%- when 'rooms' -%}{% render 'module-rooms', product: product %}
+  {%- when 'whyLove' -%}{% render 'module-why-love', product: product %}
+  {%- when 'customization' -%}{% render 'module-customization', product: product %}
+  {%- when 'assembly', 'installation' -%}{% render 'module-assembly', product: product %}
+  {%- when 'faq' -%}{% render 'module-faq', product: product %}
+  {%- when 'origin' -%}{% render 'module-craft', product: product %}
+{%- endcase -%}

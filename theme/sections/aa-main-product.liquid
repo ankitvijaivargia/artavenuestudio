@@ -1,0 +1,183 @@
+{%- comment -%}
+  Art Avenue — sections/aa-main-product.liquid
+  RESOLVER + ordered render of module snippets. No design decisions here; everything
+  comes from aa.* metafields, the preset, and the lifecycle state.
+
+  Resolution pipeline (last wins):
+    preset defaults  ->  product metafield overrides  ->  lifecycle composition
+
+  Production-safe Shopify Liquid: NO parse_json. Preset/visibility/lifecycle/cta
+  values come from case/when resolver snippets (aa-preset, aa-visibility,
+  aa-lifecycle, aa-cta-attr). Module maps come from NATIVE json/list metafield
+  deserialization (product.metafields.ava.modules.value), with a preset fallback.
+{%- endcomment -%}
+
+{%- liquid
+  assign p = product
+  assign preset = p.metafields.ava.preset.value | default: 'made-to-order-product'
+-%}
+
+{%- comment -%} 1) Preset defaults (each resolver call returns ONE scalar) {%- endcomment -%}
+{%- capture pre_fulfillment -%}{%- render 'aa-preset', key: preset, field: 'fulfillment' -%}{%- endcapture -%}
+{%- capture pre_visibility -%}{%- render 'aa-preset', key: preset, field: 'visibility' -%}{%- endcapture -%}
+{%- capture pre_size -%}{%- render 'aa-preset', key: preset, field: 'size_mode' -%}{%- endcapture -%}
+
+{%- liquid
+  # 2) Overrides — explicit metafields beat preset defaults
+  assign fulfillment = p.metafields.ava.fulfillment.value | default: pre_fulfillment | strip
+  assign visibility  = p.metafields.ava.visibility.value  | default: pre_visibility | strip
+  assign lifecycle   = p.metafields.ava.lifecycle.value   | default: 'active' | strip
+  assign size_mode   = p.metafields.ava.size_mode.value   | default: pre_size | strip
+-%}
+
+{%- comment -%} 3) Visibility -> price / cart / CTA defaults {%- endcomment -%}
+{%- capture vis_price -%}{%- render 'aa-visibility', key: visibility, attr: 'price' -%}{%- endcapture -%}
+{%- capture vis_cart -%}{%- render 'aa-visibility', key: visibility, attr: 'cart' -%}{%- endcapture -%}
+{%- capture vis_primary -%}{%- render 'aa-visibility', key: visibility, attr: 'primary' -%}{%- endcapture -%}
+{%- capture vis_secondary -%}{%- render 'aa-visibility', key: visibility, attr: 'secondary' -%}{%- endcapture -%}
+
+{%- liquid
+  assign show_price = false
+  if vis_price contains 'true'
+    assign show_price = true
+  endif
+  assign show_cart = false
+  if vis_cart contains 'true'
+    assign show_cart = true
+  endif
+  assign primary   = p.metafields.ava.cta_primary.value   | default: vis_primary   | strip
+  assign secondary = p.metafields.ava.cta_secondary.value | default: vis_secondary | strip
+-%}
+
+{%- comment -%} 4) Lifecycle composition — non-shopable removes cart + swaps primary CTA {%- endcomment -%}
+{%- capture life_shopable -%}{%- render 'aa-lifecycle', key: lifecycle, attr: 'shopable' -%}{%- endcapture -%}
+{%- capture life_primary -%}{%- render 'aa-lifecycle', key: lifecycle, attr: 'primary' -%}{%- endcapture -%}
+{%- liquid
+  assign shopable = false
+  if life_shopable contains 'true'
+    assign shopable = true
+  endif
+  unless shopable
+    assign show_cart = false
+    assign life_primary_clean = life_primary | strip
+    if life_primary_clean != blank
+      assign primary = life_primary_clean
+    endif
+  endunless
+-%}
+
+{%- comment -%} 5) Modules — enabled set + order, NATIVE metafield access, preset fallback {%- endcomment -%}
+{%- liquid
+  assign enabled = ''
+  assign product_mods = p.metafields.ava.modules.value
+  if product_mods
+    for pair in product_mods
+      if pair[1]
+        assign enabled = enabled | append: ',' | append: pair[0]
+      endif
+    endfor
+  else
+    capture pre_modules
+      render 'aa-preset', key: preset, field: 'modules'
+    endcapture
+    assign enabled = pre_modules | strip
+  endif
+  assign enabled = ',' | append: enabled | append: ','
+
+  assign order_arr = p.metafields.ava.module_order.value
+  unless order_arr
+    capture pre_order
+      render 'aa-preset', key: preset, field: 'order'
+    endcapture
+    assign order_arr = pre_order | strip | split: ','
+  endunless
+-%}
+
+<section
+  class="aa-product"
+  data-preset="{{ preset }}"
+  data-fulfillment="{{ fulfillment }}"
+  data-visibility="{{ visibility }}"
+  data-lifecycle="{{ lifecycle }}"
+  data-size-mode="{{ size_mode }}"
+  {{ section.shopify_attributes }}
+>
+  {%- render 'aa-gallery', product: p -%}
+
+  <div class="aa-buybox">
+    {%- render 'aa-buybox-meta', product: p -%}
+    {%- render 'aa-price', product: p, show_price: show_price, visibility: visibility -%}
+    {%- render 'aa-fulfillment-bar', type: fulfillment, lead_time: p.metafields.ava.lead_time.value -%}
+    {%- render 'aa-lifecycle-banner', state: lifecycle -%}
+
+    {%- comment -%} Buy-box modules, fixed buy-flow order, each gated by the enabled set {%- endcomment -%}
+    {%- render 'aa-size', product: p, mode: size_mode, show_cart: show_cart -%}
+    {%- if enabled contains ',finish,' %}{% render 'module-finish', product: p, inline: true %}{% endif -%}
+    {%- if enabled contains ',material,' %}{% render 'module-material', product: p, inline: true %}{% endif -%}
+    {%- if enabled contains ',upholstery,' %}{% render 'module-upholstery', product: p, inline: true %}{% endif -%}
+    {%- if enabled contains ',samples,' %}{% render 'aa-sample-request', product: p %}{% endif -%}
+
+    {%- render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart -%}
+
+    {%- if enabled contains ',delivery,' %}{% render 'module-delivery', fulfillment: fulfillment %}{% endif -%}
+  </div>
+</section>
+
+{%- comment -%} Section modules — ORDER from aa.module_order (or preset). Each gated by the enabled set. {%- endcomment -%}
+{%- for key in order_arr -%}
+  {%- assign needle = ',' | append: key | append: ',' -%}
+  {%- if enabled contains needle -%}
+    {%- render 'aa-module', key: key, product: p, fulfillment: fulfillment, visibility: visibility -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- comment -%} Sticky buy bar (appears after scroll) {%- endcomment -%}
+{%- if section.settings.show_sticky_bar -%}
+  <div class="aa-stickybar" data-aa-stickybar>
+    <div class="aa-stickybar__inner">
+      <div>
+        <div class="aa-stickybar__title">{{ p.title }}</div>
+        {%- if show_price -%}<div class="aa-stickybar__price">{{ p.price | money }}</div>{%- endif -%}
+      </div>
+      {%- render 'aa-cta', product: p, primary: primary, secondary: nil, show_cart: show_cart, compact: true -%}
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var bar = document.querySelector('[data-aa-stickybar]');
+      if (!bar) return;
+      var onScroll = function () {
+        if (window.scrollY > 620) { bar.classList.add('is-visible'); }
+        else { bar.classList.remove('is-visible'); }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AA Product",
+  "tag": "section",
+  "class": "aa-section-product",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Art Avenue product engine"
+    },
+    {
+      "type": "paragraph",
+      "content": "Behaviour is driven by product metafields (namespace ava) and the preset. Edit metafields on the product, not this section."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky_bar",
+      "label": "Show sticky buy bar on scroll",
+      "default": true
+    }
+  ],
+  "presets": [{ "name": "AA Product" }]
+}
+{% endschema %}

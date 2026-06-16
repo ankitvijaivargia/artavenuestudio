@@ -1,0 +1,155 @@
+/* ============================================================================
+   Art Avenue — Design Tokens
+   Ported from the approved design system handoff (design-system/tokens/*).
+   Warm quiet-luxury: ivory canvas, stone neutrals, muted bronze accent,
+   warm charcoal ink. No pure black/white in surfaces.
+   This file is the single source of the visual language for the theme.
+   ============================================================================ */
+
+:root {
+  /* ---- Base neutrals (warm greige scale, light -> deep) ---- */
+  --aa-warm-white: #FCFAF6;
+  --aa-ivory:      #FAF6EF; /* primary page background */
+  --aa-canvas:     #F4EEE3; /* alternating section background */
+  --aa-stone:      #EAE1D3; /* raised surface / stone beige */
+  --aa-sand:       #DCD1BD; /* deeper neutral fill */
+  --aa-clay:       #C9BCA4; /* quiet muted fill */
+
+  /* ---- Hairlines & borders ---- */
+  --aa-border:        #DCD2C1;
+  --aa-border-strong: #C3B7A1;
+
+  /* ---- Ink (warm charcoal scale) ---- */
+  --aa-charcoal:  #2B2824; /* primary text */
+  --aa-ink:       #46413A; /* secondary text */
+  --aa-stone-600: #766E61; /* muted / captions */
+  --aa-stone-400: #9C9384; /* disabled / faint */
+
+  /* ---- Bronze accent ---- */
+  --aa-bronze:      #9C7C4E; /* primary accent */
+  --aa-bronze-deep: #7B6038; /* pressed / hover accent */
+  --aa-bronze-soft: #B89A6E; /* lighter accent */
+  --aa-bronze-tint: #ECE1CE; /* accent wash background */
+
+  /* ---- Dark surface (footer / contrast sections) ---- */
+  --aa-espresso:      #221F1B; /* deep warm near-black surface */
+  --aa-espresso-soft: #36322B;
+  --aa-white:         #FFFFFF;
+
+  /* ===== Semantic surface aliases ===== */
+  --surface-page:        var(--aa-ivory);
+  --surface-alt:         var(--aa-canvas);
+  --surface-raised:      var(--aa-warm-white);
+  --surface-stone:       var(--aa-stone);
+  --surface-accent-tint: var(--aa-bronze-tint);
+  --surface-dark:        var(--aa-espresso);
+  --surface-dark-soft:   var(--aa-espresso-soft);
+
+  /* ===== Semantic text aliases ===== */
+  --text-primary:       var(--aa-charcoal);
+  --text-secondary:     var(--aa-ink);
+  --text-muted:         var(--aa-stone-600);
+  --text-faint:         var(--aa-stone-400);
+  --text-accent:        var(--aa-bronze-deep);
+  --text-on-dark:       var(--aa-ivory);
+  --text-on-dark-muted: #B7AE9E;
+
+  /* ===== Borders / accent ===== */
+  --border-hairline: var(--aa-border);
+  --border-strong:   var(--aa-border-strong);
+  --border-on-dark:  rgba(250, 246, 239, 0.16);
+  --accent:          var(--aa-bronze);
+  --accent-deep:     var(--aa-bronze-deep);
+  --accent-soft:     var(--aa-bronze-soft);
+  --focus-ring:      0 0 0 2px var(--aa-ivory), 0 0 0 3px var(--aa-bronze);
+
+  /* ============================ Typography ============================ */
+  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-sans:  "Jost", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+
+  /* Fluid editorial scale — enlarged for premium, airy luxury-home feel
+     (reference: Anthropologie / Good Earth / Jaipur Rugs). Bigger display
+     statements, more generous body copy, roomier eyebrows. */
+  --text-display-1: clamp(4.25rem, 8vw, 8rem);     /* hero statements */
+  --text-display-2: clamp(3.25rem, 5.8vw, 5.5rem); /* section openers */
+  --text-h1: clamp(2.75rem, 4.4vw, 4rem);
+  --text-h2: clamp(2.2rem, 3.4vw, 3rem);
+  --text-h3: clamp(1.65rem, 2.2vw, 2.15rem);
+  --text-h4: 1.45rem;          /* ~23px */
+  --text-body-lg: 1.3125rem;   /* 21px — lead paragraphs */
+  --text-body:    1.1875rem;   /* 19px — default body */
+  --text-sm:      1.0rem;      /* 16px */
+  --text-xs:      0.875rem;    /* 14px */
+  --text-eyebrow: 0.8125rem;   /* 13px letterspaced label */
+
+  /* Weights */
+  --weight-light:   300;
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+
+  /* Line height — a touch more air across the board */
+  --leading-display: 1.05;
+  --leading-tight:   1.14;
+  --leading-snug:    1.32;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.8;
+
+  /* Tracking */
+  --tracking-eyebrow: 0.24em;
+  --tracking-caps:    0.14em;
+  --tracking-tight:  -0.015em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal:  0;
+
+  /* Reading widths */
+  --measure-narrow: 42ch;
+  --measure:        66ch;
+  --measure-wide:   78ch;
+
+  /* ============================ Spacing ============================ */
+  --space-3xs: 4px;
+  --space-2xs: 8px;
+  --space-xs:  12px;
+  --space-sm:  16px;
+  --space-md:  24px;
+  --space-lg:  32px;
+  --space-xl:  48px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 128px;
+  --space-5xl: 176px;
+
+  --section-y:       clamp(80px, 10vw, 168px);
+  --section-y-tight: clamp(56px, 7vw, 104px);
+
+  --container-max:  1360px;
+  --container-text: 820px;
+  --gutter:         clamp(24px, 5.5vw, 76px);
+
+  --gap-card: clamp(18px, 2.2vw, 32px);
+  --gap-tile: 2px;
+
+  /* ============================ Effects ============================ */
+  --radius-none: 0px;
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-pill: 999px;
+
+  --border-thin: 1px;
+  --border-med:  1.5px;
+
+  --shadow-none:     none;
+  --shadow-hairline: 0 1px 0 rgba(43, 40, 36, 0.04);
+  --shadow-soft:     0 2px 4px rgba(43, 40, 36, 0.04), 0 10px 28px -20px rgba(43, 40, 36, 0.22);
+  --shadow-raised:   0 4px 10px rgba(43, 40, 36, 0.06), 0 22px 48px -28px rgba(43, 40, 36, 0.28);
+  --shadow-overlay:  0 30px 80px -32px rgba(43, 40, 36, 0.40);
+
+  --ease-luxe: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:  180ms;
+  --dur-base:  320ms;
+  --dur-slow:  560ms;
+  --dur-image: 900ms;
+}

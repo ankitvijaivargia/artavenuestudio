@@ -1,0 +1,13 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-lifecycle-banner.liquid  (AALifecycleBanner)
+  Params: state (lifecycle)
+{%- endcomment -%}
+{%- capture lb_banner -%}{%- render 'aa-lifecycle', key: state, attr: 'banner' -%}{%- endcapture -%}
+{%- assign lb_banner = lb_banner | strip -%}
+{%- if lb_banner != blank -%}
+  {%- capture lb_label -%}{%- render 'aa-lifecycle', key: state, attr: 'label' -%}{%- endcapture -%}
+  <div class="aa-lifecycle aa-lifecycle--{{ state }}">
+    <span class="aa-lifecycle__label">{{ lb_label | strip }}</span>
+    <p>{{ lb_banner }}</p>
+  </div>
+{%- endif -%}

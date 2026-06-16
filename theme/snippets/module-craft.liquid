@@ -1,0 +1,9 @@
+{%- comment -%} Art Avenue — Craft & origin {%- endcomment -%}
+{%- assign ct = product.metafields.ava.craft_technique.value -%}
+<section class="module module--craft module--feature aa-surface-alt">
+  <div>
+    <p class="aa-eyebrow module__eyebrow">Craft & origin</p>
+    <h2 class="aa-h2">{{ ct.name | default: 'Made by hand, in India' }}</h2>
+    <p class="aa-lead aa-measure">{{ ct.description | default: 'Every piece is crafted in our ateliers by makers who have practised their technique for generations.' }}</p>
+  </div>
+</section>

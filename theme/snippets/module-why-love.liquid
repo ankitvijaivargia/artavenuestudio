@@ -1,0 +1,14 @@
+{%- comment -%} Art Avenue — Why you'll love it {%- endcomment -%}
+<section class="module module--why">
+  <p class="aa-eyebrow module__eyebrow">Why you'll love it</p>
+  <h2 class="aa-h2">Designed to be lived with</h2>
+  {%- if product.metafields.ava.why_love.value -%}
+    <div class="aa-lead aa-measure rte">{{ product.metafields.ava.why_love.value }}</div>
+  {%- else -%}
+    <div class="aa-tiles aa-tiles--3" style="margin-top:var(--space-lg)">
+      <div><i class="ph ph-hand-heart" style="font-size:28px;color:var(--accent)"></i><h3 class="aa-h4" style="margin:.5rem 0">Made to last</h3><p class="aa-body aa-muted">Solid materials and joinery built to be handed down.</p></div>
+      <div><i class="ph ph-pencil-ruler" style="font-size:28px;color:var(--accent)"></i><h3 class="aa-h4" style="margin:.5rem 0">Made for you</h3><p class="aa-body aa-muted">Sizes, finishes and upholstery tailored to your space.</p></div>
+      <div><i class="ph ph-leaf" style="font-size:28px;color:var(--accent)"></i><h3 class="aa-h4" style="margin:.5rem 0">Responsibly sourced</h3><p class="aa-body aa-muted">Natural materials, traceable makers, low-waste ateliers.</p></div>
+    </div>
+  {%- endif -%}
+</section>

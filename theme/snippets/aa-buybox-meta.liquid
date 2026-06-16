@@ -1,0 +1,5 @@
+{%- comment -%} Art Avenue — buy-box vendor + title {%- endcomment -%}
+{%- if product.vendor and product.vendor != blank -%}
+  <div class="aa-buybox__vendor">{{ product.vendor }}</div>
+{%- endif -%}
+<h1 class="aa-buybox__title">{{ product.title }}</h1>

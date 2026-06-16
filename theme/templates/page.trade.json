@@ -1,0 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "aa-hero",
+      "settings": {
+        "eyebrow": "Trade & Design",
+        "heading": "For designers & architects.",
+        "subheading": "Trade pricing, material sampling, project procurement and a dedicated consultant for your studio.",
+        "cta_label": "Apply to the trade program",
+        "cta_link": "shopify://pages/enquiry"
+      }
+    },
+    "programs": {
+      "type": "aa-collection-tiles",
+      "blocks": {
+        "p1": { "type": "tile", "settings": { "eyebrow": "Program", "title": "Designer Program", "tone": "espresso" } },
+        "p2": { "type": "tile", "settings": { "eyebrow": "Program", "title": "Architects", "tone": "olive" } },
+        "p3": { "type": "tile", "settings": { "eyebrow": "Program", "title": "Hospitality", "tone": "bronze" } }
+      },
+      "block_order": ["p1", "p2", "p3"],
+      "settings": { "eyebrow": "Programs", "heading": "Built for the way studios work.", "columns": 3, "bg": "page" }
+    },
+    "lead": {
+      "type": "aa-lead-section",
+      "settings": { "default_type": "trade" }
+    }
+  },
+  "order": ["hero", "programs", "lead"]
+}

@@ -1,0 +1,14 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-commerce-badge.liquid  (badge label resolver, no parse_json)
+  Echoes the human label. Mirror of enums.json#/labels/commerce_badge.
+  Params: key = in-stock | made-to-order | customizable | project
+{%- endcomment -%}
+{%- liquid
+  assign k = key
+-%}
+{%- case k -%}
+{%- when 'in-stock' -%}In Stock
+{%- when 'made-to-order' -%}Made to Order
+{%- when 'customizable' -%}Customizable
+{%- when 'project' -%}Made for Projects
+{%- endcase -%}

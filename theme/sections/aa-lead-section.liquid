@@ -1,0 +1,26 @@
+{%- comment -%}
+  Art Avenue — lead section. Renders the unified lead form (aa-lead-form).
+  Used on the Enquiry page (all CTAs route here) and on Custom/Trade pages.
+  default_type sets the lead_type when no ?type= is in the URL.
+{%- endcomment -%}
+<section class="aa-section">
+  <div class="aa-container">
+    {%- render 'aa-lead-form', default_type: section.settings.default_type -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "AA Lead Form",
+  "settings": [
+    { "type": "select", "id": "default_type", "label": "Default lead type", "options": [
+      { "value": "consultation", "label": "Consultation" },
+      { "value": "pricing", "label": "Pricing" },
+      { "value": "samples", "label": "Samples" },
+      { "value": "custom", "label": "Custom / Bespoke" },
+      { "value": "project", "label": "Project" },
+      { "value": "trade", "label": "Trade" }
+    ], "default": "consultation" }
+  ],
+  "presets": [{ "name": "AA Lead Form" }]
+}
+{% endschema %}

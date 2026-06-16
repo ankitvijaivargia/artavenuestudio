@@ -1,0 +1,18 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-sample-request.liquid  (AASampleRequest)
+  A DEDICATED sample request near the selectors — NOT a CTA button.
+  Lists material samples when the product references materials; otherwise a
+  generic sample link. Routes through the unified lead flow (type=samples).
+{%- endcomment -%}
+<div class="aa-samples">
+  <strong>Request a sample</strong>
+  <span>Feel the material in your own light · from ₹999</span>
+  {%- assign mats = product.metafields.ava.materials.value -%}
+  {%- if mats and mats.size > 0 -%}
+    {%- for m in mats limit: 6 -%}
+      <a href="{%- render 'aa-lead-url', type: 'samples', product: product, message: m.name -%}">Request {{ m.name }} sample</a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="{%- render 'aa-lead-url', type: 'samples', product: product -%}">Request a material sample</a>
+  {%- endif -%}
+</div>

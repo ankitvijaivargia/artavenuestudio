@@ -1,0 +1,12 @@
+{%- comment -%} Art Avenue — Care {%- endcomment -%}
+<section class="module module--care">
+  <p class="aa-eyebrow module__eyebrow">Care</p>
+  <h2 class="aa-h2">Caring for your piece</h2>
+  <div class="aa-measure">
+    {%- if product.metafields.ava.care.value -%}
+      <div class="aa-body rte">{{ product.metafields.ava.care.value }}</div>
+    {%- else -%}
+      <p class="aa-body">Dust regularly with a soft, dry cloth. Avoid direct sunlight and household chemicals. For natural materials, occasional conditioning preserves the finish. Full care guidance ships with every order.</p>
+    {%- endif -%}
+  </div>
+</section>

@@ -1,0 +1,26 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-lead-url.liquid
+  Builds the URL for the unified lead flow. Mirrors the prototype `aa_lead_url`.
+  All CTAs (consult / pricing / samples / custom / project / notify) route here,
+  landing on the Enquiry page which renders snippets/aa-lead-form.liquid. The
+  query string pre-fills the form (read client-side in aa-lead-form.liquid).
+
+  Usage:  {%- render 'aa-lead-url', type: 'consultation', product: product, message: m.name -%}
+  Settings:  lead_page (page handle, default 'enquiry')
+{%- endcomment -%}
+{%- liquid
+  assign lead_page = settings.aa_lead_page | default: 'enquiry'
+  assign lt = type | default: 'consultation'
+  assign base = '/pages/' | append: lead_page
+  assign qs = '?type=' | append: lt
+  if product
+    assign qs = qs | append: '&product=' | append: product.handle
+    if product.selected_or_first_available_variant.sku and product.selected_or_first_available_variant.sku != blank
+      assign qs = qs | append: '&sku=' | append: product.selected_or_first_available_variant.sku | url_encode
+    endif
+  endif
+  if message and message != blank
+    assign qs = qs | append: '&msg=' | append: message | url_encode
+  endif
+  echo base | append: qs
+-%}

@@ -1,0 +1,90 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-preset.liquid  (preset resolver, no parse_json)
+  Echoes ONE scalar for a preset. Mirror of the approved presets registry.
+  Params:
+    key   — preset key (enums.json#/preset)
+    field — fulfillment | visibility | size_mode | cta_primary | modules | order
+  Usage:
+    {%- capture v -%}{%- render 'aa-preset', key: preset, field: 'fulfillment' -%}{%- endcapture -%}
+    {%- assign fulfillment_default = v | strip -%}
+  `modules` returns a comma-separated list of enabled module keys.
+  `order`   returns a comma-separated module order.
+{%- endcomment -%}
+{%- liquid
+  assign k = key | default: 'made-to-order-product'
+  assign f = field | default: 'fulfillment'
+-%}
+{%- case k -%}
+
+{%- when 'luxury-furniture' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}made-to-order
+    {%- when 'visibility' -%}ecommerce
+    {%- when 'size_mode' -%}multi
+    {%- when 'cta_primary' -%}
+    {%- when 'modules' -%}material,finish,upholstery,samples,customization,assembly,completeRoom,faq,related,delivery
+    {%- when 'order' -%}assembly,whyLove,customization,completeRoom,faq,related
+  {%- endcase -%}
+
+{%- when 'luxury-rug' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}made-to-order
+    {%- when 'visibility' -%}ecommerce
+    {%- when 'size_mode' -%}multi
+    {%- when 'cta_primary' -%}
+    {%- when 'modules' -%}guides,specs,construction,material,craft,rooms,related,samples
+    {%- when 'order' -%}whyLove,customization,guides,specs,construction,material,craft,rooms,consult,related
+  {%- endcase -%}
+
+{%- when 'luxury-cushion' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}made-to-order
+    {%- when 'visibility' -%}ecommerce
+    {%- when 'size_mode' -%}single
+    {%- when 'cta_primary' -%}
+    {%- when 'modules' -%}samples,whyLove,customization,pairs
+    {%- when 'order' -%}whyLove,customization,pairs
+  {%- endcase -%}
+
+{%- when 'custom-product' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}custom
+    {%- when 'visibility' -%}price-on-request
+    {%- when 'size_mode' -%}custom
+    {%- when 'cta_primary' -%}request-pricing
+    {%- when 'modules' -%}customization,material,craft,samples
+    {%- when 'order' -%}whyLove,customization,material,craft
+  {%- endcase -%}
+
+{%- when 'project-product' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}project
+    {%- when 'visibility' -%}project-only
+    {%- when 'size_mode' -%}custom
+    {%- when 'cta_primary' -%}project-enquiry
+    {%- when 'modules' -%}customization,specifications,consultation
+    {%- when 'order' -%}customization,specifications,consultation
+  {%- endcase -%}
+
+{%- when 'in-stock-product' -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}in-stock
+    {%- when 'visibility' -%}ecommerce
+    {%- when 'size_mode' -%}multi
+    {%- when 'cta_primary' -%}add-to-cart
+    {%- when 'modules' -%}specifications,delivery,related
+    {%- when 'order' -%}whyLove,specifications,related
+  {%- endcase -%}
+
+{%- else -%}
+  {%- comment -%} made-to-order-product (default) {%- endcomment -%}
+  {%- case f -%}
+    {%- when 'fulfillment' -%}made-to-order
+    {%- when 'visibility' -%}ecommerce
+    {%- when 'size_mode' -%}multi
+    {%- when 'cta_primary' -%}add-to-cart
+    {%- when 'modules' -%}specifications,delivery,related,samples
+    {%- when 'order' -%}whyLove,specifications,related
+  {%- endcase -%}
+
+{%- endcase -%}

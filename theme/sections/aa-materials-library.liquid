@@ -1,0 +1,64 @@
+{%- comment -%}
+  Art Avenue — Materials Library (editorial grid of material families).
+  Fully editable: each material is a block (name, note, tone/image, link).
+  Pulls nothing hardcoded; merchants add/remove materials in the theme editor.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="aa-section {% if s.bg == 'alt' %}aa-surface-alt{% elsif s.bg == 'dark' %}aa-surface-dark{% endif %}">
+  <div class="aa-container">
+    <div class="aa-section-head {% if s.center %}aa-section-head--center{% endif %}">
+      {%- if s.eyebrow != blank -%}<p class="aa-eyebrow {% if s.bg == 'dark' %}aa-eyebrow--on-dark{% endif %}">{{ s.eyebrow }}</p>{%- endif -%}
+      {%- if s.heading != blank -%}<h2 class="aa-display-2" style="margin-top:14px{% if s.bg == 'dark' %};color:var(--text-on-dark){% endif %}">{{ s.heading }}</h2>{%- endif -%}
+      {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:16px{% if s.bg == 'dark' %};color:var(--text-on-dark-muted){% endif %}">{{ s.intro }}</p>{%- endif -%}
+    </div>
+    <div class="aa-materials" style="margin-top:var(--space-2xl)">
+      {%- for block in section.blocks -%}
+        <a class="aa-material" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="aa-material__swatch aa-fig aa-fig--{{ block.settings.tone | default: 'stone' }}">
+            {%- if block.settings.image != blank -%}<img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.name }}" width="{{ block.settings.image.width | default: 600 }}" height="{{ block.settings.image.height | default: 600 }}">{%- endif -%}
+          </div>
+          <div class="aa-material__name">{{ block.settings.name }}</div>
+          {%- if block.settings.note != blank -%}<div class="aa-material__note aa-muted">{{ block.settings.note }}</div>{%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+    {%- if s.cta_label != blank -%}
+      <div style="margin-top:var(--space-xl)">
+        <a class="aa-btn {% if s.bg == 'dark' %}aa-btn--on-dark{% else %}aa-btn--secondary{% endif %}" href="{{ s.cta_link }}">{{ s.cta_label }} <i class="ph ph-arrow-right"></i></a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "AA Materials Library",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Materials Library" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The materials we build with." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Natural wood, hand-knotted wool, cast brass and honed stone — explore the materials behind every Art Avenue piece." },
+    { "type": "checkbox", "id": "center", "label": "Center header", "default": true },
+    { "type": "text", "id": "cta_label", "label": "Button", "default": "Explore the full library" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "select", "id": "bg", "label": "Background", "options": [ { "value": "page", "label": "Page" }, { "value": "alt", "label": "Alt" }, { "value": "dark", "label": "Dark" } ], "default": "alt" }
+  ],
+  "blocks": [
+    { "type": "material", "name": "Material", "settings": [
+      { "type": "text", "id": "name", "label": "Name", "default": "Teak" },
+      { "type": "text", "id": "note", "label": "Short note" },
+      { "type": "image_picker", "id": "image", "label": "Swatch image" },
+      { "type": "url", "id": "link", "label": "Link" },
+      { "type": "select", "id": "tone", "label": "Placeholder tone", "options": [
+        { "value": "stone", "label": "Stone" }, { "value": "sand", "label": "Sand" }, { "value": "clay", "label": "Clay" }, { "value": "bronze", "label": "Bronze" }, { "value": "olive", "label": "Olive" }, { "value": "espresso", "label": "Espresso" }
+      ], "default": "stone" }
+    ]}
+  ],
+  "presets": [{ "name": "AA Materials Library", "blocks": [
+    { "type": "material", "settings": { "name": "Solid Teak", "note": "Warm, durable hardwood", "tone": "clay" } },
+    { "type": "material", "settings": { "name": "Hand-Knotted Wool", "note": "Natural-dyed, generational craft", "tone": "olive" } },
+    { "type": "material", "settings": { "name": "Cast Brass", "note": "Solid, hand-finished metal", "tone": "bronze" } },
+    { "type": "material", "settings": { "name": "Honed Marble", "note": "Quarried stone, matte finish", "tone": "stone" } },
+    { "type": "material", "settings": { "name": "Belgian Linen", "note": "Relaxed, breathable weave", "tone": "sand" } },
+    { "type": "material", "settings": { "name": "Travertine", "note": "Textured natural stone", "tone": "stone" } }
+  ]}]
+}
+{% endschema %}

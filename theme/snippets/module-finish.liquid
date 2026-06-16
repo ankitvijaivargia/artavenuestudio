@@ -1,0 +1,30 @@
+{%- comment -%} Art Avenue — Finish options. inline=true renders swatch row in buy box. {%- endcomment -%}
+{%- assign fins = product.metafields.ava.finishes.value -%}
+{%- if fins and fins.size > 0 -%}
+  {%- if inline -%}
+    <div class="aa-option">
+      <div class="aa-option__label"><span>Finish</span></div>
+      <div class="aa-swatches">
+        {%- for f in fins -%}
+          <span class="aa-swatch" title="{{ f.name }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+            {%- if f.swatch %}<img src="{{ f.swatch | image_url: width: 92 }}" alt="{{ f.name }}" width="92" height="92">{% endif -%}
+          </span>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- else -%}
+    <section class="module module--finish">
+      <p class="aa-eyebrow module__eyebrow">Finishes</p>
+      <h2 class="aa-h2">Finish library</h2>
+      <div class="grid">
+        {%- for f in fins -%}
+          <article class="aa-card">
+            <div class="aa-card__media aa-fig aa-fig--bronze">{% if f.swatch %}<img src="{{ f.swatch | image_url: width: 400 }}" alt="{{ f.name }}" width="400" height="400">{% endif %}</div>
+            <h3 class="aa-card__title">{{ f.name }}</h3>
+            {%- if f.description %}<p class="aa-body">{{ f.description }}</p>{% endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+{%- endif -%}

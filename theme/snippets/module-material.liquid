@@ -1,0 +1,31 @@
+{%- comment -%} Art Avenue — Material & texture. inline=true renders compact swatch row in buy box. {%- endcomment -%}
+{%- assign mats = product.metafields.ava.materials.value -%}
+{%- if mats and mats.size > 0 -%}
+  {%- if inline -%}
+    <div class="aa-option">
+      <div class="aa-option__label"><span>Material</span></div>
+      <div class="aa-swatches">
+        {%- for m in mats -%}
+          <span class="aa-swatch" title="{{ m.name }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+            {%- if m.image %}<img src="{{ m.image | image_url: width: 92 }}" alt="{{ m.name }}" width="92" height="92">{% endif -%}
+          </span>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- else -%}
+    <section class="module module--material">
+      <p class="aa-eyebrow module__eyebrow">Material &amp; texture</p>
+      <h2 class="aa-h2">Made from materials worth touching</h2>
+      <div class="grid">
+        {%- for m in mats -%}
+          <article class="aa-card">
+            <div class="aa-card__media aa-fig aa-fig--stone">{% if m.image %}<img src="{{ m.image | image_url: width: 600 }}" alt="{{ m.name }}" width="600" height="600">{% endif %}</div>
+            <h3 class="aa-card__title">{{ m.name }}</h3>
+            {%- if m.description %}<p class="aa-body">{{ m.description }}</p>{% endif -%}
+            {%- if m.sample_available -%}<a class="aa-link-underline" href="{%- render 'aa-lead-url', type: 'samples', product: product, message: m.name -%}">Request sample</a>{%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+{%- endif -%}
