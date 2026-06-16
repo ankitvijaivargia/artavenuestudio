@@ -1,0 +1,20 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-visibility.liquid  (visibility resolver, no parse_json)
+  Echoes ONE scalar. Mirror of enums.json#/labels/visibility.
+  Params: key (visibility), attr = price | cart | primary | secondary | price_label
+  Booleans returned as the strings 'true' / 'false' (compare to 'true' at call site).
+{%- endcomment -%}
+{%- liquid
+  assign k = key | default: 'ecommerce'
+  assign a = attr | default: 'primary'
+-%}
+{%- case k -%}
+{%- when 'ecommerce' -%}
+  {%- case a -%}{%- when 'price' -%}true{%- when 'cart' -%}true{%- when 'primary' -%}add-to-cart{%- when 'secondary' -%}consult{%- when 'price_label' -%}{%- endcase -%}
+{%- when 'consultation' -%}
+  {%- case a -%}{%- when 'price' -%}true{%- when 'cart' -%}false{%- when 'primary' -%}consult{%- when 'secondary' -%}customize{%- when 'price_label' -%}{%- endcase -%}
+{%- when 'price-on-request' -%}
+  {%- case a -%}{%- when 'price' -%}false{%- when 'cart' -%}false{%- when 'primary' -%}request-pricing{%- when 'secondary' -%}consult{%- when 'price_label' -%}Price on request{%- endcase -%}
+{%- when 'project-only' -%}
+  {%- case a -%}{%- when 'price' -%}false{%- when 'cart' -%}false{%- when 'primary' -%}project-enquiry{%- when 'secondary' -%}consult{%- when 'price_label' -%}Project pricing{%- endcase -%}
+{%- endcase -%}

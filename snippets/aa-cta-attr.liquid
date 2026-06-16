@@ -1,0 +1,23 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-cta-attr.liquid  (CTA resolver, no parse_json)
+  Echoes ONE scalar. Mirror of enums.json#/labels/cta.
+  Params: key (cta key), attr = label | icon | kind | lead_type
+{%- endcomment -%}
+{%- liquid
+  assign k = key | default: 'consult'
+  assign a = attr | default: 'label'
+-%}
+{%- case k -%}
+{%- when 'add-to-cart' -%}
+  {%- case a -%}{%- when 'label' -%}Add to Cart{%- when 'icon' -%}shopping-bag-open{%- when 'kind' -%}cart{%- when 'lead_type' -%}{%- endcase -%}
+{%- when 'request-pricing' -%}
+  {%- case a -%}{%- when 'label' -%}Request Pricing{%- when 'icon' -%}tag{%- when 'kind' -%}lead{%- when 'lead_type' -%}pricing{%- endcase -%}
+{%- when 'consult' -%}
+  {%- case a -%}{%- when 'label' -%}Speak with a Design Consultant{%- when 'icon' -%}chat-teardrop-dots{%- when 'kind' -%}lead{%- when 'lead_type' -%}consultation{%- endcase -%}
+{%- when 'customize' -%}
+  {%- case a -%}{%- when 'label' -%}Customize This Piece{%- when 'icon' -%}pencil-ruler{%- when 'kind' -%}lead{%- when 'lead_type' -%}custom{%- endcase -%}
+{%- when 'project-enquiry' -%}
+  {%- case a -%}{%- when 'label' -%}Start a Project Enquiry{%- when 'icon' -%}buildings{%- when 'kind' -%}lead{%- when 'lead_type' -%}project{%- endcase -%}
+{%- when 'notify' -%}
+  {%- case a -%}{%- when 'label' -%}Notify Me When Available{%- when 'icon' -%}bell{%- when 'kind' -%}lead{%- when 'lead_type' -%}consultation{%- endcase -%}
+{%- endcase -%}

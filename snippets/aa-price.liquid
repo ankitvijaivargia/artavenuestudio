@@ -1,0 +1,21 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-price.liquid  (AAPriceTag)
+  Respects visibility: hidden price -> "Price on request" / "Project pricing".
+  Params: product, show_price (bool), visibility (string)
+{%- endcomment -%}
+{%- if show_price -%}
+  {%- assign v = product.selected_or_first_available_variant -%}
+  <div class="aa-price">
+    {{ v.price | money }}
+    {%- if v.compare_at_price > v.price -%}
+      <span class="aa-price__compare">{{ v.compare_at_price | money }}</span>
+    {%- endif -%}
+  </div>
+{%- else -%}
+  {%- capture price_label -%}{%- render 'aa-visibility', key: visibility, attr: 'price_label' -%}{%- endcapture -%}
+  {%- assign price_label = price_label | strip -%}
+  <div class="aa-price aa-price--enquire">
+    {{ price_label | default: 'Price on request' }}
+    <span>{% if visibility == 'project-only' %}Quoted per project{% else %}Shared on enquiry{% endif %}</span>
+  </div>
+{%- endif -%}

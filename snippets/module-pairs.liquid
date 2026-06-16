@@ -1,0 +1,17 @@
+{%- comment -%} Art Avenue — Pairs well with (cushions etc.) {%- endcomment -%}
+{%- assign coll = product.collections.first -%}
+{%- if coll -%}
+<section class="module module--pairs">
+  <p class="aa-eyebrow module__eyebrow">Pairs well with</p>
+  <h2 class="aa-h2">Layer it up</h2>
+  <div class="aa-tiles aa-tiles--4" style="margin-top:var(--space-lg)">
+    {%- assign shown = 0 -%}
+    {%- for pr in coll.products -%}
+      {%- if pr.id != product.id and shown < 4 -%}
+        {%- render 'aa-product-card', product: pr -%}
+        {%- assign shown = shown | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+{%- endif -%}

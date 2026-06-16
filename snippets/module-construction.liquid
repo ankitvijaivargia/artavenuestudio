@@ -1,0 +1,18 @@
+{%- comment -%} Art Avenue — Construction {%- endcomment -%}
+{%- assign ct = product.metafields.ava.craft_technique.value -%}
+<section class="module module--construction">
+  <p class="aa-eyebrow module__eyebrow">Construction</p>
+  <h2 class="aa-h2">How it's made</h2>
+  <div class="aa-split">
+    <div class="aa-card__media aa-fig aa-fig--espresso" style="aspect-ratio:4/3">{% if ct.image %}<img src="{{ ct.image | image_url: width: 900 }}" alt="{{ ct.name }}" width="900" height="675">{% endif %}</div>
+    <div class="aa-measure">
+      {%- if ct.name %}<h3 class="aa-h3">{{ ct.name }}</h3>{% endif -%}
+      {%- if ct.description %}<p class="aa-lead">{{ ct.description }}</p>{% endif -%}
+      <table class="aa-specs">
+        {% if ct.durability %}<tr><th>Durability</th><td>{{ ct.durability }}</td></tr>{% endif %}
+        {% if ct.best_for %}<tr><th>Best for</th><td>{{ ct.best_for }}</td></tr>{% endif %}
+        {% if ct.lead_time %}<tr><th>Lead time</th><td>{{ ct.lead_time }}</td></tr>{% endif %}
+      </table>
+    </div>
+  </div>
+</section>

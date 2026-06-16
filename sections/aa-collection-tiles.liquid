@@ -1,0 +1,58 @@
+{%- comment -%} Art Avenue — signature collections / shop-by-room tile grid {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="aa-section {% if s.bg == 'alt' %}aa-surface-alt{% elsif s.bg == 'dark' %}aa-surface-dark{% endif %}">
+  <div class="aa-container">
+    <div class="aa-section-head {% if s.center %}aa-section-head--center{% endif %}">
+      {%- if s.eyebrow != blank -%}<p class="aa-eyebrow {% if s.bg == 'dark' %}aa-eyebrow--on-dark{% endif %}">{{ s.eyebrow }}</p>{%- endif -%}
+      {%- if s.heading != blank -%}<h2 class="aa-display-2" style="margin-top:14px{% if s.bg == 'dark' %};color:var(--text-on-dark){% endif %}">{{ s.heading }}</h2>{%- endif -%}
+      {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:14px{% if s.bg == 'dark' %};color:var(--text-on-dark-muted){% endif %}">{{ s.intro }}</p>{%- endif -%}
+    </div>
+    <div class="aa-tiles aa-tiles--{{ s.columns | default: 3 }}" style="margin-top:var(--space-xl)">
+      {%- for block in section.blocks -%}
+        {%- assign url = block.settings.link -%}
+        {%- if block.settings.collection != blank -%}{%- assign url = collections[block.settings.collection].url -%}{%- endif -%}
+        <a class="aa-tile aa-fig aa-fig--{{ block.settings.tone | default: 'clay' }}" href="{{ url | default: '#' }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}<img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.title }}" width="{{ block.settings.image.width | default: 800 }}" height="{{ block.settings.image.height | default: 1000 }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">{%- endif -%}
+          <div style="position:relative;z-index:1">
+            {%- if block.settings.eyebrow != blank -%}<p class="aa-eyebrow aa-eyebrow--on-dark" style="margin-bottom:6px">{{ block.settings.eyebrow }}</p>{%- endif -%}
+            <h3>{{ block.settings.title }}</h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "AA Collection Tiles",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "intro", "label": "Intro" },
+    { "type": "checkbox", "id": "center", "label": "Center header", "default": false },
+    { "type": "range", "id": "columns", "min": 2, "max": 5, "step": 1, "label": "Columns", "default": 3 },
+    { "type": "select", "id": "bg", "label": "Background", "options": [
+      { "value": "page", "label": "Page" }, { "value": "alt", "label": "Alt" }, { "value": "dark", "label": "Dark" }
+    ], "default": "page" }
+  ],
+  "blocks": [
+    { "type": "tile", "name": "Tile", "settings": [
+      { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Furniture" },
+      { "type": "collection", "id": "collection", "label": "Collection (link)" },
+      { "type": "url", "id": "link", "label": "Or custom link" },
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "select", "id": "tone", "label": "Placeholder tone", "options": [
+        { "value": "clay", "label": "Clay" }, { "value": "olive", "label": "Olive" }, { "value": "bronze", "label": "Bronze" }, { "value": "stone", "label": "Stone" }, { "value": "sand", "label": "Sand" }, { "value": "espresso", "label": "Espresso" }
+      ], "default": "clay" }
+    ]}
+  ],
+  "presets": [{ "name": "AA Collection Tiles", "blocks": [
+    { "type": "tile", "settings": { "eyebrow": "01 — Furniture", "title": "Furniture", "tone": "clay" } },
+    { "type": "tile", "settings": { "eyebrow": "02 — Rugs", "title": "Rugs", "tone": "olive" } },
+    { "type": "tile", "settings": { "eyebrow": "03 — Lighting", "title": "Lighting", "tone": "bronze" } },
+    { "type": "tile", "settings": { "eyebrow": "04 — Decor", "title": "Decor", "tone": "stone" } },
+    { "type": "tile", "settings": { "eyebrow": "05 — Wall Art", "title": "Wall Art", "tone": "sand" } }
+  ]}]
+}
+{% endschema %}

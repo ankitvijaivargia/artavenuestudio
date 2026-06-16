@@ -1,0 +1,51 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-product-card.liquid  (AACommerce card)
+  The commerce badge (In Stock · Made to Order · Customizable · Made for Projects)
+  is visible WITHOUT entering the PDP. Resolution:
+    collection force_badge  ->  product aa.commerce_badge  ->  preset-derived default
+  Params: product (req), force_badge (opt)
+{%- endcomment -%}
+{%- liquid
+  assign badge_key = force_badge | default: product.metafields.ava.commerce_badge.value
+  unless badge_key
+    assign pf = product.metafields.ava.fulfillment.value
+    case pf
+      when 'in-stock'
+        assign badge_key = 'in-stock'
+      when 'made-to-order'
+        assign badge_key = 'made-to-order'
+      when 'custom'
+        assign badge_key = 'customizable'
+      when 'project'
+        assign badge_key = 'project'
+    endcase
+  endunless
+  assign vis = product.metafields.ava.visibility.value | default: 'ecommerce'
+-%}
+{%- capture badge_label -%}{%- if badge_key -%}{%- render 'aa-commerce-badge', key: badge_key -%}{%- endif -%}{%- endcapture -%}
+{%- assign badge_label = badge_label | strip -%}
+<a class="aa-card" href="{{ product.url }}">
+  <div class="aa-card__media aa-fig aa-fig--sand">
+    {%- if badge_label != blank -%}<span class="aa-card__badge aa-badge aa-badge--{{ badge_key }}">{{ badge_label }}</span>{%- endif -%}
+    {%- if product.featured_media -%}
+      <img src="{{ product.featured_media | image_url: width: 700 }}"
+        srcset="{{ product.featured_media | image_url: width: 400 }} 400w, {{ product.featured_media | image_url: width: 700 }} 700w"
+        sizes="(min-width:990px) 25vw, 50vw"
+        alt="{{ product.featured_media.alt | escape | default: product.title }}" loading="lazy" width="700" height="875">
+    {%- else -%}
+      <span class="aa-fig__label">{{ product.title }}</span>
+    {%- endif -%}
+  </div>
+  {%- if product.vendor != blank -%}<div class="aa-card__vendor">{{ product.vendor }}</div>{%- endif -%}
+  <div class="aa-card__title">{{ product.title }}</div>
+  <div class="aa-card__price">
+    {%- if vis == 'price-on-request' -%}
+      <span class="aa-price--enquire">Price on request</span>
+    {%- elsif vis == 'project-only' -%}
+      <span class="aa-price--enquire">Project pricing</span>
+    {%- else -%}
+      {%- if product.compare_at_price > product.price -%}<span class="aa-card__compare">{{ product.compare_at_price | money }}</span> {% endif -%}
+      {{ product.price | money }}
+    {%- endif -%}
+  </div>
+</a>

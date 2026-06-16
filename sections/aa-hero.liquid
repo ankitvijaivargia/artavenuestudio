@@ -1,0 +1,35 @@
+{%- comment -%} Art Avenue — editorial hero (HomePage Hero) {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="aa-hero{% if s.image == blank %} aa-fig aa-fig--clay{% endif %}">
+  {%- if s.image != blank -%}
+    <div class="aa-hero__bg">
+      <img src="{{ s.image | image_url: width: 2400 }}" alt="{{ s.heading | escape }}" width="{{ s.image.width | default: 2400 }}" height="{{ s.image.height | default: 1350 }}" loading="eager" style="width:100%;height:100%;object-fit:cover">
+    </div>
+  {%- endif -%}
+  <div class="aa-hero__overlay" style="position:absolute;inset:0;background:linear-gradient(to top, rgba(34,31,27,.55), rgba(34,31,27,.12) 45%, rgba(34,31,27,.30))"></div>
+  <div class="aa-hero__inner">
+    {%- if s.eyebrow != blank -%}<p class="aa-eyebrow aa-eyebrow--on-dark">{{ s.eyebrow }}</p>{%- endif -%}
+    <h1>{{ s.heading | default: 'Crafted spaces, collected stories.' }}</h1>
+    {%- if s.subheading != blank -%}<p>{{ s.subheading }}</p>{%- endif -%}
+    <div class="aa-hero__cta">
+      {%- if s.cta_label != blank -%}<a class="aa-btn aa-btn--primary aa-btn--lg" href="{{ s.cta_link }}">{{ s.cta_label }}</a>{%- endif -%}
+      {%- if s.cta2_label != blank -%}<a class="aa-btn aa-btn--on-dark" href="{{ s.cta2_link }}">{{ s.cta2_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "AA Hero",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Background image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Spring Collection · 2026" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "Crafted spaces, collected stories." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Handcrafted furniture, rugs and objects for homes made to be lived in — and remembered." },
+    { "type": "text", "id": "cta_label", "label": "Primary button", "default": "Explore the Collection" },
+    { "type": "url", "id": "cta_link", "label": "Primary link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Trade & Design" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary link" }
+  ],
+  "presets": [{ "name": "AA Hero" }]
+}
+{% endschema %}

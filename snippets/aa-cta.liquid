@@ -1,0 +1,48 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-cta.liquid  (AACtaButtons)
+  primary / secondary are CTA keys (enums.json#/cta). Cart is gated by show_cart
+  (visibility.cart AND lifecycle shopable). Everything else opens the lead flow.
+  Params: product, primary, secondary, show_cart, compact (bool)
+{%- endcomment -%}
+{%- capture p_kind -%}{%- render 'aa-cta-attr', key: primary, attr: 'kind' -%}{%- endcapture -%}
+{%- capture p_label -%}{%- render 'aa-cta-attr', key: primary, attr: 'label' -%}{%- endcapture -%}
+{%- capture p_icon -%}{%- render 'aa-cta-attr', key: primary, attr: 'icon' -%}{%- endcapture -%}
+{%- capture p_lead -%}{%- render 'aa-cta-attr', key: primary, attr: 'lead_type' -%}{%- endcapture -%}
+{%- assign p_kind = p_kind | strip -%}
+{%- assign p_lead = p_lead | strip -%}
+<div class="aa-cta{% if compact %} aa-cta--compact{% endif %}">
+  {%- if p_kind == 'cart' and show_cart -%}
+    {%- form 'product', product, id: 'aa-product-form', class: 'aa-cta__form' -%}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <button type="submit" class="aa-btn aa-btn--primary aa-btn--lg" {% unless product.available %}disabled{% endunless %}>
+        <i class="ph ph-{{ p_icon | strip }}" aria-hidden="true"></i>
+        {% if product.available %}{{ p_label | strip }}{% else %}Sold Out{% endif %}
+      </button>
+    {%- endform -%}
+  {%- else -%}
+    <a class="aa-btn aa-btn--primary aa-btn--lg" href="{%- render 'aa-lead-url', type: p_lead, product: product -%}">
+      <i class="ph ph-{{ p_icon | strip }}" aria-hidden="true"></i> {{ p_label | strip }}
+    </a>
+  {%- endif -%}
+
+  {%- if secondary and secondary != blank -%}
+    {%- capture s_label -%}{%- render 'aa-cta-attr', key: secondary, attr: 'label' -%}{%- endcapture -%}
+    {%- capture s_icon -%}{%- render 'aa-cta-attr', key: secondary, attr: 'icon' -%}{%- endcapture -%}
+    {%- capture s_lead -%}{%- render 'aa-cta-attr', key: secondary, attr: 'lead_type' -%}{%- endcapture -%}
+    {%- assign s_label = s_label | strip -%}
+    {%- assign s_lead = s_lead | strip -%}
+    {%- if s_label != blank -%}
+      <a class="aa-btn aa-btn--secondary" href="{%- render 'aa-lead-url', type: s_lead, product: product -%}">
+        <i class="ph ph-{{ s_icon | strip }}" aria-hidden="true"></i> {{ s_label }}
+      </a>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- unless compact -%}
+    <div class="aa-cta__assure">
+      <span><i class="ph ph-shield-check" aria-hidden="true"></i> Trade-trusted craftsmanship</span>
+      <span><i class="ph ph-truck" aria-hidden="true"></i> White-glove delivery</span>
+      <span><i class="ph ph-chat-teardrop-dots" aria-hidden="true"></i> Design help available</span>
+    </div>
+  {%- endunless -%}
+</div>
