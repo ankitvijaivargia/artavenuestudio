@@ -120,11 +120,11 @@
     <span class="serif" style="font-size:22px;letter-spacing:.16em;text-transform:uppercase">Art Avenue</span>
     <button aria-label="Close menu" style="background:none;border:none;font-size:24px;cursor:pointer" onclick="document.getElementById('aaDrawer').classList.remove('is-open');document.body.style.overflow='';"><i class="ph ph-x"></i></button>
   </div>
-  {% render 'aa-drawer-accordion', label: 'Furniture', url: '/collections/furniture', rail: furn_rail %}
-  {% render 'aa-drawer-accordion', label: 'Rugs', url: '/collections/rugs', rail: rug_rail %}
-  {% render 'aa-drawer-accordion', label: 'Lighting', url: '/collections/lighting', cols: light_cols %}
-  {% render 'aa-drawer-accordion', label: 'Decor', url: '/collections/decor', cols: decor_cols %}
-  {% render 'aa-drawer-accordion', label: 'Wall Art', url: '/collections/wall-art', cols: wall_cols %}
+  {% render 'aa-drawer-accordion', label: 'Furniture', url: '/collections/furniture', rail: furn_rail, show: 'Shop by Category,Shop by Room' %}
+  {% render 'aa-drawer-accordion', label: 'Rugs', url: '/collections/rugs', rail: rug_rail, show: 'Shop by Construction,Shop by Material' %}
+  {% render 'aa-drawer-accordion', label: 'Lighting', url: '/collections/lighting', cols: light_cols, show: 'Shop by Type,Shop by Room' %}
+  {% render 'aa-drawer-accordion', label: 'Decor', url: '/collections/decor', cols: decor_cols, show: 'Shop by Type' %}
+  {% render 'aa-drawer-accordion', label: 'Wall Art', url: '/collections/wall-art', cols: wall_cols, show: 'Medium' %}
   <a class="aa-drawer__top-link" href="/pages/atelier">Discover</a>
   <a class="aa-drawer__top-link" href="/pages/custom">Custom &amp; Bespoke</a>
   <a class="aa-drawer__top-link" href="/pages/trade">Trade</a>
