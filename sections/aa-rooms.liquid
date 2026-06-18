@@ -1,8 +1,8 @@
 <section class="aa-section aa-alt">
   <div class="aa-wrap" style="text-align:center;max-width:720px;margin:0 auto"><span class="aa-eyebrow aa-eyebrow--center aa-eyebrow--rule">{{ section.settings.eyebrow }}</span><h2 class="aa-display-2" style="margin-top:18px">{{ section.settings.heading }}</h2><p class="aa-lead" style="margin:18px auto 0">{{ section.settings.intro }}</p></div>
-  <div style="display:flex;gap:var(--gap-tile);margin-top:48px;overflow:hidden">
+  <div class="aa-rooms__row" style="display:flex;gap:var(--gap-tile);margin-top:48px;overflow:hidden">
     {% for block in section.blocks %}
-      <a class="aa-tile" href="{{ block.settings.link | default:'#' }}" {{ block.shopify_attributes }} style="flex:1;min-height:440px;border-radius:0">
+      <a class="aa-tile aa-rooms__tile" href="{{ block.settings.link | default:'#' }}" {{ block.shopify_attributes }} style="flex:1;min-height:440px;border-radius:0">
         {% render 'aa-figure', tone: block.settings.tone, class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span>
         <span class="aa-tile__inner"><span class="aa-tile__title">{{ block.settings.title }}</span><span class="aa-tile__cta">Shop the room <i class="ph ph-arrow-right"></i></span></span>
       </a>
