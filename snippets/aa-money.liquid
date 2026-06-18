@@ -1,0 +1,25 @@
+{%- comment -%}
+  aa-money — format a price (in cents) as ₹ with Indian lakh grouping, no decimals.
+  e.g. 14800000 -> ₹ 1,48,000   |   190000 -> ₹ 1,900
+  param: cents (integer, the Shopify price in cents)
+{%- endcomment -%}
+{%- assign rupees = cents | divided_by: 100 -%}
+{%- assign s = rupees | append: '' -%}
+{%- assign n = s | size -%}
+{%- if n <= 3 -%}&#8377;&nbsp;{{ s }}
+{%- else -%}
+  {%- assign last3 = s | slice: -3, 3 -%}
+  {%- assign headlen = n | minus: 3 -%}
+  {%- assign head = s | slice: 0, headlen -%}
+  {%- assign grouped = '' -%}
+  {%- assign idx = 0 -%}
+  {%- assign rem = headlen | modulo: 2 -%}
+  {%- if rem == 1 -%}{%- assign grouped = head | slice: 0, 1 -%}{%- assign idx = 1 -%}{%- endif -%}
+  {%- for k in (1..20) -%}
+    {%- if idx >= headlen -%}{%- break -%}{%- endif -%}
+    {%- assign pair = head | slice: idx, 2 -%}
+    {%- if grouped == '' -%}{%- assign grouped = pair -%}{%- else -%}{%- assign grouped = grouped | append: ',' | append: pair -%}{%- endif -%}
+    {%- assign idx = idx | plus: 2 -%}
+  {%- endfor -%}
+&#8377;&nbsp;{{ grouped }},{{ last3 }}
+{%- endif -%}

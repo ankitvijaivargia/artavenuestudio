@@ -1,0 +1,10 @@
+<section class="aa-section" style="text-align:center"><div class="aa-wrap" style="max-width:920px">
+  <span class="aa-eyebrow aa-eyebrow--center aa-eyebrow--rule">{{ section.settings.eyebrow }}</span>
+  <p class="serif" style="font-weight:500;font-size:clamp(28px,3.6vw,48px);line-height:1.18;letter-spacing:var(--tracking-tight);margin-top:26px">{{ section.settings.text }}</p>
+</div></section>
+{% schema %}
+{ "name":"AA Statement","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Art Avenue"},
+  {"type":"textarea","id":"text","label":"Statement","default":"We are not a furniture store. We are a design house — curating the handcrafted, the considered, and the made-to-last, so your home can hold its stories for generations."}
+],"presets":[{"name":"AA Statement"}]}
+{% endschema %}

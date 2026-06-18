@@ -11,156 +11,228 @@
   "sections": {
     "hero": {
       "type": "aa-hero",
-      "settings": {
-        "eyebrow": "The Spring Collection · 2026",
-        "heading": "Crafted spaces, collected stories.",
-        "subheading": "Handcrafted furniture, rugs and objects for homes made to be lived in — and remembered.",
-        "cta_label": "Explore the Collection",
-        "cta_link": "shopify://collections/new-arrivals",
-        "cta2_label": "Trade & Projects",
-        "cta2_link": "shopify://pages/trade"
-      }
+      "settings": {}
     },
-    "categories": {
-      "type": "aa-collection-tiles",
+    "signature": {
+      "type": "aa-signature",
       "blocks": {
-        "c1": { "type": "tile", "settings": { "eyebrow": "01 — Furniture", "title": "Furniture", "collection": "furniture", "tone": "clay" } },
-        "c2": { "type": "tile", "settings": { "eyebrow": "02 — Rugs", "title": "Rugs", "collection": "rugs", "tone": "olive" } },
-        "c3": { "type": "tile", "settings": { "eyebrow": "03 — Cushions", "title": "Cushions", "collection": "cushions", "tone": "sand" } },
-        "c4": { "type": "tile", "settings": { "eyebrow": "04 — Lighting", "title": "Lighting", "collection": "lighting", "tone": "bronze" } },
-        "c5": { "type": "tile", "settings": { "eyebrow": "05 — Decor", "title": "Decor", "collection": "decor", "tone": "stone" } },
-        "c6": { "type": "tile", "settings": { "eyebrow": "06 — Wall Art", "title": "Wall Art", "collection": "wall-art", "tone": "espresso" } }
+        "s1": {
+          "type": "tile",
+          "settings": {
+            "eyebrow": "01 — Furniture",
+            "title": "Furniture",
+            "link": "/collections/furniture",
+            "tone": "clay"
+          }
+        },
+        "s2": {
+          "type": "tile",
+          "settings": {
+            "eyebrow": "02 — Rugs",
+            "title": "Rugs",
+            "link": "/collections/rugs",
+            "tone": "olive"
+          }
+        },
+        "s3": {
+          "type": "tile",
+          "settings": {
+            "eyebrow": "03 — Lighting",
+            "title": "Lighting",
+            "link": "/collections/lighting",
+            "tone": "bronze"
+          }
+        },
+        "s4": {
+          "type": "tile",
+          "settings": {
+            "eyebrow": "04 — Decor",
+            "title": "Decor",
+            "link": "/collections/decor",
+            "tone": "stone"
+          }
+        },
+        "s5": {
+          "type": "tile",
+          "settings": {
+            "eyebrow": "05 — Wall Art",
+            "title": "Wall Art",
+            "link": "/collections/wall-art",
+            "tone": "sand"
+          }
+        }
       },
-      "block_order": ["c1", "c2", "c3", "c4", "c5", "c6"],
-      "settings": {
-        "eyebrow": "Signature Collections",
-        "heading": "Six disciplines, one point of view.",
-        "intro": "Each category is curated and commissioned in-house — a considered edit rather than an endless catalog.",
-        "columns": 3,
-        "bg": "page"
-      }
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ],
+      "settings": {}
+    },
+    "craft": {
+      "type": "aa-craft",
+      "settings": {}
     },
     "arrivals": {
-      "type": "aa-product-rail",
-      "settings": {
-        "eyebrow": "Just Arrived",
-        "heading": "New this season",
-        "collection": "new-arrivals",
-        "limit": 4,
-        "bg": "page"
-      }
+      "type": "aa-arrivals",
+      "settings": {}
     },
-    "made_to_order": {
-      "type": "aa-split-feature",
+    "rooms": {
+      "type": "aa-rooms",
       "blocks": {
-        "b1": { "type": "point", "settings": { "text": "Choose your size, finish and upholstery" } },
-        "b2": { "type": "point", "settings": { "text": "Crafted to order in 3–4 weeks" } },
-        "b3": { "type": "point", "settings": { "text": "Made by hand — never mass-produced" } }
+        "r1": {
+          "type": "room",
+          "settings": {
+            "title": "Living Room",
+            "link": "/collections/living-room",
+            "tone": "clay"
+          }
+        },
+        "r2": {
+          "type": "room",
+          "settings": {
+            "title": "Dining",
+            "link": "/collections/dining-room",
+            "tone": "espresso"
+          }
+        },
+        "r3": {
+          "type": "room",
+          "settings": {
+            "title": "Bedroom",
+            "link": "/collections/bedroom",
+            "tone": "stone"
+          }
+        },
+        "r4": {
+          "type": "room",
+          "settings": {
+            "title": "Study",
+            "link": "/collections/study",
+            "tone": "olive"
+          }
+        },
+        "r5": {
+          "type": "room",
+          "settings": {
+            "title": "Outdoor",
+            "link": "/collections/outdoor",
+            "tone": "bronze"
+          }
+        }
       },
-      "block_order": ["b1", "b2", "b3"],
-      "settings": {
-        "tone": "espresso",
-        "eyebrow": "Made to Order",
-        "heading": "Made slowly, by hand, to last.",
-        "body": "<p>Most Art Avenue pieces are made to order in our ateliers — so the size, finish and material are yours to choose.</p>",
-        "cta_label": "How made-to-order works",
-        "cta_link": "shopify://pages/custom",
-        "bg": "alt"
-      }
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5"
+      ],
+      "settings": {}
     },
-    "custom_rugs": {
-      "type": "aa-split-feature",
-      "blocks": {
-        "r1": { "type": "point", "settings": { "text": "Any size, shape or colourway" } },
-        "r2": { "type": "point", "settings": { "text": "Hand-knotted, hand-tufted or flat-weave" } },
-        "r3": { "type": "point", "settings": { "text": "Sample the wool before you commit" } }
-      },
-      "block_order": ["r1", "r2", "r3"],
-      "settings": {
-        "tone": "olive", "reverse": true,
-        "eyebrow": "Custom Rugs",
-        "heading": "A rug made to your room.",
-        "body": "<p>Specify the exact dimensions, construction and palette — and we'll knot it by hand to suit your space.</p>",
-        "cta_label": "Start a custom rug",
-        "cta_link": "shopify://collections/custom-rugs",
-        "bg": "page"
-      }
-    },
-    "custom_furniture": {
-      "type": "aa-editorial-cta",
-      "settings": {
-        "eyebrow": "Custom Furniture",
-        "heading": "Built around your space.",
-        "body": "Adjust dimensions, choose a finish, or specify your own upholstery — our atelier tailors each piece to you.",
-        "cta_label": "Explore custom furniture",
-        "cta_link": "shopify://collections/custom-furniture",
-        "cta2_label": "Speak with a consultant",
-        "cta2_link": "shopify://pages/enquiry",
-        "bg": "tint"
-      }
-    },
-    "designer_faves": {
-      "type": "aa-product-rail",
-      "settings": {
-        "eyebrow": "Editor's Edit",
-        "heading": "Designer favourites",
-        "collection": "designer-favourites",
-        "limit": 4,
-        "bg": "alt"
-      }
-    },
-    "projects": {
-      "type": "aa-split-feature",
-      "blocks": {
-        "p1": { "type": "point", "settings": { "text": "Residential, hospitality and commercial" } },
-        "p2": { "type": "point", "settings": { "text": "Procurement, customization and project pricing" } },
-        "p3": { "type": "point", "settings": { "text": "A dedicated consultant for your project" } }
-      },
-      "block_order": ["p1", "p2", "p3"],
-      "settings": {
-        "tone": "bronze",
-        "eyebrow": "Interior Projects",
-        "heading": "For interiors at every scale.",
-        "body": "<p>From a single room to a full hospitality fit-out, our projects team plans, prices and delivers to your schedule.</p>",
-        "cta_label": "Start a project enquiry",
-        "cta_link": "shopify://pages/trade",
-        "bg": "page"
-      }
-    },
-    "materials": {
-      "type": "aa-materials-library",
-      "blocks": {
-        "m1": { "type": "material", "settings": { "name": "Solid Teak", "note": "Warm, durable hardwood", "tone": "clay" } },
-        "m2": { "type": "material", "settings": { "name": "Hand-Knotted Wool", "note": "Natural-dyed, generational craft", "tone": "olive" } },
-        "m3": { "type": "material", "settings": { "name": "Cast Brass", "note": "Solid, hand-finished metal", "tone": "bronze" } },
-        "m4": { "type": "material", "settings": { "name": "Honed Marble", "note": "Quarried stone, matte finish", "tone": "stone" } },
-        "m5": { "type": "material", "settings": { "name": "Belgian Linen", "note": "Relaxed, breathable weave", "tone": "sand" } },
-        "m6": { "type": "material", "settings": { "name": "Travertine", "note": "Textured natural stone", "tone": "stone" } }
-      },
-      "block_order": ["m1", "m2", "m3", "m4", "m5", "m6"],
-      "settings": {
-        "eyebrow": "Materials Library",
-        "heading": "The materials we build with.",
-        "intro": "Natural wood, hand-knotted wool, cast brass and honed stone — explore the materials behind every Art Avenue piece.",
-        "center": true,
-        "cta_label": "Explore the full library",
-        "cta_link": "shopify://pages/materials",
-        "bg": "alt"
-      }
+    "featured": {
+      "type": "aa-featured",
+      "settings": {}
     },
     "trade": {
-      "type": "aa-editorial-cta",
-      "settings": {
-        "eyebrow": "Trade & Projects",
-        "heading": "For designers & architects.",
-        "body": "Trade pricing, material sampling and project procurement, with a dedicated consultant for your studio.",
-        "cta_label": "Apply to the trade program",
-        "cta_link": "shopify://pages/trade",
-        "cta2_label": "Custom & Bespoke",
-        "cta2_link": "shopify://pages/custom",
-        "bg": "dark"
-      }
+      "type": "aa-trade-band",
+      "settings": {}
+    },
+    "homes": {
+      "type": "aa-homes",
+      "blocks": {
+        "h1": {
+          "type": "img",
+          "settings": {
+            "label": "@studio.kohl",
+            "tone": "clay"
+          }
+        },
+        "h2": {
+          "type": "img",
+          "settings": {
+            "label": "@thebandracs",
+            "tone": "stone"
+          }
+        },
+        "h3": {
+          "type": "img",
+          "settings": {
+            "label": "@maison.rao",
+            "tone": "olive"
+          }
+        },
+        "h4": {
+          "type": "img",
+          "settings": {
+            "label": "@verandah.co",
+            "tone": "bronze"
+          }
+        }
+      },
+      "block_order": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+      ],
+      "settings": {}
+    },
+    "journal": {
+      "type": "aa-journal",
+      "blocks": {
+        "j1": {
+          "type": "post",
+          "settings": {
+            "category": "Styling",
+            "title": "How to layer a living room like a designer",
+            "read": "6 min",
+            "tone": "stone"
+          }
+        },
+        "j2": {
+          "type": "post",
+          "settings": {
+            "category": "Materials",
+            "title": "Why hand-knotted wool ages so beautifully",
+            "read": "4 min",
+            "tone": "olive"
+          }
+        },
+        "j3": {
+          "type": "post",
+          "settings": {
+            "category": "At Home",
+            "title": "Inside a Bandra apartment, restored",
+            "read": "8 min",
+            "tone": "clay"
+          }
+        }
+      },
+      "block_order": [
+        "j1",
+        "j2",
+        "j3"
+      ],
+      "settings": {}
+    },
+    "statement": {
+      "type": "aa-statement",
+      "settings": {}
     }
   },
-  "order": ["hero", "categories", "arrivals", "made_to_order", "custom_rugs", "custom_furniture", "designer_faves", "projects", "materials", "trade"]
+  "order": [
+    "hero",
+    "signature",
+    "craft",
+    "arrivals",
+    "rooms",
+    "featured",
+    "trade",
+    "homes",
+    "journal",
+    "statement"
+  ]
 }

@@ -1,0 +1,24 @@
+<section class="aa-section"><div class="aa-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px">
+    <div style="max-width:640px"><span class="aa-eyebrow aa-eyebrow--rule">{{ section.settings.eyebrow }}</span><h2 class="aa-display-2" style="margin-top:18px">{{ section.settings.heading }}</h2></div>
+    <a class="btn btn--ghost" href="{{ section.settings.link | default:'/collections/new-arrivals' }}">View all new <i class="ph ph-arrow-right"></i></a>
+  </div>
+  <div class="grid-4" style="margin-top:44px">
+    {%- if section.settings.collection != blank -%}
+      {%- for product in collections[section.settings.collection].products limit: 4 -%}{% render 'aa-product-card', product: product %}{%- endfor -%}
+    {%- else -%}
+      {% render 'aa-product-card', ph_cat:'Seating', ph_name:'Marwar Lounge Chair', ph_price:'₹ 1,48,000', ph_note:'Made to order', ph_badge:'Handcrafted', ph_tone:'clay' %}
+      {% render 'aa-product-card', ph_cat:'Rugs', ph_name:'Aravalli Hand-Knotted Rug', ph_price:'₹ 2,20,000', ph_badge:'New', ph_tone:'olive' %}
+      {% render 'aa-product-card', ph_cat:'Lighting', ph_name:'Brass Meridian Pendant', ph_price:'₹ 64,000', ph_note:'Ships in 3 wks', ph_tone:'bronze' %}
+      {% render 'aa-product-card', ph_cat:'Tables', ph_name:'Udai Travertine Coffee Table', ph_price:'₹ 96,000', ph_badge:'New', ph_tone:'stone' %}
+    {%- endif -%}
+  </div>
+</div></section>
+{% schema %}
+{ "name":"AA New Arrivals","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Just Arrived"},
+  {"type":"text","id":"heading","label":"Heading","default":"New this season"},
+  {"type":"collection","id":"collection","label":"Collection"},
+  {"type":"url","id":"link","label":"View-all link"}
+],"presets":[{"name":"AA New Arrivals"}]}
+{% endschema %}

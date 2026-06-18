@@ -1,0 +1,34 @@
+{%- comment -%} Buy-box option rows. params: product, show_material, show_finish, show_upholstery {%- endcomment -%}
+{%- assign mats = product.metafields.aav.materials.value -%}
+{%- if show_material -%}
+  <div class="aa-opt">
+    <div class="aa-opt__label"><span>Material</span><span data-aa-optval style="color:var(--text-secondary)">{% if mats and mats.size > 0 %}{{ mats.first.name }}{% else %}Solid Teak{% endif %}</span></div>
+    <div class="aa-opt__row">
+      {%- if mats and mats.size > 0 -%}
+        {%- for m in mats -%}<button type="button" class="aa-opt__chip{% if forloop.first %} is-active{% endif %}" data-aa-opt data-aa-label="{{ m.name }}">{{ m.name }}</button>{%- endfor -%}
+      {%- else -%}
+        {%- assign dm = "Solid Teak,Mango Wood,Oak Veneer" | split: "," -%}
+        {%- for m in dm -%}<button type="button" class="aa-opt__chip{% if forloop.first %} is-active{% endif %}" data-aa-opt data-aa-label="{{ m }}">{{ m }}</button>{%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+{%- if show_finish -%}
+  <div class="aa-opt">
+    <div class="aa-opt__label"><span>Finish</span><span data-aa-optval style="color:var(--text-secondary)">Natural</span></div>
+    <div class="aa-opt__row">
+      {%- assign fns = "Natural|#b9966a,Walnut|#6a4a2e,Dark Walnut|#4a3422,Black|#2c2824" | split: "," -%}
+      {%- for f in fns -%}{%- assign fp = f | split: "|" -%}<button type="button" class="aa-opt__dot{% if forloop.first %} is-active{% endif %}" data-aa-opt data-aa-label="{{ fp[0] }}" title="{{ fp[0] }}" style="background:{{ fp[1] }}"></button>{%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+{%- if show_upholstery -%}
+  <div class="aa-opt">
+    <div class="aa-opt__label"><span>Upholstery</span><span data-aa-optval style="color:var(--text-secondary)">Belgian Linen</span></div>
+    <div class="aa-opt__row">
+      {%- assign us = "Belgian Linen|#d8cdb6,Performance Weave|#b7b09c,Aniline Leather|#8a5a3c" | split: "," -%}
+      {%- for u in us -%}{%- assign up = u | split: "|" -%}<button type="button" class="aa-opt__dot{% if forloop.first %} is-active{% endif %}" data-aa-opt data-aa-label="{{ up[0] }}" title="{{ up[0] }}" style="background:{{ up[1] }}"></button>{%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+{%- if show_material or show_finish or show_upholstery -%}<p class="aa-note">Explore the range — bespoke sizes, finishes and materials are confirmed with a design consultant before you order.</p>{%- endif -%}

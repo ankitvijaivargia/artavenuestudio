@@ -1,0 +1,29 @@
+<section class="aa-section aa-alt"><div class="aa-wrap" style="display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(40px,6vw,96px);align-items:center">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-card)">
+    {% render 'aa-figure', tone:'espresso', ratio:'3/4', label:'The maker’s hand', class:'span2' %}
+    {% render 'aa-figure', tone:'clay', ratio:'4/3' %}
+    {% render 'aa-figure', tone:'stone', ratio:'4/3' %}
+  </div>
+  <div>
+    <span class="aa-eyebrow aa-eyebrow--rule">{{ section.settings.eyebrow }}</span>
+    <h2 class="aa-display-2" style="margin-top:18px">{{ section.settings.heading }}</h2>
+    <p class="aa-lead" style="margin-top:18px">{{ section.settings.intro }}</p>
+    <ul style="list-style:none;margin:28px 0 0;padding:0;display:grid;gap:14px">
+      {% for block in section.blocks %}<li style="display:flex;gap:12px;align-items:baseline;color:var(--text-secondary)"><i class="ph ph-circle" style="font-size:7px;color:var(--accent)"></i>{{ block.settings.text }}</li>{% endfor %}
+    </ul>
+    <a class="btn btn--ghost" href="{{ section.settings.cta_link | default:'/pages/about' }}" style="margin-top:30px">Inside the Atelier <i class="ph ph-arrow-right"></i></a>
+  </div>
+</div></section>
+{% schema %}
+{ "name":"AA Craft","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"The Atelier"},
+  {"type":"text","id":"heading","label":"Heading","default":"Made slowly, by hand, to last."},
+  {"type":"textarea","id":"intro","label":"Intro","default":"Every piece begins in the hands of an artisan — turned, joined and finished the way furniture was always meant to be made."},
+  {"type":"url","id":"cta_link","label":"CTA link"}
+],"blocks":[{"type":"point","name":"Point","settings":[{"type":"text","id":"text","label":"Text"}]}],
+"presets":[{"name":"AA Craft","blocks":[
+  {"type":"point","settings":{"text":"Workshops across India, partnered for generations"}},
+  {"type":"point","settings":{"text":"Solid wood, hand-knotted wool, cast brass & stone"}},
+  {"type":"point","settings":{"text":"Made to order — never mass-produced"}}
+]}]}
+{% endschema %}

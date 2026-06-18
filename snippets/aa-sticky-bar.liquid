@@ -1,0 +1,13 @@
+{%- comment -%} Sticky buy bar — reveals on scroll. params: product, show_cart, price_text {%- endcomment -%}
+{%- capture consult -%}{% render 'aa-lead-url', type:'consultation', product: product %}{%- endcapture -%}
+<div class="aa-stickybar" data-aa-sticky>
+  <div class="aa-stickybar__in">
+    <div class="aa-stickybar__name"><b>{{ product.title }}</b><span>{{ price_text }}</span></div>
+    <a class="btn btn--secondary" href="{{ consult | strip }}" target="_blank" rel="noopener"><i class="ph ph-chat-teardrop-dots"></i> Consult</a>
+    {%- if show_cart -%}
+      {%- form 'product', product -%}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"><button class="btn btn--primary" type="submit">Add to Cart</button>{%- endform -%}
+    {%- else -%}
+      <a class="btn btn--primary" href="{{ consult | strip }}" target="_blank" rel="noopener">Enquire</a>
+    {%- endif -%}
+  </div>
+</div>

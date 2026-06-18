@@ -1,0 +1,13 @@
+{%- comment -%} Rich PDP detail accordion. params: product {%- endcomment -%}
+<div class="aa-accordion">
+  {%- if product.description != blank -%}
+  <details open><summary>Description <i class="ph ph-plus aa-acc-pm"></i></summary><div class="rte" style="padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary)">{{ product.description }}</div></details>
+  {%- endif -%}
+  <details><summary>Materials <i class="ph ph-plus aa-acc-pm"></i></summary><p>Built from carefully selected, natural materials — kiln-dried hardwoods, hand-spun textiles, cast metal and quarried stone, chosen to last for decades. Naturally occurring grain and tone variation is intrinsic to each handmade piece.</p></details>
+  <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary><p>Carved, joined and finished by hand in our workshops, passing through the hands of several craftspeople. Joinery is mortise-and-tenon — never glued shortcuts — so the piece is made to be kept and passed down.</p></details>
+  <details><summary>Dimensions &amp; Specifications <i class="ph ph-plus aa-acc-pm"></i></summary><p>Generous, considered proportions drawn for real homes. Custom dimensions are available on most pieces through our design consultants. Share your space and we will confirm exact measurements before you order.</p></details>
+  <details><summary>Assembly &amp; Installation <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most pieces arrive securely packed and ready to use. Some larger items may require simple assembly; installation assistance may be available depending on the product and your location — speak with a consultant to confirm before ordering.</p></details>
+  <details><summary>Care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust timber with a soft dry cloth and treat with wax balm twice yearly. Vacuum upholstery gently and treat marks promptly. Keep out of prolonged direct sun to preserve the finish.</p></details>
+  <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>Made-to-order pieces ship in 3&ndash;4 weeks via safe, insured delivery, securely packed for transit. Assembly assistance is available on selected pieces. International freight is quoted at checkout.</p></details>
+  <details><summary>Designer Notes <i class="ph ph-plus aa-acc-pm"></i></summary><p>&ldquo;We design for the way you actually live &mdash; pieces generous enough to sink into, detailed enough to reward a second look, and made to age beautifully.&rdquo; &mdash; Art Avenue Design Studio</p></details>
+</div>

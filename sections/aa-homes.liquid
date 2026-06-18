@@ -1,0 +1,16 @@
+<section class="aa-section"><div class="aa-wrap" style="text-align:center;max-width:720px;margin:0 auto"><span class="aa-eyebrow aa-eyebrow--center aa-eyebrow--rule">{{ section.settings.eyebrow }}</span><h2 class="aa-display-2" style="margin-top:18px">{{ section.settings.heading }}</h2><p class="aa-lead" style="margin:18px auto 0">{{ section.settings.intro }}</p></div>
+  <div class="aa-wrap grid-4" style="margin-top:48px">
+    {% for block in section.blocks %}{% render 'aa-figure', tone: block.settings.tone, ratio:'1/1', label: block.settings.label %}{% endfor %}
+  </div>
+</section>
+{% schema %}
+{ "name":"AA Customer Homes","max_blocks":8,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Customer Homes"},
+  {"type":"text","id":"heading","label":"Heading","default":"Lived in, beautifully."},
+  {"type":"textarea","id":"intro","label":"Intro","default":"Real spaces, shared by the homeowners and designers who made them. Tag #ArtAvenueAtHome."}
+],"blocks":[{"type":"img","name":"Image","settings":[{"type":"text","id":"label","label":"Label"},{"type":"select","id":"tone","label":"Tone","default":"clay","options":[{"value":"clay","label":"Clay"},{"value":"stone","label":"Stone"},{"value":"olive","label":"Olive"},{"value":"bronze","label":"Bronze"}]}]}],
+"presets":[{"name":"AA Customer Homes","blocks":[
+  {"type":"img","settings":{"label":"@studio.kohl","tone":"clay"}},{"type":"img","settings":{"label":"@thebandracs","tone":"stone"}},
+  {"type":"img","settings":{"label":"@maison.rao","tone":"olive"}},{"type":"img","settings":{"label":"@verandah.co","tone":"bronze"}}
+]}]}
+{% endschema %}

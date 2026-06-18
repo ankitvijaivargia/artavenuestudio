@@ -1,74 +1,21 @@
-{%- comment -%}
-  Art Avenue — snippets/aa-size.liquid  (size module)
-  modes:
-    multi  = selector grid from product variants (updates cart variant id + price)
-    fixed  = one size + "Need another size? -> consult"
-    single = read-only "One size"
-    custom = "Configured at consultation", no cart
-    mto    = "Request a custom order", no cart
-  Params: product, mode, show_cart
-{%- endcomment -%}
-{%- case mode -%}
-
-{%- when 'multi' -%}
-  {%- if product.variants.size > 1 -%}
-    <div class="aa-option" data-aa-size>
-      <div class="aa-option__label"><span>Size</span> <b data-aa-size-current>{{ product.selected_or_first_available_variant.title }}</b></div>
-      <div class="aa-size-grid">
-        {%- for v in product.variants -%}
-          <button type="button" class="aa-size"
-            data-variant-id="{{ v.id }}"
-            data-price="{{ v.price | money }}"
-            data-title="{{ v.title | escape }}"
-            {% unless v.available %}disabled{% endunless %}
-            aria-current="{% if v.id == product.selected_or_first_available_variant.id %}true{% else %}false{% endif %}">
-            {{ v.title }}
-          </button>
-        {%- endfor -%}
-      </div>
+{%- comment -%} params: mode, product {%- endcomment -%}
+{%- capture custom_href -%}{% render 'aa-lead-url', type:'custom', product: product, message:'Custom size or finish' %}{%- endcapture -%}
+{%- assign t = product.type | downcase -%}
+{%- if mode == 'mto' or mode == 'custom' -%}
+  <div style="margin-top:24px;padding:18px 20px;border-radius:var(--radius-sm);background:var(--surface-accent-tint);border:1px solid var(--accent-soft)">
+    <div class="serif" style="font-size:18px">Custom dimensions available</div>
+    <p style="font-size:13px;line-height:1.55;color:var(--text-secondary);margin:6px 0 0">This piece is made to your measurements — share your space and we'll build it to fit.</p>
+  </div>
+{%- elsif mode == 'multi' -%}
+  {%- if t contains 'rug' -%}{%- assign sizes = "3×5 ft,4×6 ft,5×8 ft,6×9 ft,8×10 ft,9×12 ft" | split: "," -%}{%- assign default = "8×10 ft" -%}
+  {%- else -%}{%- assign sizes = "Standard,Grand" | split: "," -%}{%- assign default = "Standard" -%}{%- endif -%}
+  <div class="aa-opt">
+    <div class="aa-opt__label"><span>Size</span><span data-aa-optval style="color:var(--text-secondary)">{{ default }}</span></div>
+    <div class="aa-opt__row">
+      {%- for s in sizes -%}<button type="button" class="aa-opt__chip{% if s == default %} is-active{% endif %}" data-aa-opt data-aa-label="{{ s }}">{{ s }}</button>{%- endfor -%}
     </div>
-    <script>
-      (function () {
-        var root = document.querySelector('[data-aa-size]');
-        if (!root) return;
-        root.querySelectorAll('.aa-size').forEach(function (b) {
-          b.addEventListener('click', function () {
-            root.querySelectorAll('.aa-size').forEach(function (x) { x.setAttribute('aria-current', 'false'); });
-            b.setAttribute('aria-current', 'true');
-            var cur = root.querySelector('[data-aa-size-current]'); if (cur) cur.textContent = b.dataset.title;
-            var idInput = document.querySelector('form[action$="/cart/add"] [name="id"]');
-            if (idInput) idInput.value = b.dataset.variantId;
-            var priceEl = document.querySelector('.aa-price'); if (priceEl && b.dataset.price && priceEl.firstChild) priceEl.firstChild.textContent = b.dataset.price + ' ';
-            var barPrice = document.querySelector('.aa-stickybar__price'); if (barPrice && b.dataset.price) barPrice.textContent = b.dataset.price;
-          });
-        });
-      })();
-    </script>
-  {%- endif -%}
-
-{%- when 'fixed' -%}
-  {%- assign parts = product.metafields.ava.fixed_size.value | default: 'One size' | split: '|' -%}
-  <div class="aa-option">
-    <div class="aa-option__label"><span>Size</span></div>
-    <div class="aa-size-grid">
-      <span class="aa-size aa-size--read" aria-current="true">{{ parts[0] | strip }}</span>
-    </div>
-    <a class="aa-link-underline" href="{%- render 'aa-lead-url', type: 'custom', product: product -%}">Need another size? Speak with a consultant</a>
   </div>
-
-{%- when 'single' -%}
-  <div class="aa-option">
-    <div class="aa-size-grid"><span class="aa-size aa-size--read" aria-current="true">One size</span></div>
-  </div>
-
-{%- when 'custom' -%}
-  <div class="aa-option">
-    <p class="aa-body aa-muted">Dimensions and specification are configured with you at consultation.</p>
-  </div>
-
-{%- when 'mto' -%}
-  <div class="aa-option">
-    <p class="aa-body aa-muted">Made to order to your specification.</p>
-  </div>
-
-{%- endcase -%}
+  <a href="{{ custom_href | strip }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:16px;color:var(--text-accent);font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase">Need a custom size or finish? <i class="ph ph-arrow-right"></i></a>
+{%- elsif mode == 'single' or mode == 'fixed' -%}
+  <div class="aa-opt"><div class="aa-opt__label"><span>Size</span></div><div class="aa-opt__row"><span class="aa-opt__chip is-active"><i class="ph ph-check" style="font-size:11px"></i> One size</span></div></div>
+{%- endif -%}

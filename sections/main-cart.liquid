@@ -1,0 +1,25 @@
+<section class="aa-section"><div class="aa-wrap" style="max-width:980px">
+  <span class="aa-eyebrow aa-eyebrow--rule">Your Cart</span>
+  {%- if cart.item_count == 0 -%}
+    <h1 class="aa-h1" style="margin:16px 0 24px">Your cart is empty.</h1>
+    <a class="btn btn--primary" href="/collections/all">Explore the Collection</a>
+  {%- else -%}
+    <form action="{{ routes.cart_url }}" method="post">
+      <table style="width:100%;border-collapse:collapse;margin:24px 0">
+        {%- for item in cart.items -%}
+          <tr style="border-bottom:1px solid var(--border-hairline)">
+            <td style="padding:18px 0;width:96px">{% if item.image %}<div class="aa-fig" style="width:80px;aspect-ratio:1/1"><img src="{{ item.image | image_url: width:200 }}" alt="{{ item.title }}"></div>{% endif %}</td>
+            <td style="padding:18px 16px"><div class="serif" style="font-size:19px">{{ item.product.title }}</div><div style="font-size:13px;color:var(--text-muted)">{{ item.variant.title }}</div></td>
+            <td style="padding:18px 16px"><input type="number" name="updates[]" value="{{ item.quantity }}" min="0" class="aa-control" style="width:72px"></td>
+            <td style="padding:18px 0;text-align:right;font-family:var(--font-serif);font-size:18px">{{ item.final_line_price | money }}</td>
+          </tr>
+        {%- endfor -%}
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+        <button class="btn btn--secondary" type="submit" name="update">Update</button>
+        <div style="display:flex;align-items:center;gap:24px"><span class="serif" style="font-size:22px">Subtotal {{ cart.total_price | money }}</span><button class="btn btn--primary" type="submit" name="checkout">Checkout</button></div>
+      </div>
+    </form>
+  {%- endif -%}
+</div></section>
+{% schema %}{ "name": "Cart", "settings": [] }{% endschema %}

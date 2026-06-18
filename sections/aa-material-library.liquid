@@ -1,0 +1,24 @@
+<section style="position:relative;height:380px;display:flex;align-items:center;text-align:center">
+  {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(34,31,27,.55),rgba(34,31,27,.32))"></div>
+  <div style="position:relative;max-width:720px;margin:0 auto;padding:0 var(--gutter)">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--center">The Library</span>
+    <h1 class="aa-display-2" style="color:var(--text-on-dark);margin-top:16px">Materials &amp; Finishes</h1>
+    <p class="aa-lead" style="color:rgba(250,246,239,.84);margin-top:16px">Every wood, weave, fibre, metal and stone we work across the house — and a sample of any, sent to your door.</p>
+  </div>
+</section>
+<section class="aa-section"><div class="aa-wrap">
+  {%- assign groups = "Wood Finishes|Natural Teak;bronze,Walnut;clay,Dark Walnut;espresso,Ebonised Oak;espresso&Fabric & Upholstery|Belgian Linen;stone,Performance Weave;sand,Bouclé;stone,Aniline Leather;clay&Metal Finishes|Aged Brass;bronze,Blackened Steel;espresso,Antique Bronze;clay&Stone & Surface|Travertine;sand,Carrara Marble;stone,Kota Stone;olive" | split: "&" -%}
+  {%- for g in groups -%}{%- assign gp = g | split: "|" -%}
+    <div style="margin-bottom:48px">
+      <h3 class="aa-h3" style="margin-bottom:24px">{{ gp[0] }}</h3>
+      <div class="grid-4">
+        {%- assign items = gp[1] | split: "," -%}
+        {%- for it in items -%}{%- assign ip = it | split: ";" -%}
+          <div style="background:var(--surface-raised);border:1px solid var(--border-hairline);border-radius:var(--radius-sm);overflow:hidden">{% render 'aa-figure', tone: ip[1], ratio:'4/3' %}<div style="padding:16px 18px 18px"><h4 class="serif" style="font-size:19px">{{ ip[0] }}</h4></div></div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endfor -%}
+</div></section>
+{% schema %}{ "name": "AA Material Library", "settings": [] }{% endschema %}

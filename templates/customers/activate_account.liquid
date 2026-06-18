@@ -1,0 +1,4 @@
+<section class="aa-section"><div class="aa-wrap" style="max-width:480px">
+  <h1 class="aa-h1" style="margin-bottom:24px">Activate account</h1>
+  {% form 'activate_customer_password' %}{{ form.errors | default_errors }}<div class="aa-form"><div><label>Password</label><input type="password" name="customer[password]"></div><div><label>Confirm</label><input type="password" name="customer[password_confirmation]"></div><button class="btn btn--primary btn--block" type="submit">Activate</button></div>{% endform %}
+</div></section>

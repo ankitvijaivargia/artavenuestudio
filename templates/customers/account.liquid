@@ -1,0 +1,6 @@
+<section class="aa-section"><div class="aa-wrap">
+  <span class="aa-eyebrow aa-eyebrow--rule">Account</span><h1 class="aa-h1" style="margin:16px 0 24px">Welcome, {{ customer.first_name }}</h1>
+  <p style="margin-bottom:24px"><a href="{{ routes.account_logout_url }}" class="btn btn--secondary">Log out</a> <a href="{{ routes.account_addresses_url }}" class="btn btn--ghost">Addresses</a></p>
+  <h2 class="aa-h3" style="margin-bottom:16px">Order history</h2>
+  {% paginate customer.orders by 12 %}{% for order in customer.orders %}<div style="padding:14px 0;border-bottom:1px solid var(--border-hairline)"><a href="{{ order.customer_url }}">{{ order.name }}</a> · {{ order.created_at | date: '%d %b %Y' }} · {{ order.total_price | money }} · {{ order.fulfillment_status_label }}</div>{% else %}<p style="color:var(--text-muted)">No orders yet.</p>{% endfor %}{% endpaginate %}
+</div></section>

@@ -1,23 +1,7 @@
-<style type="text/css">
-  .template-404 .title + * {
-    margin-top: 1rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .template-404 .title + * {
-      margin-top: 2rem;
-    }
-  }
-</style>
-
-<div class="template-404 page-width page-margin center">
-  <p>
-    {{ 'templates.404.subtext' | t }}
-  </p>
-  <h1 class="title">
-    {{ 'templates.404.title' | t }}
-  </h1>
-  <a href="{{ routes.all_products_collection_url }}" class="button">
-    {{ 'general.continue_shopping' | t }}
-  </a>
-</div>
+<section class="aa-section" style="text-align:center"><div class="aa-wrap" style="max-width:620px">
+  <span class="aa-eyebrow aa-eyebrow--center aa-eyebrow--rule">404</span>
+  <h1 class="aa-display-2" style="margin-top:18px">This page has wandered off.</h1>
+  <p class="aa-lead" style="margin:18px auto 28px">The page you're looking for can't be found — but the collection is just a click away.</p>
+  <a class="btn btn--primary" href="{{ routes.root_url }}">Return Home</a>
+</div></section>
+{% schema %}{ "name": "404", "settings": [] }{% endschema %}

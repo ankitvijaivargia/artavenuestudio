@@ -10,11 +10,11 @@
 {
   "sections": {
     "main": {
-      "type": "aa-collection-grid",
-      "settings": {
-        "per_row": 4
-      }
+      "type": "aa-collection",
+      "settings": {}
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

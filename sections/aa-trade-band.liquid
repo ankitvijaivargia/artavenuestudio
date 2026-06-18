@@ -1,0 +1,25 @@
+<section class="aa-section aa-dark"><div class="aa-wrap">
+  <div class="grid-2" style="align-items:end">
+    <div><span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">{{ section.settings.eyebrow }}</span><h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">{{ section.settings.heading }}</h2></div>
+    <p class="aa-lead" style="color:var(--text-on-dark-muted)">{{ section.settings.intro }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;background:var(--border-on-dark);border:1px solid var(--border-on-dark)">
+    {% for block in section.blocks %}
+      <div style="background:var(--surface-dark);padding:34px 28px"><i class="ph-light {{ block.settings.icon }}" style="font-size:30px;color:var(--accent-soft)"></i><h4 class="serif" style="font-size:22px;margin:20px 0 10px;color:var(--text-on-dark)">{{ block.settings.title }}</h4><p style="font-size:14px;line-height:1.65;color:var(--text-on-dark-muted)">{{ block.settings.text }}</p></div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:40px"><a class="btn btn--accent" href="/pages/trade">Request Trade Access</a></div>
+</div></section>
+{% schema %}
+{ "name":"AA Trade Band","max_blocks":4,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Trade & Design Program"},
+  {"type":"text","id":"heading","label":"Heading","default":"For designers & architects."},
+  {"type":"textarea","id":"intro","label":"Intro","default":"We partner with interior designers, architects and hospitality buyers to source with confidence — from a single statement piece to an entire property."}
+],"blocks":[{"type":"perk","name":"Perk","settings":[{"type":"text","id":"icon","label":"Phosphor icon class","default":"ph-medal"},{"type":"text","id":"title","label":"Title"},{"type":"textarea","id":"text","label":"Text"}]}],
+"presets":[{"name":"AA Trade Band","blocks":[
+  {"type":"perk","settings":{"icon":"ph-medal","title":"Trade Pricing","text":"Member pricing across every collection, with dedicated account support."}},
+  {"type":"perk","settings":{"icon":"ph-pencil-ruler","title":"Customization","text":"Bespoke dimensions, finishes and materials for your projects."}},
+  {"type":"perk","settings":{"icon":"ph-swatches","title":"Sampling","text":"Material and finish samples shipped to your studio."}},
+  {"type":"perk","settings":{"icon":"ph-buildings","title":"Project & Bulk","text":"Procurement and delivery logistics for residential & hospitality."}}
+]}]}
+{% endschema %}

@@ -1,0 +1,33 @@
+<section class="aa-section"><div class="aa-wrap">
+  <div style="max-width:640px">
+    <span class="aa-eyebrow aa-eyebrow--rule">{{ section.settings.eyebrow }}</span>
+    <h2 class="aa-display-2" style="margin-top:18px">{{ section.settings.heading }}</h2>
+    <p class="aa-lead" style="max-width:560px;margin-top:18px">{{ section.settings.intro }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:260px 260px;gap:var(--gap-card);margin-top:48px">
+    {% for block in section.blocks %}
+      <a class="aa-tile" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }} style="border-radius:12px;{% if forloop.first %}grid-row:span 2{% endif %}">
+        {% render 'aa-figure', tone: block.settings.tone, class: 'aa-tile__bg' %}
+        <span class="aa-tile__scrim"></span>
+        <span class="aa-tile__inner"><span class="aa-tile__eyebrow">{{ block.settings.eyebrow }}</span><span class="aa-tile__title">{{ block.settings.title }}</span><span class="aa-tile__cta">Explore <i class="ph ph-arrow-right"></i></span></span>
+      </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% schema %}
+{ "name":"AA Signature","max_blocks":6,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Signature Collections"},
+  {"type":"text","id":"heading","label":"Heading","default":"Five disciplines, one point of view."},
+  {"type":"textarea","id":"intro","label":"Intro","default":"Each category is curated and commissioned in-house — a considered edit rather than an endless catalog."}
+],"blocks":[{"type":"tile","name":"Tile","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow"},{"type":"text","id":"title","label":"Title"},{"type":"url","id":"link","label":"Link"},
+  {"type":"select","id":"tone","label":"Tone","default":"clay","options":[{"value":"clay","label":"Clay"},{"value":"olive","label":"Olive"},{"value":"bronze","label":"Bronze"},{"value":"stone","label":"Stone"},{"value":"sand","label":"Sand"},{"value":"espresso","label":"Espresso"}]}
+]}],
+"presets":[{"name":"AA Signature","blocks":[
+  {"type":"tile","settings":{"eyebrow":"01 — Furniture","title":"Furniture","tone":"clay","link":"/collections/furniture"}},
+  {"type":"tile","settings":{"eyebrow":"02 — Rugs","title":"Rugs","tone":"olive","link":"/collections/rugs"}},
+  {"type":"tile","settings":{"eyebrow":"03 — Lighting","title":"Lighting","tone":"bronze","link":"/collections/lighting"}},
+  {"type":"tile","settings":{"eyebrow":"04 — Decor","title":"Decor","tone":"stone","link":"/collections/decor"}},
+  {"type":"tile","settings":{"eyebrow":"05 — Wall Art","title":"Wall Art","tone":"sand","link":"/collections/wall-art"}}
+]}]}
+{% endschema %}

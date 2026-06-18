@@ -9,36 +9,12 @@
  */
 {
   "sections": {
-    "hero": {
-      "type": "aa-hero",
-      "settings": {
-        "eyebrow": "Custom & Bespoke",
-        "heading": "Made for your space.",
-        "subheading": "Adjust dimensions, choose finishes, specify your own upholstery — or commission something entirely new.",
-        "cta_label": "Start a custom enquiry",
-        "cta_link": "shopify://pages/enquiry"
-      }
-    },
-    "how": {
-      "type": "aa-split-feature",
-      "blocks": {
-        "b1": { "type": "point", "settings": { "text": "Share your brief — dimensions, materials, references" } },
-        "b2": { "type": "point", "settings": { "text": "We design, quote and sample for approval" } },
-        "b3": { "type": "point", "settings": { "text": "Handcrafted to order and delivered white-glove" } }
-      },
-      "block_order": ["b1", "b2", "b3"],
-      "settings": {
-        "tone": "clay", "reverse": true,
-        "eyebrow": "How it works",
-        "heading": "A considered process, start to finish.",
-        "body": "<p>From a single bespoke piece to a fully specified interior, our atelier tailors every detail to you.</p>",
-        "bg": "alt"
-      }
-    },
-    "lead": {
-      "type": "aa-lead-section",
-      "settings": { "default_type": "custom" }
+    "main": {
+      "type": "aa-custom",
+      "settings": {}
     }
   },
-  "order": ["hero", "how", "lead"]
+  "order": [
+    "main"
+  ]
 }

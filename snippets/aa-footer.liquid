@@ -1,0 +1,29 @@
+<footer class="aa-footer">
+  <div class="aa-footer__news"><div class="aa-wrap">
+    <div>
+      <span class="aa-eyebrow aa-eyebrow--on-dark">The Art Avenue Letter</span>
+      <h3 class="serif" style="font-size:34px;margin-top:14px;line-height:1.1;font-weight:500">Stories from the atelier, <em class="accent">first.</em></h3>
+    </div>
+    {% form 'customer' %}
+      <div style="display:flex;gap:12px;align-items:stretch">
+        <input class="aa-input" type="email" name="contact[email]" placeholder="Your email address" required>
+        <button class="btn btn--secondary btn--on-dark" type="submit">Subscribe</button>
+      </div>
+    {% endform %}
+  </div></div>
+  <div class="aa-footer__cols">
+    <div class="aa-footer__brand">
+      <b>Art Avenue</b>
+      <p>A design house curating handcrafted furniture, rugs, lighting and objects — made by hand in India, made to last for generations.</p>
+      <div style="display:flex;gap:18px;margin-top:22px;font-size:19px;color:var(--text-on-dark-muted)"><i class="ph-light ph-instagram-logo"></i><i class="ph-light ph-pinterest-logo"></i><i class="ph-light ph-linkedin-logo"></i></div>
+    </div>
+    <div><h4>Shop</h4><ul><li><a href="/collections/furniture">Furniture</a></li><li><a href="/collections/rugs">Rugs</a></li><li><a href="/collections/lighting">Lighting</a></li><li><a href="/collections/decor">Decor</a></li><li><a href="/collections/wall-art">Wall Art</a></li></ul></div>
+    <div><h4>Discover</h4><ul><li><a href="/pages/about">Our Story</a></li><li><a href="/pages/material-library">The Library</a></li><li><a href="/blogs/journal">Journal</a></li><li><a href="/collections/all">Collections</a></li></ul></div>
+    <div><h4>Trade</h4><ul><li><a href="/pages/trade">Designer Program</a></li><li><a href="/pages/trade">Architects</a></li><li><a href="/pages/trade">Hospitality</a></li><li><a href="/pages/custom-bespoke">Customization</a></li></ul></div>
+    <div><h4>Service</h4><ul><li><a href="/pages/delivery">Delivery &amp; Shipping</a></li><li><a href="/pages/care">Care &amp; Materials</a></li><li><a href="/pages/contact">Contact</a></li><li><a href="/pages/contact">Track Order</a></li></ul></div>
+  </div>
+  <div class="aa-footer__trust"><div class="aa-wrap">
+    <span>&copy; {{ 'now' | date: '%Y' }} Art Avenue Design House &middot; Handcrafted in India</span>
+    <span style="display:flex;gap:24px"><a href="/policies/privacy-policy">Privacy</a><a href="/policies/terms-of-service">Terms</a><a href="/pages/shipping">Secure international shipping</a></span>
+  </div></div>
+</footer>

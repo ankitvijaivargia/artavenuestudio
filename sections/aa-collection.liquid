@@ -1,0 +1,133 @@
+{%- assign col = collection -%}
+{%- assign t = col.title | downcase -%}
+{%- assign isRug = false -%}{%- if t contains 'rug' -%}{%- assign isRug = true -%}{%- endif -%}
+
+{%- comment -%} Collection hero {%- endcomment -%}
+<section style="position:relative;height:420px;display:flex;align-items:center;text-align:center">
+  {% if col.image %}<div class="aa-fig aa-full-bg"><img src="{{ col.image | image_url: width:2000 }}" alt="{{ col.title | escape }}"></div>{% else %}{% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}{% endif %}
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(34,31,27,.5),rgba(34,31,27,.3))"></div>
+  <div style="position:relative;max-width:720px;margin:0 auto;padding:0 var(--gutter)">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--center">{% if isRug %}The Rug Atelier{% else %}Signature Collection{% endif %}</span>
+    <h1 class="aa-display-2" style="color:var(--text-on-dark);margin-top:16px">{{ col.title }}</h1>
+    {%- if col.description != blank -%}<p class="aa-lead" style="color:rgba(250,246,239,.84);margin-top:16px">{{ col.description | strip_html | truncatewords: 32 }}</p>{%- endif -%}
+    {%- if isRug -%}<div style="margin-top:26px"><a class="btn btn--secondary" href="#aa-edit" style="border-color:rgba(250,246,239,.4);color:#fff">Need help choosing a rug size? <i class="ph ph-arrow-right"></i></a></div>{%- endif -%}
+  </div>
+</section>
+
+{%- comment -%} Merchandising — Shop the way you design {%- endcomment -%}
+<section class="aa-wrap" id="aa-edit" style="padding-top:var(--section-y-tight)">
+  <div style="max-width:640px"><span class="aa-eyebrow aa-eyebrow--rule">Begin Your Edit</span><h2 class="aa-h1" style="margin:14px 0 0">Shop the way you design.</h2></div>
+
+  {%- assign room_tags = "living-room-rugs|Living Room|clay,dining-room-rugs|Dining|espresso,bedroom-rugs|Bedroom|stone,study-rugs|Study|olive,outdoor-rugs|Outdoor|bronze" | split: "," -%}
+  {%- unless isRug -%}{%- assign room_tags = "living-room|Living Room|clay,dining-room|Dining|espresso,bedroom|Bedroom|stone,study|Study|olive,outdoor|Outdoor|bronze" | split: "," -%}{%- endunless -%}
+  <div style="margin-top:30px">
+    <div class="aa-eyebrow" style="margin-bottom:16px">Shop by Room</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap-card)">
+      {%- for r in room_tags -%}{%- assign rp = r | split: "|" -%}
+        <a class="aa-tile" href="/collections/{{ col.handle }}/{{ rp[0] }}" style="min-height:170px;border-radius:var(--radius-xs)">{% render 'aa-figure', tone: rp[2], class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title" style="font-size:18px">{{ rp[1] }}</span></span></a>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if col.all_tags.size > 0 -%}
+  <div style="margin-top:30px">
+    <div class="aa-eyebrow" style="margin-bottom:14px">Refine by</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      {%- for tag in col.all_tags limit: 12 -%}
+        {%- assign tl = tag | downcase -%}
+        {%- unless tl contains 'room' or tl == 'aa-demo' or tl == 'rug' or tl == 'rugs' -%}
+          {%- assign label = tag | replace: '-rugs', '' | replace: '-', ' ' | capitalize -%}
+          <a href="/collections/{{ col.handle }}/{{ tag | handleize }}" style="padding:9px 18px;border-radius:var(--radius-pill);font-size:13px;color:var(--text-secondary);border:1px solid var(--border-strong);text-decoration:none">{{ label }}</a>
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+  </div>
+  {%- endif -%}
+</section>
+
+{%- comment -%} Sticky toolbar {%- endcomment -%}
+<div style="border-top:1px solid var(--border-hairline);border-bottom:1px solid var(--border-hairline);position:sticky;top:76px;background:var(--surface-page);z-index:20;margin-top:var(--section-y-tight)">
+  <div class="aa-wrap" style="display:flex;justify-content:space-between;align-items:center;height:64px">
+    <span style="font-size:13px;color:var(--text-muted)">{{ col.products_count }} {% if col.products_count == 1 %}piece{% else %}pieces{% endif %}</span>
+    <form method="get" style="min-width:220px">
+      <select name="sort_by" class="aa-control" onchange="this.form.submit()">
+        {%- assign sb = col.sort_by | default: col.default_sort_by -%}
+        <option value="manual"{% if sb == 'manual' %} selected{% endif %}>Sort: Featured</option>
+        <option value="created-descending"{% if sb == 'created-descending' %} selected{% endif %}>Newest</option>
+        <option value="price-ascending"{% if sb == 'price-ascending' %} selected{% endif %}>Price: Low to High</option>
+        <option value="price-descending"{% if sb == 'price-descending' %} selected{% endif %}>Price: High to Low</option>
+      </select>
+    </form>
+  </div>
+</div>
+
+{%- comment -%} Body — sidebar (native filters) + grid {%- endcomment -%}
+<section class="aa-section" style="padding-top:48px">
+<div class="aa-wrap" style="display:grid;grid-template-columns:{% if col.filters.size > 0 %}248px 1fr{% else %}1fr{% endif %};gap:48px;align-items:start">
+  {%- if col.filters.size > 0 -%}
+  <aside style="position:sticky;top:150px;align-self:start">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px"><span class="serif" style="font-size:22px;font-weight:500">Filter</span><a href="{{ col.url }}" style="font-size:12px;color:var(--text-accent)">Clear all</a></div>
+    <form method="get">
+      {%- for f in col.filters -%}
+        <div style="border-bottom:1px solid var(--border-hairline);padding:20px 0">
+          <div class="aa-eyebrow" style="margin-bottom:16px">{{ f.label }}</div>
+          {%- if f.type == 'price_range' -%}
+            <div style="display:flex;gap:10px"><input type="number" name="{{ f.min_value.param_name }}" value="{{ f.min_value.value }}" placeholder="Min" class="aa-control" style="width:50%"><input type="number" name="{{ f.max_value.param_name }}" value="{{ f.max_value.value }}" placeholder="Max" class="aa-control" style="width:50%"></div>
+            <button type="submit" class="btn btn--ghost" style="margin-top:12px">Apply</button>
+          {%- else -%}
+            <ul style="list-style:none;margin:0;padding:0;display:grid;gap:12px">
+              {%- for v in f.values -%}
+                <li><label style="display:flex;align-items:center;gap:11px;cursor:pointer;font-size:14px;color:var(--text-secondary)"><input type="checkbox" name="{{ v.param_name }}" value="{{ v.value }}"{% if v.active %} checked{% endif %} onchange="this.form.submit()"><span style="flex:1">{{ v.label }}</span><span style="color:var(--text-faint);font-size:12px">{{ v.count }}</span></label></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </form>
+  </aside>
+  {%- endif -%}
+
+  <div>
+    {%- comment -%} Edit tabs (sort shortcuts) {%- endcomment -%}
+    <div style="display:flex;gap:28px;border-bottom:1px solid var(--border-hairline);margin-bottom:32px;flex-wrap:wrap">
+      {%- assign tabs = "Featured|manual,New Arrivals|created-descending,Price: Low|price-ascending,Price: High|price-descending" | split: "," -%}
+      {%- for tb in tabs -%}{%- assign tp = tb | split: "|" -%}
+        <a href="{{ col.url }}?sort_by={{ tp[1] }}" style="text-decoration:none;padding:0 0 14px;font-size:12px;font-weight:500;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:{% if sb == tp[1] %}var(--text-primary){% else %}var(--text-muted){% endif %};border-bottom:2px solid {% if sb == tp[1] %}var(--accent){% else %}transparent{% endif %};margin-bottom:-1px">{{ tp[0] }}</a>
+      {%- endfor -%}
+    </div>
+
+    {%- paginate col.products by 9 -%}
+      {%- assign half = col.products_count | divided_by: 2 -%}
+      <div class="grid-3">
+        {%- for product in col.products -%}
+          {% render 'aa-product-card', product: product %}
+          {%- if forloop.index == 6 and paginate.current_page == 1 -%}
+            </div>
+            <a class="aa-tile" href="{{ col.url }}" style="display:block;min-height:300px;border-radius:var(--radius-sm);margin:var(--gap-card) 0">{% render 'aa-figure', tone:'clay', class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__eyebrow">Room Inspiration</span><span class="aa-tile__title">{% if isRug %}The layered living room{% else %}The slow-living living room{% endif %}</span><span class="aa-tile__cta">Shop the look <i class="ph ph-arrow-right"></i></span></span></a>
+            <div class="grid-3">
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}<div style="text-align:center;margin-top:56px">{{ paginate | default_pagination }}</div>{%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+</section>
+
+{%- comment -%} Related collections {%- endcomment -%}
+<section class="aa-section aa-alt"><div class="aa-wrap">
+  <span class="aa-eyebrow aa-eyebrow--rule">Continue Exploring</span>
+  <div class="grid-3" style="margin-top:32px">
+    {%- assign rel = "rugs|Rugs|olive,lighting|Lighting|bronze,decor|Decor|stone,furniture|Furniture|clay" | split: "," -%}
+    {%- assign rn = 0 -%}
+    {%- for c in rel -%}{%- assign cp = c | split: "|" -%}
+      {%- unless cp[0] == col.handle or rn >= 3 -%}
+        <a class="aa-tile" href="/collections/{{ cp[0] }}" style="min-height:300px">{% render 'aa-figure', tone: cp[2], class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title">{{ cp[1] }}</span><span class="aa-tile__cta">Explore <i class="ph ph-arrow-right"></i></span></span></a>
+        {%- assign rn = rn | plus: 1 -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  </div>
+</div></section>
+{% schema %}
+{ "name": "Art Avenue Collection", "settings": [] }
+{% endschema %}

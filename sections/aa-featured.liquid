@@ -1,0 +1,19 @@
+<section style="position:relative;min-height:620px;display:flex;align-items:center">
+  {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.74),rgba(34,31,27,.25) 60%,transparent)"></div>
+  <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:520px">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">{{ section.settings.eyebrow }}</span>
+    <h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:20px">{{ section.settings.heading }}</h2>
+    <p class="aa-lead" style="color:rgba(250,246,239,.84);margin-top:20px">{{ section.settings.intro }}</p>
+    <div style="margin-top:34px"><a class="btn btn--secondary btn--on-dark" href="{{ section.settings.link | default:'/collections/all' }}">Explore the Collection <i class="ph ph-arrow-right"></i></a></div>
+  </div></div>
+</section>
+{% schema %}
+{ "name":"AA Featured","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"The Featured Collection"},
+  {"type":"text","id":"heading","label":"Heading","default":"The Marwar Collection"},
+  {"type":"textarea","id":"intro","label":"Intro","default":"An ode to the courtyards of Rajasthan — low silhouettes, hand-carved frames, and the deep warmth of aged teak and brass."},
+  {"type":"collection","id":"collection","label":"Collection"},{"type":"url","id":"link","label":"Link"},
+  {"type":"image_picker","id":"image","label":"Image"}
+],"presets":[{"name":"AA Featured"}]}
+{% endschema %}

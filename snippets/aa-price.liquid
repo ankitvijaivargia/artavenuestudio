@@ -1,21 +1,10 @@
-{%- comment -%}
-  Art Avenue — snippets/aa-price.liquid  (AAPriceTag)
-  Respects visibility: hidden price -> "Price on request" / "Project pricing".
-  Params: product, show_price (bool), visibility (string)
-{%- endcomment -%}
 {%- if show_price -%}
-  {%- assign v = product.selected_or_first_available_variant -%}
-  <div class="aa-price">
-    {{ v.price | money }}
-    {%- if v.compare_at_price > v.price -%}
-      <span class="aa-price__compare">{{ v.compare_at_price | money }}</span>
-    {%- endif -%}
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:16px">
+    <span class="aa-price" style="margin-top:0">{% render 'aa-money', cents: product.price %}</span>
+    {%- if caption != blank -%}<span class="aa-price-cap" style="margin-top:0">{{ caption }}</span>{%- endif -%}
   </div>
+{%- elsif visibility == 'project-only' -%}
+  <div class="aa-price aa-price--enquire">Project pricing <span>Quoted per project</span></div>
 {%- else -%}
-  {%- capture price_label -%}{%- render 'aa-visibility', key: visibility, attr: 'price_label' -%}{%- endcapture -%}
-  {%- assign price_label = price_label | strip -%}
-  <div class="aa-price aa-price--enquire">
-    {{ price_label | default: 'Price on request' }}
-    <span>{% if visibility == 'project-only' %}Quoted per project{% else %}Shared on enquiry{% endif %}</span>
-  </div>
+  <div class="aa-price aa-price--enquire">Price on request <span>Shared on enquiry</span></div>
 {%- endif -%}

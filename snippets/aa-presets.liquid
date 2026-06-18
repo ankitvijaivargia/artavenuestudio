@@ -1,0 +1,10 @@
+{%- comment -%} Returns preset JSON for {key}. Mirrors presets.json. Parsed by main-product via parse_json. {%- endcomment -%}
+{%- case key -%}
+{%- when 'luxury-furniture' -%}{"fulfillment":"made-to-order","visibility":"ecommerce","size_mode":"multi","modules":{"material":true,"finish":true,"upholstery":true,"samples":true,"customization":true,"assembly":true,"completeRoom":true,"faq":true,"related":true,"delivery":true},"moduleOrder":["assembly","whyLove","customization","completeRoom","faq","related"]}
+{%- when 'luxury-rug' -%}{"fulfillment":"made-to-order","visibility":"ecommerce","size_mode":"multi","modules":{"guides":true,"specs":true,"construction":true,"material":true,"craft":true,"rooms":true,"related":true,"samples":true},"moduleOrder":["whyLove","customization","guides","specs","construction","material","craft","rooms","consult","related"]}
+{%- when 'luxury-cushion' -%}{"fulfillment":"made-to-order","visibility":"ecommerce","size_mode":"single","modules":{"samples":true,"whyLove":true,"customization":true,"pairs":true},"moduleOrder":["whyLove","customization","pairs"]}
+{%- when 'custom-product' -%}{"fulfillment":"custom","visibility":"price-on-request","size_mode":"custom","cta_primary":"request-pricing","modules":{"customization":true,"samples":true,"faq":true},"moduleOrder":["whyLove","customization","faq"]}
+{%- when 'project-product' -%}{"fulfillment":"project","visibility":"project-only","size_mode":"mto","cta_primary":"project-enquiry","modules":{"customization":true,"faq":true},"moduleOrder":["whyLove","customization","faq"]}
+{%- when 'in-stock-product' -%}{"fulfillment":"in-stock","visibility":"ecommerce","size_mode":"single","cta_primary":"add-to-cart","modules":{"completeRoom":true,"faq":true,"related":true,"delivery":true},"moduleOrder":["whyLove","completeRoom","faq","related"]}
+{%- else -%}{"fulfillment":"made-to-order","visibility":"ecommerce","size_mode":"single","cta_primary":"add-to-cart","modules":{"completeRoom":true,"faq":true,"related":true,"delivery":true},"moduleOrder":["whyLove","completeRoom","faq","related"]}
+{%- endcase -%}

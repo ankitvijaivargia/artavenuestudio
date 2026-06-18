@@ -10,11 +10,11 @@
 {
   "sections": {
     "main": {
-      "type": "aa-main-product",
-      "settings": {
-        "show_sticky_bar": true
-      }
+      "type": "main-product",
+      "settings": {}
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

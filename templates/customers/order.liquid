@@ -1,0 +1,6 @@
+<section class="aa-section"><div class="aa-wrap">
+  <span class="aa-eyebrow aa-eyebrow--rule">Order {{ order.name }}</span>
+  <p style="margin:12px 0 24px;color:var(--text-muted)">{{ order.created_at | date: '%d %B %Y' }}</p>
+  <table style="width:100%;border-collapse:collapse">{% for line in order.line_items %}<tr style="border-bottom:1px solid var(--border-hairline)"><td style="padding:12px 0">{{ line.title }}</td><td style="text-align:right">{{ line.quantity }} × {{ line.price | money }}</td></tr>{% endfor %}</table>
+  <p style="text-align:right;margin-top:18px" class="serif">Total {{ order.total_price | money }}</p>
+</div></section>

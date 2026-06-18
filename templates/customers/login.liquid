@@ -1,0 +1,7 @@
+<section class="aa-section"><div class="aa-wrap" style="max-width:480px">
+  <span class="aa-eyebrow aa-eyebrow--rule">Account</span><h1 class="aa-h1" style="margin:16px 0 24px">Sign in</h1>
+  {% form 'customer_login' %}{{ form.errors | default_errors }}
+    <div class="aa-form"><div><label>Email</label><input type="email" name="customer[email]" required></div><div><label>Password</label><input type="password" name="customer[password]"></div><button class="btn btn--primary btn--block" type="submit">Sign in</button></div>
+  {% endform %}
+  <p style="margin-top:16px;font-size:14px"><a href="{{ routes.account_register_url }}" style="color:var(--text-accent)">Create an account</a></p>
+</div></section>

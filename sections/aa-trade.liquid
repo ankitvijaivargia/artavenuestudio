@@ -1,0 +1,33 @@
+<section style="position:relative;min-height:540px;display:flex;align-items:center">
+  {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.78),rgba(34,31,27,.3) 65%,transparent)"></div>
+  <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:580px">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Trade &amp; Design Program</span>
+    <h1 class="aa-display-1" style="color:var(--text-on-dark);margin-top:22px">Source like the <em class="accent">design house you are.</em></h1>
+    <p class="aa-lead" style="color:rgba(250,246,239,.86);max-width:470px;margin-top:22px">A program built for interior designers, architects and hospitality buyers — trade pricing, customization and dedicated support, on every project.</p>
+    <div style="margin-top:34px"><a class="btn btn--primary" href="#trade-apply">Apply for Access</a></div>
+  </div></div>
+</section>
+<section class="aa-section"><div class="aa-wrap">
+  <div style="max-width:640px"><span class="aa-eyebrow aa-eyebrow--rule">What's Included</span><h2 class="aa-display-2" style="margin-top:18px">Everything a project needs.</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:52px;background:var(--border-hairline);border:1px solid var(--border-hairline)">
+    {%- assign perks = "ph-medal|Trade Pricing|Member pricing across every collection, with a dedicated account manager.~ph-pencil-ruler|Customization|Bespoke dimensions, finishes, materials and COM upholstery.~ph-swatches|Material Sampling|Finish, wood and textile samples shipped to your studio.~ph-buildings|Project & Bulk|Procurement, lead-time planning and delivery for full properties.~ph-clipboard-text|Spec Support|Tear sheets and specifications prepared for your drawings.~ph-handshake|Hospitality|Contract-grade construction and durability standards." | split: "~" -%}
+    {%- for pk in perks -%}{%- assign pp = pk | split:"|" -%}<div style="background:var(--surface-page);padding:38px 34px"><i class="ph-light {{ pp[0] }}" style="font-size:32px;color:var(--accent-deep)"></i><h4 class="serif" style="font-size:24px;margin:20px 0 12px">{{ pp[1] }}</h4><p style="font-size:15px;line-height:1.7;color:var(--text-secondary)">{{ pp[2] }}</p></div>{%- endfor -%}
+  </div>
+</div></section>
+<section id="trade-apply" class="aa-section"><div class="aa-wrap" style="display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(40px,6vw,96px);align-items:start">
+  <div><span class="aa-eyebrow aa-eyebrow--rule">Apply</span><h2 class="aa-h1" style="margin-top:18px">Request trade access.</h2><p class="aa-lead" style="margin-top:18px;max-width:42ch">Approval typically within two business days. Tell us about your studio and the work you do.</p></div>
+  {% form 'contact' %}
+    {% if form.posted_successfully? %}<p style="grid-column:1/-1;color:var(--text-accent)">Thank you — we'll be in touch within two business days.</p>{% endif %}
+    <div class="aa-form">
+      <input type="hidden" name="contact[lead_type]" value="trade">
+      <div class="grid-2"><div><label>First name</label><input name="contact[first_name]" required></div><div><label>Last name</label><input name="contact[last_name]"></div></div>
+      <div><label>Studio / Firm</label><input name="contact[company]" required></div>
+      <div class="grid-2"><div><label>Work email</label><input type="email" name="contact[email]" required></div><div><label>Phone</label><input type="tel" name="contact[phone]"></div></div>
+      <div><label>Profession</label><select name="contact[profession]"><option>Interior Designer</option><option>Architect</option><option>Hospitality Buyer</option><option>Developer</option><option>Other</option></select></div>
+      <div><label>Tell us about your work</label><textarea name="contact[body]" placeholder="Sectors, project scale, what you're sourcing for…"></textarea></div>
+      <button class="btn btn--primary btn--block" type="submit">Submit Application</button>
+    </div>
+  {% endform %}
+</div></section>
+{% schema %}{ "name": "Art Avenue Trade", "settings": [] }{% endschema %}

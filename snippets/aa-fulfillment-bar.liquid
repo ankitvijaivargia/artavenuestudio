@@ -1,17 +1,14 @@
-{%- comment -%}
-  Art Avenue — snippets/aa-fulfillment-bar.liquid  (AAFulfillment)
-  Lead-time messaging. Params: type (fulfillment), lead_time (override)
-{%- endcomment -%}
-{%- capture f_label -%}{%- render 'aa-fulfillment', key: type, attr: 'label' -%}{%- endcapture -%}
-{%- capture f_lead -%}{%- render 'aa-fulfillment', key: type, attr: 'lead' -%}{%- endcapture -%}
-{%- capture f_icon -%}{%- render 'aa-fulfillment', key: type, attr: 'icon' -%}{%- endcapture -%}
-{%- assign f_label = f_label | strip -%}
-{%- if f_label != blank -%}
-  <div class="aa-fulfillment">
-    <i class="ph ph-{{ f_icon | strip }} icon" aria-hidden="true"></i>
-    <div>
-      <strong>{{ f_label }}</strong>
-      <span> · {{ lead_time | default: f_lead | strip }}</span>
-    </div>
+{%- assign t = type | default: 'made-to-order' -%}
+{%- case t -%}
+{%- when 'in-stock' -%}{%- assign fl='In Stock' -%}{%- assign fi='ph-package' -%}{%- assign fd='Ships in 3–5 days' -%}{%- assign fm='In stock and ready to ship — dispatched within 3–5 business days, securely packed and insured.' -%}
+{%- when 'custom' -%}{%- assign fl='Custom Order' -%}{%- assign fi='ph-pencil-ruler' -%}{%- assign fd='Timeline set at consultation' -%}{%- assign fm='Made to your specification — dimensions, finish and materials of your choosing, shaped with a design consultant before you commit.' -%}
+{%- when 'project' -%}{%- assign fl='Project Enquiry' -%}{%- assign fi='ph-buildings' -%}{%- assign fd='Planned to your project schedule' -%}{%- assign fm='For multi-room, hospitality and contract orders — planned, sourced and delivered to your project timeline by a dedicated consultant.' -%}
+{%- else -%}{%- assign fl='Made to Order' -%}{%- assign fi='ph-hammer' -%}{%- assign fd='Crafted in 3–4 weeks' -%}{%- assign fm='Crafted by hand to order — made for you once you order, and delivered in 3–4 weeks.' -%}
+{%- endcase -%}
+<div class="aa-fulfillment">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span class="aa-pill"><i class="ph {{ fi }}" style="color:var(--accent-deep)"></i>{{ fl }}</span>
+    <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-secondary)"><i class="ph-light ph-clock" style="color:var(--accent-deep)"></i>{{ fd }}</span>
   </div>
-{%- endif -%}
+  <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:11px">{{ fm }}</p>
+</div>

@@ -1,7 +1,0 @@
-{%- comment -%} Art Avenue — Delivery & lead time. Param: fulfillment {%- endcomment -%}
-{%- capture d_lead -%}{%- render 'aa-fulfillment', key: fulfillment, attr: 'lead' -%}{%- endcapture -%}
-{%- assign d_lead = d_lead | strip -%}
-<div class="aa-fulfillment" style="margin-top:var(--space-2xs)">
-  <i class="ph ph-truck icon" aria-hidden="true"></i>
-  <div><strong>Delivery</strong><span> · {% if d_lead != blank %}{{ d_lead }}{% else %}White-glove delivery available{% endif %}</span></div>
-</div>

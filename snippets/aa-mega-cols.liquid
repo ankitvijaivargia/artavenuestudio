@@ -1,0 +1,17 @@
+{%- comment -%}
+  Columns mega menu (Lighting / Decor / Wall Art style).
+  params:
+    cols — records sep '~', each 'Heading^pairs'. pairs sep ';' each 'Label|url'
+    feat_eyebrow, feat_title, feat_url — featured card
+    discover — chips sep ';' each 'Label|url' (optional)
+{%- endcomment -%}
+<div class="aa-mcols">
+  {%- assign columns = cols | split: '~' -%}
+  {%- for col in columns -%}{%- assign c = col | split: '^' -%}
+    <div class="aa-mcol"><span class="aa-mega__h">{{ c[0] }}</span><ul>{%- assign pairs = c[1] | split: ';' -%}{%- for p in pairs -%}{%- assign pp = p | split: '|' -%}<li><a href="{{ pp[1] }}">{{ pp[0] }}</a></li>{%- endfor -%}</ul></div>
+  {%- endfor -%}
+  <a class="aa-mega__feature aa-mega__feature--col" href="{{ feat_url }}"><span>{{ feat_eyebrow }}</span><h4>{{ feat_title }}</h4><em>Explore <i class="ph ph-arrow-right"></i></em></a>
+</div>
+{%- if discover != blank -%}
+<div class="aa-mdiscover"><span class="aa-mdiscover__label">Discover</span>{%- assign dch = discover | split: ';' -%}{%- for d in dch -%}{%- assign dp = d | split: '|' -%}<a class="aa-mdiscover__chip" href="{{ dp[1] }}">{{ dp[0] }}</a>{%- endfor -%}</div>
+{%- endif -%}

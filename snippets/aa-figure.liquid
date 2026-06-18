@@ -1,0 +1,5 @@
+{%- comment -%} params: tone, label, ratio, image, class {%- endcomment -%}
+<div class="aa-fig aa-fig--{{ tone | default: 'sand' }} {{ class }}"{% if ratio %} style="aspect-ratio:{{ ratio }}"{% endif %}>
+  {%- if image -%}<img src="{{ image | image_url: width: 1200 }}" alt="{{ label | escape }}" loading="lazy">{%- endif -%}
+  {%- if label -%}<span class="aa-fig__label">{{ label }}</span>{%- endif -%}
+</div>

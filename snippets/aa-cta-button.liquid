@@ -1,0 +1,29 @@
+{%- comment -%} params: ctakey, variant (primary/secondary), product, show_cart {%- endcomment -%}
+{%- assign iscart = false -%}
+{%- case ctakey -%}
+{%- when 'add-to-cart' -%}{%- assign lbl='Add to Cart' -%}{%- assign iscart=true -%}
+{%- when 'request-pricing' -%}{%- assign lbl='Request Pricing' -%}{%- assign lt='pricing' -%}
+{%- when 'customize' -%}{%- assign lbl='Customize This Piece' -%}{%- assign lt='custom' -%}
+{%- when 'project-enquiry' -%}{%- assign lbl='Start a Project Enquiry' -%}{%- assign lt='project' -%}
+{%- when 'notify' -%}{%- assign lbl='Notify Me When Available' -%}{%- assign lt='consultation' -%}
+{%- else -%}{%- assign lbl='Speak with a Design Consultant' -%}{%- assign lt='consultation' -%}
+{%- endcase -%}
+{%- if iscart and show_cart -%}
+  <div class="aa-buyrow">
+    {%- form 'product', product -%}
+      {%- if product.variants.size > 1 -%}
+        <select name="id" class="aa-control" style="flex:none;width:auto">{%- for v in product.variants -%}<option value="{{ v.id }}"{% unless v.available %} disabled{% endunless %}>{{ v.title }}</option>{%- endfor -%}</select>
+      {%- else -%}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{%- endif -%}
+      <div class="aa-qty"><button type="button" data-aa-qty="-" aria-label="Decrease">&minus;</button><input type="number" name="quantity" value="1" min="1" aria-label="Quantity"><button type="button" data-aa-qty="+" aria-label="Increase">+</button></div>
+      <button class="btn btn--primary btn--block" type="submit">{{ lbl }}{% if product.price > 0 %} &middot; {% render 'aa-money', cents: product.price %}{% endif %}</button>
+    {%- endform -%}
+    <button type="button" class="aa-save" aria-label="Save to wishlist"><i class="ph ph-heart"></i></button>
+  </div>
+{%- else -%}
+  {%- if iscart -%}{%- assign lt='consultation' -%}{%- assign lbl='Speak with a Design Consultant' -%}{%- endif -%}
+  {%- capture href -%}{% render 'aa-lead-url', type: lt, product: product %}{%- endcapture -%}
+  <div style="display:flex;gap:14px;align-items:stretch;{% if variant == 'primary' %}margin-top:22px;{% endif %}">
+    <a class="btn btn--{{ variant }} btn--block" href="{{ href | strip }}" target="_blank" rel="noopener" style="flex:1">{{ lbl }}</a>
+    {%- if variant == 'primary' -%}<button type="button" class="aa-save" aria-label="Save to wishlist"><i class="ph ph-heart"></i></button>{%- endif -%}
+  </div>
+{%- endif -%}

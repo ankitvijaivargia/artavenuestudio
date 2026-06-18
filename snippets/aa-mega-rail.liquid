@@ -1,0 +1,26 @@
+{%- comment -%}
+  Left-rail mega menu (Furniture / Rugs style).
+  params:
+    rail  — records sep '~', fields sep '^' (label ^ url ^ panel). panel = 'link' OR pairs sep ';' each 'Label|url'
+    feat_eyebrow, feat_title, feat_url — featured card
+{%- endcomment -%}
+<div class="aa-mega__inner">
+  {%- assign rows = rail | split: '~' -%}
+  {%- assign shown = false -%}
+  <ul class="aa-mega__rail">
+    {%- for row in rows -%}{%- assign f = row | split: '^' -%}
+      <li class="aa-mrail__item">
+        <a class="aa-mrail__link" href="{{ f[1] }}">{{ f[0] }}{% if f[2] == 'link' %} <i class="ph ph-arrow-up-right"></i>{% else %} <i class="ph ph-caret-right"></i>{% endif %}</a>
+        {%- unless f[2] == 'link' -%}
+          <div class="aa-mega__panel{% unless shown %} is-default{% endunless %}">
+            <span class="aa-mega__h">{{ f[0] }}</span>
+            <ul>{%- assign pairs = f[2] | split: ';' -%}{%- for p in pairs -%}{%- assign pp = p | split: '|' -%}<li><a href="{{ pp[1] }}">{{ pp[0] }}</a></li>{%- endfor -%}</ul>
+            <a class="aa-mega__viewall" href="{{ f[1] }}">View all {{ f[0] | remove: 'Shop by ' | remove: 'Shop ' }} <i class="ph ph-arrow-right"></i></a>
+          </div>
+          {%- assign shown = true -%}
+        {%- endunless -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+  <a class="aa-mega__feature" href="{{ feat_url }}"><span>{{ feat_eyebrow }}</span><h4>{{ feat_title }}</h4><em>Explore <i class="ph ph-arrow-right"></i></em></a>
+</div>

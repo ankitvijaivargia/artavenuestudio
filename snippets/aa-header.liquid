@@ -1,0 +1,122 @@
+{%- comment -%} Header — brand mega menu. Furniture/Rugs = left-rail layout; Lighting/Decor/Wall Art = columns layout. Structure is brand-fixed (edit here). {%- endcomment -%}
+<style>
+  .aa-nav__item{position:static;}
+  .aa-nav__top{display:inline-flex;align-items:center;gap:6px;padding:6px 0;font-size:12px;font-weight:500;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-primary);opacity:.86;white-space:nowrap;border-bottom:1px solid transparent;cursor:pointer;}
+  .aa-nav__item:hover .aa-nav__top{opacity:1;border-bottom-color:currentColor;}
+  .aa-mega{position:absolute;left:0;right:0;top:100%;background:var(--surface-page);border-top:1px solid var(--border-hairline);border-bottom:1px solid var(--border-hairline);box-shadow:var(--shadow-soft);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity var(--dur-base) var(--ease-luxe),transform var(--dur-base) var(--ease-luxe),visibility var(--dur-base);z-index:60;}
+  .aa-nav__item:hover .aa-mega,.aa-nav__item:focus-within .aa-mega{opacity:1;visibility:visible;transform:translateY(0);}
+
+  /* left-rail layout */
+  .aa-mega__inner{position:relative;min-height:340px;padding:36px var(--gutter) 44px;}
+  .aa-mega__rail{list-style:none;margin:0;padding:0;width:264px;display:grid;gap:2px;}
+  .aa-mrail__item{position:static;}
+  .aa-mrail__link{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;font-family:var(--font-serif);font-size:18px;color:var(--text-primary);border-bottom:1px solid transparent;}
+  .aa-mrail__link i{font-size:12px;color:var(--text-muted);transition:transform var(--dur-base),color var(--dur-base);}
+  .aa-mrail__item:hover > .aa-mrail__link{color:var(--text-accent);}
+  .aa-mrail__item:hover > .aa-mrail__link i{color:var(--text-accent);transform:translateX(3px);}
+  .aa-mega__panel{position:absolute;top:36px;left:calc(var(--gutter) + 264px + 56px);right:calc(var(--gutter) + 320px + 56px);opacity:0;visibility:hidden;background:var(--surface-page);transition:opacity var(--dur-base) var(--ease-luxe);}
+  .aa-mega__panel.is-default{opacity:1;visibility:visible;}
+  .aa-mrail__item:hover > .aa-mega__panel{opacity:1;visibility:visible;z-index:3;}
+  .aa-mega__h{display:block;font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent);margin-bottom:20px;}
+  .aa-mega__panel ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 40px;}
+  .aa-mega__panel ul a{font-family:var(--font-serif);font-size:17px;color:var(--text-primary);}
+  .aa-mega__panel ul a:hover{color:var(--text-accent);}
+  .aa-mega__viewall{display:inline-flex;align-items:center;gap:8px;margin-top:26px;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent);}
+  .aa-mega__feature{position:absolute;top:36px;right:var(--gutter);width:320px;height:260px;border-radius:var(--radius-sm);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;background:linear-gradient(160deg,#b69b78,#8a6f4f);color:#fff;}
+  .aa-mega__feature span{font-size:10px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;opacity:.85;}
+  .aa-mega__feature h4{font-family:var(--font-serif);font-size:23px;line-height:1.15;font-weight:500;margin:8px 0 0;color:#fff;white-space:normal;}
+  .aa-mega__feature em{display:inline-flex;align-items:center;gap:7px;margin-top:14px;font-style:normal;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;}
+
+  /* columns layout */
+  .aa-mcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 320px;gap:0 clamp(28px,4vw,56px);padding:36px var(--gutter) 30px;}
+  .aa-mcol ul{list-style:none;margin:0;padding:0;display:grid;gap:15px;}
+  .aa-mcol ul a{font-family:var(--font-serif);font-size:18px;color:var(--text-primary);}
+  .aa-mcol ul a:hover{color:var(--text-accent);}
+  .aa-mega__feature--col{position:static;width:auto;height:230px;}
+  .aa-mdiscover{display:flex;align-items:center;gap:14px;padding:16px var(--gutter);border-top:1px solid var(--border-hairline);}
+  .aa-mdiscover__label{font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-muted);margin-right:4px;}
+  .aa-mdiscover__chip{padding:8px 18px;border-radius:var(--radius-pill);border:1px solid var(--border-strong);font-size:13px;color:var(--text-secondary);}
+  .aa-mdiscover__chip:hover{border-color:var(--accent);color:var(--text-accent);}
+
+  .aa-burger{display:none;background:none;border:none;cursor:pointer;font-size:24px;color:var(--text-primary);padding:0;}
+  .aa-drawer{position:fixed;inset:0;z-index:100;background:var(--surface-page);transform:translateX(-100%);transition:transform var(--dur-base) var(--ease-luxe);overflow-y:auto;padding:20px var(--gutter) 60px;}
+  .aa-drawer.is-open{transform:translateX(0);}
+  .aa-drawer__top{display:flex;justify-content:space-between;align-items:center;height:56px;margin-bottom:12px;}
+  .aa-drawer a.aa-drawer__top-link{display:block;padding:16px 0;border-bottom:1px solid var(--border-hairline);font-family:var(--font-serif);font-size:22px;color:var(--text-primary);}
+  @media (max-width:1180px){ .aa-mega__feature{display:none;} .aa-mega__panel{right:var(--gutter);} .aa-mcols{grid-template-columns:repeat(3,minmax(0,1fr));} }
+  @media (max-width:1000px){
+    .aa-header__bar{grid-template-columns:auto 1fr auto;}
+    .aa-nav{display:none;}
+    .aa-burger{display:inline-flex;}
+  }
+</style>
+
+{%- comment -%} ---- Brand navigation data (edit here) ---- {%- endcomment -%}
+{%- assign furn_rail = "Shop All Furniture^/collections/furniture^link~Shop by Category^/collections/furniture^Sofas|/collections/furniture/sofas;Lounge Chairs|/collections/furniture/lounge-chairs;Dining Chairs|/collections/furniture/dining-chairs;Tables|/collections/furniture/tables;Storage|/collections/furniture/storage;Beds|/collections/furniture/beds~Shop by Room^/collections/furniture^Living Room|/collections/furniture/living-room-furniture;Dining|/collections/furniture/dining-furniture;Bedroom|/collections/furniture/bedroom-furniture;Study|/collections/furniture/study-furniture;Outdoor|/collections/furniture/outdoor-furniture~Shop by Material^/collections/furniture^Solid Teak|/collections/furniture/teak-furniture;Mango Wood|/collections/furniture/mango-furniture;Oak|/collections/furniture/oak-furniture;Cane & Rattan|/collections/furniture/cane-furniture;Marble & Stone|/collections/furniture/stone-furniture;Brass|/collections/furniture/brass-furniture~Shop by Collection^/collections^The Marwar Collection|/collections/the-marwar-collection;Aravalli|/collections/aravalli;The Object Library|/collections/decor~Shop by Style^/collections/furniture^Contemporary|/collections/furniture/contemporary;Classic|/collections/furniture/classic;Minimal|/collections/furniture/minimal;Hand-Carved|/collections/furniture/hand-carved~New Arrivals^/collections/new-arrivals^link~Best Sellers^/collections/furniture?sort_by=best-selling^link~Designer Favourites^/collections/designer-favourites^link~Customization^/pages/custom^link~Materials Library^/pages/materials^link" -%}
+
+{%- assign rug_rail = "Shop All Rugs^/collections/rugs^link~Collections^/collections^link~Shop by Style^/collections/rugs^Contemporary|/collections/rugs/contemporary;Modern Indian|/collections/rugs/modern-indian;Organic Modern|/collections/rugs/organic-modern;Traditional|/collections/rugs/traditional;Minimal|/collections/rugs/minimal;Transitional|/collections/rugs/transitional~Shop by Colour^/collections/rugs^Ivory & Sand|/collections/rugs/ivory;Charcoal|/collections/rugs/charcoal;Terracotta|/collections/rugs/terracotta;Indigo|/collections/rugs/indigo;Olive|/collections/rugs/olive~Shop by Material^/collections/rugs^Hand-Knotted Wool|/collections/rugs/wool-rugs;Flatweave|/collections/rugs/flat-weave-rugs;Cotton|/collections/rugs/cotton-rugs;Silk Blend|/collections/rugs/silk-rugs;Jute & Natural|/collections/rugs/jute-rugs~Shop by Construction^/collections/rugs^Hand-Knotted|/collections/rugs/hand-knotted-rugs;Hand-Tufted|/collections/rugs/hand-tufted-rugs;Flat-Weave|/collections/rugs/flat-weave-rugs;Hand-Loomed|/collections/rugs/hand-loomed-rugs~Shop by Room^/collections/rugs^Living Room|/collections/rugs/living-room-rugs;Dining|/collections/rugs/dining-room-rugs;Bedroom|/collections/rugs/bedroom-rugs;Study|/collections/rugs/study-rugs~Shop by Shape^/collections/rugs^Rectangle|/collections/rugs/rectangle-rugs;Round|/collections/rugs/round-rugs;Runner|/collections/rugs/runner-rugs~Shop by Size^/collections/rugs^5×8 ft|/collections/rugs/5x8;6×9 ft|/collections/rugs/6x9;8×10 ft|/collections/rugs/8x10;9×12 ft|/collections/rugs/9x12~Custom Rugs^/pages/custom^link~Rug Size Guide^/pages/size-guide^link" -%}
+
+{%- assign light_cols = "Shop by Type^Pendants|/collections/lighting/pendants;Chandeliers|/collections/lighting/chandeliers;Floor Lamps|/collections/lighting/floor-lamps;Table Lamps|/collections/lighting/table-lamps;Flush Mounts|/collections/lighting/flush-mounts~Shop by Room^Living Room|/collections/lighting/living-room;Dining|/collections/lighting/dining;Bedroom|/collections/lighting/bedroom;Entryway|/collections/lighting/entryway~Shop by Material^Brass|/collections/lighting/brass;Stone & Marble|/collections/lighting/stone;Glass|/collections/lighting/glass;Rattan|/collections/lighting/rattan" -%}
+
+{%- assign decor_cols = "Shop by Type^Vases|/collections/decor/vases;Vessels|/collections/decor/vessels;Trays|/collections/decor/trays;Bowls|/collections/decor/bowls;Objects|/collections/decor/objects~Shop by Room^Living Room|/collections/decor/living-room;Dining|/collections/decor/dining;Bedroom|/collections/decor/bedroom;Entryway|/collections/decor/entryway~Shop by Material^Ceramic|/collections/decor/ceramic;Stone|/collections/decor/stone;Brass|/collections/decor/brass;Glass|/collections/decor/glass" -%}
+
+{%- assign wall_cols = "Medium^Original Works|/collections/wall-art/original;Limited Prints|/collections/wall-art/prints;Textile Art|/collections/wall-art/textile;Photography|/collections/wall-art/photography~Format^Framed|/collections/wall-art/framed;Canvas|/collections/wall-art/canvas;Diptych & Triptych|/collections/wall-art/diptych~Shop by Room^Living Room|/collections/wall-art/living-room;Bedroom|/collections/wall-art/bedroom;Study|/collections/wall-art/study" -%}
+
+<header class="aa-header">
+  <div class="aa-header__bar">
+    <button class="aa-burger" aria-label="Open menu" onclick="document.getElementById('aaDrawer').classList.add('is-open');document.body.style.overflow='hidden';"><i class="ph ph-list"></i></button>
+    <nav class="aa-nav">
+      <div class="aa-nav__item">
+        <a class="aa-nav__top" href="/collections/furniture">Furniture <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+        <div class="aa-mega">{% render 'aa-mega-rail', rail: furn_rail, feat_eyebrow: 'Featured Collection', feat_title: 'The Marwar Collection', feat_url: '/collections/the-marwar-collection' %}</div>
+      </div>
+      <div class="aa-nav__item">
+        <a class="aa-nav__top" href="/collections/rugs">Rugs <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+        <div class="aa-mega">{% render 'aa-mega-rail', rail: rug_rail, feat_eyebrow: 'Bespoke', feat_title: 'Custom Rugs', feat_url: '/pages/custom' %}</div>
+      </div>
+      <div class="aa-nav__item">
+        <a class="aa-nav__top" href="/collections/lighting">Lighting <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+        <div class="aa-mega">{% render 'aa-mega-cols', cols: light_cols, feat_eyebrow: 'Featured', feat_title: 'Brass Meridian', feat_url: '/collections/lighting', discover: 'New Arrivals|/collections/new-arrivals;Best Sellers|/collections/lighting?sort_by=best-selling' %}</div>
+      </div>
+      <div class="aa-nav__item">
+        <a class="aa-nav__top" href="/collections/decor">Decor <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+        <div class="aa-mega">{% render 'aa-mega-cols', cols: decor_cols, feat_eyebrow: 'Gallery', feat_title: 'The Object Library', feat_url: '/collections/decor', discover: 'New Arrivals|/collections/new-arrivals;Best Sellers|/collections/decor?sort_by=best-selling' %}</div>
+      </div>
+      <div class="aa-nav__item">
+        <a class="aa-nav__top" href="/collections/wall-art">Wall Art <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+        <div class="aa-mega">{% render 'aa-mega-cols', cols: wall_cols, feat_eyebrow: 'Gallery', feat_title: 'Commissioned Works', feat_url: '/pages/custom', discover: 'Commissioned Works|/pages/custom;New Arrivals|/collections/new-arrivals' %}</div>
+      </div>
+    </nav>
+
+    <a class="aa-wordmark" href="{{ routes.root_url }}"><b>Art Avenue</b><small>Design House</small></a>
+
+    <div class="aa-nav__icons">
+      <div class="aa-nav__item"><a class="aa-nav__top" href="/pages/atelier">Discover</a></div>
+      <div class="aa-nav__item"><a class="aa-nav__top" href="/pages/custom">Custom &amp; Bespoke</a></div>
+      <div class="aa-nav__item"><a class="aa-nav__top" href="/pages/trade">Trade</a></div>
+      <span style="width:1px;height:18px;background:currentColor;opacity:.22"></span>
+      <a href="{{ routes.search_url }}" aria-label="Search"><i class="ph-light ph-magnifying-glass"></i></a>
+      <a href="{{ routes.account_url }}" aria-label="Account"><i class="ph-light ph-user"></i></a>
+      <a href="{{ routes.cart_url }}" aria-label="Cart"><i class="ph-light ph-handbag-simple"></i></a>
+    </div>
+  </div>
+</header>
+
+{%- comment -%} Mobile drawer — top categories + discover {%- endcomment -%}
+<div class="aa-drawer" id="aaDrawer">
+  <div class="aa-drawer__top">
+    <span class="serif" style="font-size:22px;letter-spacing:.16em;text-transform:uppercase">Art Avenue</span>
+    <button aria-label="Close menu" style="background:none;border:none;font-size:24px;cursor:pointer" onclick="document.getElementById('aaDrawer').classList.remove('is-open');document.body.style.overflow='';"><i class="ph ph-x"></i></button>
+  </div>
+  <a class="aa-drawer__top-link" href="/collections/furniture">Furniture</a>
+  <a class="aa-drawer__top-link" href="/collections/rugs">Rugs</a>
+  <a class="aa-drawer__top-link" href="/collections/lighting">Lighting</a>
+  <a class="aa-drawer__top-link" href="/collections/decor">Decor</a>
+  <a class="aa-drawer__top-link" href="/collections/wall-art">Wall Art</a>
+  <a class="aa-drawer__top-link" href="/pages/atelier">Discover</a>
+  <a class="aa-drawer__top-link" href="/pages/custom">Custom &amp; Bespoke</a>
+  <a class="aa-drawer__top-link" href="/pages/trade">Trade</a>
+  <div style="margin-top:24px;display:flex;gap:20px">
+    <a href="{{ routes.search_url }}">Search</a><a href="{{ routes.account_url }}">Account</a><a href="{{ routes.cart_url }}">Cart</a>
+  </div>
+</div>

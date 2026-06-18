@@ -1,13 +1,5 @@
-{%- comment -%}
-  Art Avenue — snippets/aa-lifecycle-banner.liquid  (AALifecycleBanner)
-  Params: state (lifecycle)
-{%- endcomment -%}
-{%- capture lb_banner -%}{%- render 'aa-lifecycle', key: state, attr: 'banner' -%}{%- endcapture -%}
-{%- assign lb_banner = lb_banner | strip -%}
-{%- if lb_banner != blank -%}
-  {%- capture lb_label -%}{%- render 'aa-lifecycle', key: state, attr: 'label' -%}{%- endcapture -%}
-  <div class="aa-lifecycle aa-lifecycle--{{ state }}">
-    <span class="aa-lifecycle__label">{{ lb_label | strip }}</span>
-    <p>{{ lb_banner }}</p>
-  </div>
-{%- endif -%}
+{%- case state -%}
+{%- when 'coming-soon' -%}<div class="aa-lifecycle"><span class="aa-lifecycle__label">Coming Soon</span><p>Arriving soon — register your interest and we'll tell you the moment it's available.</p></div>
+{%- when 'seasonal' -%}<div class="aa-lifecycle"><span class="aa-lifecycle__label">Seasonal</span><p>A seasonal piece, available for a limited time.</p></div>
+{%- when 'discontinued' -%}<div class="aa-lifecycle" style="background:var(--surface-alt);border-color:var(--border-strong)"><span class="aa-lifecycle__label" style="color:var(--text-muted)">Discontinued</span><p>This piece has been discontinued. Speak with a consultant about current alternatives.</p></div>
+{%- endcase -%}

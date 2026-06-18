@@ -1,0 +1,36 @@
+<section class="aa-section aa-alt"><div class="aa-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px">
+    <div><span class="aa-eyebrow aa-eyebrow--rule">{{ section.settings.eyebrow }}</span><h2 class="aa-h1" style="margin:16px 0 0">{{ section.settings.heading }}</h2></div>
+    <a class="btn btn--ghost" href="{{ section.settings.link | default: '/blogs/journal' }}">Read the Journal <i class="ph ph-arrow-right"></i></a>
+  </div>
+  <div class="grid-3" style="margin-top:44px">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }} style="text-decoration:none;color:inherit;display:block">
+        {% if block.settings.image %}<div class="aa-fig" style="aspect-ratio:3/2"><img src="{{ block.settings.image | image_url: width: 900 }}" alt="{{ block.settings.title | escape }}" loading="lazy"></div>{% else %}{% render 'aa-figure', tone: block.settings.tone, ratio: '3/2' %}{% endif %}
+        <div style="margin-top:18px;display:flex;gap:12px;align-items:center;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted)">
+          <span style="color:var(--text-accent)">{{ block.settings.category }}</span><span>·</span><span>{{ block.settings.read }} read</span>
+        </div>
+        <h3 class="serif" style="font-size:24px;line-height:1.2;font-weight:500;margin:12px 0 0;max-width:92%">{{ block.settings.title }}</h3>
+      </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% schema %}
+{ "name":"AA Journal","max_blocks":6,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"The Journal"},
+  {"type":"text","id":"heading","label":"Heading","default":"Design notes & stories"},
+  {"type":"url","id":"link","label":"View-all link"}
+],"blocks":[{"type":"post","name":"Post","settings":[
+  {"type":"text","id":"category","label":"Category"},
+  {"type":"text","id":"title","label":"Title"},
+  {"type":"text","id":"read","label":"Read time","default":"5 min"},
+  {"type":"url","id":"link","label":"Link"},
+  {"type":"image_picker","id":"image","label":"Image"},
+  {"type":"select","id":"tone","label":"Placeholder tone","default":"stone","options":[{"value":"clay","label":"Clay"},{"value":"olive","label":"Olive"},{"value":"bronze","label":"Bronze"},{"value":"stone","label":"Stone"},{"value":"sand","label":"Sand"},{"value":"espresso","label":"Espresso"}]}
+]}],
+"presets":[{"name":"AA Journal","blocks":[
+  {"type":"post","settings":{"category":"Styling","title":"How to layer a living room like a designer","read":"6 min","tone":"stone"}},
+  {"type":"post","settings":{"category":"Materials","title":"Why hand-knotted wool ages so beautifully","read":"4 min","tone":"olive"}},
+  {"type":"post","settings":{"category":"At Home","title":"Inside a Bandra apartment, restored","read":"8 min","tone":"clay"}}
+]}]}
+{% endschema %}
