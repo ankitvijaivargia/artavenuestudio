@@ -22,7 +22,7 @@
   {%- unless isRug -%}{%- assign room_tags = "living-room|Living Room|clay,dining-room|Dining|espresso,bedroom|Bedroom|stone,study|Study|olive,outdoor|Outdoor|bronze" | split: "," -%}{%- endunless -%}
   <div style="margin-top:30px">
     <div class="aa-eyebrow" style="margin-bottom:16px">Shop by Room</div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap-card)">
+    <div class="aa-col-roomrail" style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap-card)">
       {%- for r in room_tags -%}{%- assign rp = r | split: "|" -%}
         <a class="aa-tile" href="/collections/{{ col.handle }}/{{ rp[0] }}" style="min-height:170px;border-radius:var(--radius-xs)">{% render 'aa-figure', tone: rp[2], class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title" style="font-size:18px">{{ rp[1] }}</span></span></a>
       {%- endfor -%}
@@ -63,10 +63,11 @@
 
 {%- comment -%} Body — sidebar (native filters) + grid {%- endcomment -%}
 <section class="aa-section" style="padding-top:48px">
-<div class="aa-wrap" style="display:grid;grid-template-columns:{% if col.filters.size > 0 %}248px 1fr{% else %}1fr{% endif %};gap:48px;align-items:start">
+<div class="aa-wrap aa-col-layout" style="display:grid;grid-template-columns:{% if col.filters.size > 0 %}248px 1fr{% else %}1fr{% endif %};gap:48px;align-items:start">
   {%- if col.filters.size > 0 -%}
-  <aside style="position:sticky;top:150px;align-self:start">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px"><span class="serif" style="font-size:22px;font-weight:500">Filter</span><a href="{{ col.url }}" style="font-size:12px;color:var(--text-accent)">Clear all</a></div>
+  <aside class="aa-col-filter" style="position:sticky;top:150px;align-self:start">
+    <details class="aa-col-filter__d" open>
+    <summary class="aa-col-filter__sum"><div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px"><span class="serif" style="font-size:22px;font-weight:500">Filter <i class="ph ph-caret-down aa-col-filter__chev"></i></span><a href="{{ col.url }}" style="font-size:12px;color:var(--text-accent)">Clear all</a></div></summary>
     <form method="get">
       {%- for f in col.filters -%}
         <div style="border-bottom:1px solid var(--border-hairline);padding:20px 0">
@@ -84,7 +85,15 @@
         </div>
       {%- endfor -%}
     </form>
+    </details>
   </aside>
+  <script>
+    (function(){
+      var d=document.currentScript.parentNode.querySelector('.aa-col-filter__d');
+      function sync(){ if(window.innerWidth<=782){ d.open=false; } else { d.open=true; } }
+      sync();
+    })();
+  </script>
   {%- endif -%}
 
   <div>
