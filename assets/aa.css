@@ -102,6 +102,7 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-announce{background:var(--surface-dark);color:var(--text-on-dark);}
 .aa-announce__inner{display:flex;justify-content:center;gap:36px;padding:9px var(--gutter);font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-on-dark-muted);max-width:var(--container-max);margin:0 auto;flex-wrap:wrap;}
 .aa-announce__inner span{display:inline-flex;align-items:center;gap:36px;}
+.aa-announce__dup{display:none;}
 
 /* header */
 .aa-header{position:sticky;top:0;z-index:50;background:var(--surface-page);border-bottom:1px solid var(--border-hairline);}
@@ -269,6 +270,13 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-rooms__row{overflow-x:auto !important;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
   .aa-rooms__row::-webkit-scrollbar{display:none;}
   .aa-rooms__tile{flex:0 0 78% !important;scroll-snap-align:start;min-height:380px !important;}
+
+  /* announcement bar: single-line auto-scrolling marquee on mobile */
+  .aa-announce{overflow:hidden;}
+  .aa-announce__inner{flex-wrap:nowrap !important;justify-content:flex-start !important;width:max-content;gap:0 !important;animation:aa-marquee 18s linear infinite;}
+  .aa-announce__inner span{flex:0 0 auto;padding:0 28px;gap:10px !important;}
+  .aa-announce__dup{display:inline-flex !important;}
+  @keyframes aa-marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 }
 @media (max-width:520px){
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr !important;}
