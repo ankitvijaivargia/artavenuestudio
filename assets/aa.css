@@ -278,8 +278,18 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-announce__set span{padding:0 22px;gap:8px;white-space:nowrap;}
   .aa-announce__set--dup{display:flex;}
   @keyframes aa-marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* cap over-tall image blocks on mobile for a uniform, less scrolly page */
+  .aa-hero{height:auto !important;min-height:78vh !important;}
+  .aa-tile{min-height:300px !important;}
+  .aa-rooms__tile{min-height:340px !important;}
+  .aa-pcard__media{aspect-ratio:1/1 !important;}
+  /* featured + custom dark blocks: shorter on mobile */
+  .aa-tallblock{min-height:440px !important;}
 }
 @media (max-width:520px){
+  .aa-hero{min-height:72vh !important;}
+  .aa-tile{min-height:260px !important;}
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr !important;}
 }
 
