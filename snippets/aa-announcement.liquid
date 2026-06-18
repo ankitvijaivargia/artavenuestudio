@@ -1,8 +1,11 @@
-<div class="aa-announce"><div class="aa-announce__inner">
+{%- capture aa_msgs -%}
   <span>Complimentary design consultation</span>
   <span><span style="opacity:.4">&middot;</span> Handcrafted in India</span>
   <span><span style="opacity:.4">&middot;</span> International shipping available</span>
-  <span aria-hidden="true" class="aa-announce__dup">Complimentary design consultation</span>
-  <span aria-hidden="true" class="aa-announce__dup"><span style="opacity:.4">&middot;</span> Handcrafted in India</span>
-  <span aria-hidden="true" class="aa-announce__dup"><span style="opacity:.4">&middot;</span> International shipping available</span>
-</div></div>
+{%- endcapture -%}
+<div class="aa-announce">
+  <div class="aa-announce__track">
+    <div class="aa-announce__set">{{ aa_msgs }}</div>
+    <div class="aa-announce__set aa-announce__set--dup" aria-hidden="true">{{ aa_msgs }}</div>
+  </div>
+</div>
