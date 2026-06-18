@@ -1,0 +1,35 @@
+{%- comment -%}
+  Mobile drawer accordion item.
+  params:
+    label, url — parent category
+    rail — rail-format data (Group^url^items), used by Furniture/Rugs
+    cols — cols-format data (Group^items), used by Lighting/Decor/Wall Art
+  Renders a <details> with a chevron to expand, and a separate arrow link to the page.
+{%- endcomment -%}
+<details class="aa-dacc">
+  <summary class="aa-dacc__sum">
+    <span class="aa-dacc__label">{{ label }}</span>
+    <a class="aa-dacc__go" href="{{ url }}" aria-label="Go to {{ label }}" onclick="event.stopPropagation();"><i class="ph ph-arrow-right"></i></a>
+    <i class="ph ph-caret-down aa-dacc__chev"></i>
+  </summary>
+  <div class="aa-dacc__body">
+    {%- if rail != blank -%}
+      {%- assign groups = rail | split: '~' -%}
+      {%- for g in groups -%}{%- assign gp = g | split: '^' -%}
+        {%- assign items = gp[2] -%}
+        {%- if items == 'link' -%}
+          <a class="aa-dacc__top" href="{{ gp[1] }}">{{ gp[0] }}</a>
+        {%- else -%}
+          <span class="aa-dacc__group">{{ gp[0] }}</span>
+          <div class="aa-dacc__links">{%- assign pairs = items | split: ';' -%}{%- for p in pairs -%}{%- assign pp = p | split: '|' -%}<a href="{{ pp[1] }}">{{ pp[0] }}</a>{%- endfor -%}</div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- elsif cols != blank -%}
+      {%- assign groups = cols | split: '~' -%}
+      {%- for g in groups -%}{%- assign gp = g | split: '^' -%}
+        <span class="aa-dacc__group">{{ gp[0] }}</span>
+        <div class="aa-dacc__links">{%- assign pairs = gp[1] | split: ';' -%}{%- for p in pairs -%}{%- assign pp = p | split: '|' -%}<a href="{{ pp[1] }}">{{ pp[0] }}</a>{%- endfor -%}</div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</details>
