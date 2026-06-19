@@ -301,9 +301,13 @@ em.accent{color:var(--accent);font-style:italic;}
   /* PDP module 2-col editorial layouts → stack on mobile (fixes horizontal overflow) */
   .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
   /* PDP module card rows → horizontal swipe rails */
-  .aa-modrail{display:flex !important;grid-template-columns:none !important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .aa-modrail{display:flex !important;grid-template-columns:none !important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:stretch;}
   .aa-modrail::-webkit-scrollbar{display:none;}
   .aa-modrail > *{flex:0 0 72% !important;scroll-snap-align:start;}
+  /* equal-height cards in rails: push add-to-cart to the bottom */
+  .aa-modrail .aa-pcard-wrap{height:auto;}
+  .aa-modrail .aa-pcard__add{margin-top:auto;}
+  .aa-modrail .aa-pcard__ful{min-height:0;}
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr 1fr !important;}
   .aa-delivery{grid-template-columns:1fr 1fr !important;}
   .aa-section{padding:clamp(40px,12vw,64px) 0;}
