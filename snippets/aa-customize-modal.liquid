@@ -29,10 +29,19 @@
 <script>
 (function(){
   var modal = document.getElementById('aaCzModal');
+  if(!modal) return;
   var dataEl = document.getElementById('aa-cz-data');
-  if(!modal || !dataEl) return;
   var DATA = {};
-  try { DATA = JSON.parse(dataEl.textContent); } catch(e){ return; }
+  if(dataEl){ try { DATA = JSON.parse(dataEl.textContent); } catch(e){ DATA = {}; } }
+
+  // Public hooks so other configurators (e.g. sofa) can register option sets
+  // and react to a choice. window.aaCz.register('sofaopt', {label, items});
+  var onChoose = null;
+  window.aaCz = {
+    register: function(group, obj){ DATA[group] = obj; },
+    onChoose: function(fn){ onChoose = fn; },
+    open: function(group){ openModal(group); }
+  };
 
   var grid = document.getElementById('aaCzGrid');
   var cats = document.getElementById('aaCzCats');
@@ -121,6 +130,7 @@
     if(row){ var sw = row.querySelector('.aa-cz-row__sw'); if(sw) sw.style.background = state.preview.hex; row.classList.add('is-chosen'); }
     syncProps();
     updateSurcharge();
+    if(typeof onChoose==='function'){ try{ onChoose(state.group, state.preview); }catch(e){} }
     closeModal();
   });
 

@@ -11,7 +11,13 @@
 {%- if iscart and show_cart -%}
   <div class="aa-buyrow">
     {%- form 'product', product -%}
-      {%- if product.variants.size > 1 -%}
+    {%- assign sofa_style = false -%}
+    {%- assign _hs = false -%}{%- assign _hm = false -%}
+    {%- for o in product.options -%}{%- if o == 'Size' -%}{%- assign _hs = true -%}{%- elsif o == 'Material' -%}{%- assign _hm = true -%}{%- endif -%}{%- endfor -%}
+    {%- if _hs and _hm -%}{%- assign sofa_style = true -%}{%- endif -%}
+    {%- if sofa_style -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      {%- elsif product.variants.size > 1 -%}
         <select name="id" class="aa-control" style="flex:none;width:auto">{%- for v in product.variants -%}<option value="{{ v.id }}"{% unless v.available %} disabled{% endunless %}>{{ v.title }}</option>{%- endfor -%}</select>
       {%- else -%}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">{%- endif -%}
       <div class="aa-qty"><button type="button" data-aa-qty="-" aria-label="Decrease">&minus;</button><input type="number" name="quantity" value="1" min="1" aria-label="Quantity"><button type="button" data-aa-qty="+" aria-label="Increase">+</button></div>
