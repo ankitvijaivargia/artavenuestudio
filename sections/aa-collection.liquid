@@ -97,13 +97,7 @@
   {%- endif -%}
 
   <div>
-    {%- comment -%} Edit tabs (sort shortcuts) {%- endcomment -%}
-    <div class="aa-col-tabs" style="display:flex;gap:28px;border-bottom:1px solid var(--border-hairline);margin-bottom:32px;flex-wrap:wrap">
-      {%- assign tabs = "Featured|manual,New Arrivals|created-descending,Price: Low|price-ascending,Price: High|price-descending" | split: "," -%}
-      {%- for tb in tabs -%}{%- assign tp = tb | split: "|" -%}
-        <a href="{{ col.url }}?sort_by={{ tp[1] }}" style="text-decoration:none;padding:0 0 14px;font-size:12px;font-weight:500;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:{% if sb == tp[1] %}var(--text-primary){% else %}var(--text-muted){% endif %};border-bottom:2px solid {% if sb == tp[1] %}var(--accent){% else %}transparent{% endif %};margin-bottom:-1px">{{ tp[0] }}</a>
-      {%- endfor -%}
-    </div>
+    {%- comment -%} Sort handled by the dropdown in the toolbar above {%- endcomment -%}
 
     {%- paginate col.products by 9 -%}
       {%- assign half = col.products_count | divided_by: 2 -%}
