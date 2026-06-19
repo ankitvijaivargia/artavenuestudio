@@ -96,12 +96,25 @@
 
 <section class="aa-product" data-preset="{{ preset }}" data-fulfillment="{{ fulfillment }}" data-visibility="{{ visibility }}" data-lifecycle="{{ lifecycle }}">
 
+  <div class="aa-product__head">
+    {%- if p.type != blank -%}<div class="aa-product__eyebrow" style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
+    <h1 class="serif aa-product__title" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
+  </div>
+
   <div class="aa-gallery">
     {%- if p.images.size > 0 -%}
-      <div class="aa-fig" style="aspect-ratio:4/5;position:relative"><img src="{{ p.featured_image | image_url: width: 1400 }}" alt="{{ p.title | escape }}" width="{{ p.featured_image.width }}" height="{{ p.featured_image.height }}"><span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span></div>
-      {%- assign rest = p.images | slice: 1, p.images.size -%}
-      {%- if p.images.size > 1 -%}<div class="grid-2">{%- for img in rest limit: 2 -%}<div class="aa-fig" style="aspect-ratio:1/1"><img src="{{ img | image_url: width: 900 }}" alt="{{ p.title | escape }}" loading="lazy"></div>{%- endfor -%}</div>{%- endif -%}
-      {%- if p.images.size > 3 -%}<div class="aa-fig" style="aspect-ratio:16/10"><img src="{{ p.images[3] | image_url: width: 1600 }}" alt="{{ p.title | escape }}" loading="lazy"></div>{%- endif -%}
+      <div class="aa-gallery__main" id="aaGalMain">
+        {%- for img in p.images -%}
+          <div class="aa-fig aa-gallery__slide" data-idx="{{ forloop.index0 }}" style="aspect-ratio:4/5;position:relative"><img src="{{ img | image_url: width: 1400 }}" alt="{{ p.title | escape }}"{% unless forloop.first %} loading="lazy"{% endunless %}>{%- if forloop.first -%}<span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span>{%- endif -%}</div>
+        {%- endfor -%}
+      </div>
+      {%- if p.images.size > 1 -%}
+      <div class="aa-gallery__thumbs" id="aaGalThumbs">
+        {%- for img in p.images -%}
+          <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
+        {%- endfor -%}
+      </div>
+      {%- endif -%}
     {%- else -%}
       <div class="aa-fig aa-fig--clay" style="aspect-ratio:4/5;position:relative"><span class="aa-fig__label">Styled in your home</span><span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span></div>
       <div class="grid-2">{% render 'aa-figure', tone: 'espresso', ratio: '1/1', label: 'Joinery detail' %}{% render 'aa-figure', tone: 'bronze', ratio: '1/1', label: 'Linen &amp; grain' %}</div>
@@ -110,8 +123,8 @@
   </div>
 
   <div class="aa-buybox">
-    {%- if p.type != blank -%}<div style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
-    <h1 class="serif" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
+    {%- if p.type != blank -%}<div class="aa-buybox__eyebrow" style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
+    <h1 class="serif aa-buybox__title" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
     {% render 'aa-price', product: p, show_price: show_price, visibility: visibility, caption: price_cap %}
     {%- if p.description != blank -%}<div class="rte" style="font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:18px;max-width:46ch">{{ p.description }}</div>{%- endif -%}
 
@@ -138,7 +151,26 @@
 
 {% render 'aa-sticky-bar', product: p, show_cart: show_cart, price_text: price_text %}
 
-{%- comment -%} Ordered section modules — order from aa.module_order, else preset; each gated by modules {%- endcomment -%}
+<script>
+  (function(){
+    var main=document.getElementById('aaGalMain'), thumbs=document.getElementById('aaGalThumbs');
+    if(!main||!thumbs) return;
+    var slides=main.querySelectorAll('.aa-gallery__slide');
+    var tbs=thumbs.querySelectorAll('.aa-gallery__thumb');
+    function setActive(i){ tbs.forEach(function(t,n){ t.classList.toggle('is-active', n===i); }); }
+    thumbs.addEventListener('click', function(e){
+      var b=e.target.closest('.aa-gallery__thumb'); if(!b) return;
+      var i=+b.getAttribute('data-idx');
+      if(slides[i]){ slides[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); setActive(i); }
+    });
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ setActive(+en.target.getAttribute('data-idx')); } });
+    },{root:main,threshold:0.6});
+    slides.forEach(function(s){ obs.observe(s); });
+  })();
+</script>
+
+{%- comment -%} Ordered section modules {%- endcomment -%}
 {%- for key in order -%}
   {%- assign on = false -%}
   {%- if mods_mf -%}{%- if mods_mf[key] -%}{%- assign on = true -%}{%- endif -%}{%- elsif d_mods contains key -%}{%- assign on = true -%}{%- endif -%}
