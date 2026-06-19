@@ -87,7 +87,7 @@
   var aSize=root.querySelector('[data-sofa-size].is-active'); if(aSize) state.size=aSize.getAttribute('data-sofa-size');
   var aMat=root.querySelector('[data-sofa-mat].is-active'); if(aMat) state.mat=aMat.getAttribute('data-sofa-mat');
 
-  function money(v){ return '\u20B9 ' + Number(v||0).toLocaleString('en-IN'); }
+  function money(v){ return '\u20B9 ' + Math.round(Number(v||0)/100).toLocaleString('en-IN'); }
   function currentVariant(){ return vmap[(state.size||'')+'||'+(state.mat||'')]; }
   function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
 
@@ -102,7 +102,11 @@
     setHiddenId(v.id);
     var f=form(); var btn=f && f.querySelector('button[type="submit"]');
     if(btn){ btn.innerHTML = 'Add to Cart &middot; ' + money(v.price); }
-    document.querySelectorAll('[data-sofa-price]').forEach(function(el){ el.textContent=money(v.price); });
+    // update the visible price (.aa-price appears in head + buybox)
+    document.querySelectorAll('.aa-price').forEach(function(el){
+      if(el.classList.contains('aa-price--enquire')) return;
+      el.textContent = money(v.price);
+    });
   }
   function refreshSwatchRow(){
     var isLeather = state.mat==='Leather';
