@@ -1,20 +1,28 @@
 {%- comment -%} params: product (object) OR ph_* placeholder fields (ph_name, ph_price, ph_cat, ph_tone) {%- endcomment -%}
 {%- if product -%}
   {%- assign badge = product.metafields.aav.commerce_badge -%}
-  <a class="aa-pcard" href="{{ product.url }}">
-    <div class="aa-pcard__media">
-      {%- if product.featured_image -%}
-        <div class="aa-fig"><img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
-      {%- else -%}{% render 'aa-figure', tone: 'clay', class: 'aa-full-bg' %}{%- endif -%}
-      {%- if badge -%}<span class="aa-pcard__badge"><span class="aa-badge aa-badge--on-image">{{ badge }}</span></span>{%- endif -%}
-      <button type="button" class="aa-pcard__fav" aria-label="Save to wishlist" onclick="event.preventDefault();this.classList.toggle('is-saved');"><i class="ph ph-heart"></i></button>
-    </div>
-    <div class="aa-pcard__body">
-      {%- if product.type != blank -%}<div class="aa-pcard__cat">{{ product.type }}</div>{%- endif -%}
-      <div class="aa-pcard__name">{{ product.title }}</div>
-      <div class="aa-pcard__price">{% if product.price > 0 %}{% render 'aa-money', cents: product.price %}{% else %}Price on request{% endif %}</div>
-    </div>
-  </a>
+  {%- assign v = product.selected_or_first_available_variant -%}
+  <div class="aa-pcard-wrap">
+    <a class="aa-pcard" href="{{ product.url }}">
+      <div class="aa-pcard__media">
+        {%- if product.featured_image -%}
+          <div class="aa-fig"><img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
+        {%- else -%}{% render 'aa-figure', tone: 'clay', class: 'aa-full-bg' %}{%- endif -%}
+        {%- if badge -%}<span class="aa-pcard__badge"><span class="aa-badge aa-badge--on-image">{{ badge }}</span></span>{%- endif -%}
+        <button type="button" class="aa-pcard__fav" aria-label="Save to wishlist" onclick="event.preventDefault();this.classList.toggle('is-saved');"><i class="ph ph-heart"></i></button>
+      </div>
+      <div class="aa-pcard__body">
+        {%- if product.type != blank -%}<div class="aa-pcard__cat">{{ product.type }}</div>{%- endif -%}
+        <div class="aa-pcard__name">{{ product.title }}</div>
+        <div class="aa-pcard__price">{% if product.price > 0 %}{% render 'aa-money', cents: product.price %}{% else %}Price on request{% endif %}</div>
+      </div>
+    </a>
+    {%- if product.has_only_default_variant and v.available and product.price > 0 -%}
+      <button type="button" class="aa-pcard__add" data-vid="{{ v.id }}" aria-label="Add {{ product.title | escape }} to cart" onclick="window.aaQuickAdd&&window.aaQuickAdd(this)">Add to cart</button>
+    {%- else -%}
+      <a class="aa-pcard__add aa-pcard__add--opts" href="{{ product.url }}">Choose options</a>
+    {%- endif -%}
+  </div>
 {%- else -%}
   <div class="aa-pcard">
     <div class="aa-pcard__media">{% render 'aa-figure', tone: ph_tone, class: 'aa-full-bg' %}{% if ph_badge != blank %}<span class="aa-pcard__badge"><span class="aa-badge aa-badge--on-image">{{ ph_badge }}</span></span>{% endif %}</div>

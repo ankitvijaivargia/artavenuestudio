@@ -137,6 +137,24 @@
     {%- endfor -%}
   </div>
 </div></section>
+<script>
+  window.aaQuickAdd = window.aaQuickAdd || function(btn){
+    var id = btn.getAttribute('data-vid'); if(!id) return;
+    var original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Adding…';
+    fetch('/cart/add.js', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify({ items:[{ id: id, quantity: 1 }] })
+    }).then(function(r){ return r.json(); }).then(function(){
+      btn.textContent = 'Added ✓';
+      setTimeout(function(){ btn.textContent = original; btn.disabled = false; }, 1600);
+    }).catch(function(){
+      btn.textContent = 'Try again'; btn.disabled = false;
+      setTimeout(function(){ btn.textContent = original; }, 1600);
+    });
+  };
+</script>
 {% schema %}
 { "name": "Art Avenue Collection", "settings": [] }
 {% endschema %}
