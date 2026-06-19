@@ -153,11 +153,12 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-pcard__media{position:relative;overflow:hidden;background:var(--surface-stone);border-radius:var(--radius-xs);aspect-ratio:4/5;}
 .aa-pcard:hover .aa-fig img{transform:scale(1.045);}
 .aa-pcard__badge{position:absolute;top:14px;left:14px;z-index:2;}
-.aa-pcard__body{padding:16px 2px 4px;display:grid;gap:6px;}
 .aa-pcard__cat{font-size:10.5px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);}
-.aa-pcard__name{font-family:var(--font-serif);font-weight:500;font-size:21px;line-height:1.18;color:var(--text-primary);}
 .aa-pcard__price{font-size:var(--text-sm);color:var(--text-secondary);}
-.aa-pcard-wrap{display:flex;flex-direction:column;}
+.aa-pcard-wrap{display:flex;flex-direction:column;height:100%;}
+.aa-pcard{flex:1;}
+.aa-pcard__body{padding:14px 2px 4px;display:flex;flex-direction:column;gap:5px;}
+.aa-pcard__name{font-family:var(--font-serif);font-weight:500;font-size:18px;line-height:1.2;color:var(--text-primary);min-height:2.4em;}
 .aa-pcard__add{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:11px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-pill);background:transparent;color:var(--text-primary);font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;cursor:pointer;transition:background var(--dur-base),color var(--dur-base),border-color var(--dur-base);}
 .aa-pcard__add:hover{background:var(--surface-dark);color:var(--text-on-dark);border-color:var(--surface-dark);}
 .aa-pcard__add[disabled]{opacity:.7;}
@@ -287,6 +288,12 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-col-roomrail{display:flex !important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .aa-col-roomrail::-webkit-scrollbar{display:none;}
   .aa-col-roomrail > .aa-tile{flex:0 0 46% !important;scroll-snap-align:start;min-height:150px !important;}
+  /* hide redundant sort tabs on mobile (dropdown covers it) */
+  .aa-col-tabs{display:none !important;}
+  /* tighter product card text on mobile */
+  .aa-pcard__name{font-size:16px !important;min-height:2.4em;}
+  .aa-pcard__cat{font-size:10px !important;}
+  .aa-pcard__add{font-size:10.5px !important;padding:10px 12px !important;}
   /* collection filter: tap-to-open on mobile */
   .aa-col-filter{position:static !important;}
   .aa-col-filter__sum{list-style:none;cursor:pointer;border:1px solid var(--border-strong);border-radius:var(--radius-pill);padding:12px 20px;margin-bottom:8px;}
