@@ -21,8 +21,8 @@
 {%- else -%}
   {%- if iscart -%}{%- assign lt='consultation' -%}{%- assign lbl='Speak with a Design Consultant' -%}{%- endif -%}
   {%- capture href -%}{% render 'aa-lead-url', type: lt, product: product %}{%- endcapture -%}
-  <div style="display:flex;gap:14px;align-items:stretch;{% if variant == 'primary' %}margin-top:22px;{% endif %}">
-    <a class="btn btn--{{ variant }} btn--block" href="{{ href | strip }}" target="_blank" rel="noopener" style="flex:1">{{ lbl }}</a>
+  <div class="aa-cta-secondary" style="display:flex;gap:12px;align-items:stretch;{% if variant == 'primary' %}margin-top:22px;{% endif %}">
     {%- if variant == 'secondary' -%}<button type="button" class="aa-save" aria-label="Save to wishlist"><i class="ph ph-heart"></i></button>{%- endif -%}
+    <a class="btn btn--{{ variant }} btn--block" href="{{ href | strip }}" target="_blank" rel="noopener" style="flex:1">{{ lbl }}</a>
   </div>
 {%- endif -%}

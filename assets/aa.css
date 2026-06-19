@@ -291,13 +291,11 @@ em.accent{color:var(--accent);font-style:italic;}
   /* hide fulfillment/lead-time delivery cells that repeat the fulfillment bar */
   .aa-delivery__dup{display:none;}
   .aa-delivery{grid-template-columns:1fr 1fr !important;}
-  /* buy row on mobile: [qty] [Add to Cart] [heart] all on one line */
-  .aa-buyrow{flex-wrap:nowrap;gap:8px;}
-  .aa-buyrow form{flex:1 1 auto;gap:8px;}
-  .aa-qty button{width:30px;}
-  .aa-qty input{width:30px;}
-  .aa-buyrow form .btn{--_px:12px;font-size:11px;}
-  .aa-save{width:48px;min-width:48px;}
+  /* buy row on mobile */
+  .aa-buyrow{flex-wrap:nowrap;gap:10px;}
+  .aa-buyrow form{flex:1 1 auto;gap:10px;}
+  .aa-buyrow form .btn{flex:1;}
+  .aa-cta-secondary{gap:10px !important;}
   /* PDP module 2-col editorial layouts → stack on mobile (fixes horizontal overflow) */
   .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
   /* PDP module card rows → horizontal swipe rails */
