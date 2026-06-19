@@ -1,8 +1,11 @@
 {%- comment -%}
   Art Avenue — Customization modal. Rendered once on the PDP.
   Reads #aa-cz-data JSON, opened by [data-cz-open] buttons from aa-customize.liquid.
+  Swatch orders add the 'swatch' product to cart with the swatch name as a property.
 {%- endcomment -%}
-<div class="aa-czm" id="aaCzModal" aria-hidden="true">
+{%- assign swatch_product = all_products['swatch'] -%}
+{%- if swatch_product and swatch_product.first_available_variant -%}{%- assign swatch_vid = swatch_product.first_available_variant.id -%}{%- else -%}{%- assign swatch_vid = '' -%}{%- endif -%}
+<div class="aa-czm" id="aaCzModal" aria-hidden="true" data-swatch-vid="{{ swatch_vid }}">
   <div class="aa-czm__overlay" data-cz-close></div>
   <div class="aa-czm__dialog" role="dialog" aria-modal="true" aria-labelledby="aaCzTitle">
     <button type="button" class="aa-czm__x" data-cz-close aria-label="Close">&times;</button>
@@ -20,7 +23,7 @@
         <div class="aa-czm__panel-sur" id="aaCzPanelSur"></div>
         <button type="button" class="aa-czm__order" id="aaCzOrder">Order a swatch &middot; &#8377;999</button>
         <button type="button" class="btn btn--primary btn--block aa-czm__choose" id="aaCzChoose">Choose this fabric</button>
-        <div class="aa-czm__note">Swatches ship in 3&ndash;5 days. The cost is credited back when you order the piece.</div>
+        <div class="aa-czm__note">Order as many swatches as you like to compare. Each ships in 3&ndash;5 days, and the cost is credited back when you order the piece. <a href="/cart" id="aaCzCartLink" style="display:none;color:var(--text-accent)">View cart &rsaquo;</a></div>
       </aside>
     </div>
   </div>
@@ -137,15 +140,23 @@
   // order swatch -> add the swatch sample to cart via AJAX (uses a generic line item)
   orderBtn.addEventListener('click', function(){
     if(!state.preview) return;
-    var label = DATA[state.group].label + ' swatch — ' + state.preview.name;
-    var btn = orderBtn; var old = btn.innerHTML; btn.disabled=true; btn.innerHTML='Adding…';
-    // Adds as a cart note-style property on the current product line is not ideal;
-    // instead we POST a $0 placeholder property add to cart attributes so staff see the swatch request.
-    fetch('/cart/update.js', {
+    var vid = modal.getAttribute('data-swatch-vid');
+    var btn = orderBtn; var old = btn.innerHTML;
+    if(!vid){ btn.innerHTML='Unavailable'; setTimeout(function(){ btn.innerHTML=old; },1600); return; }
+    btn.disabled=true; btn.innerHTML='Adding…';
+    var groupLabel = DATA[state.group] ? DATA[state.group].label : 'Swatch';
+    var props = {}; props['Swatch'] = groupLabel + ' — ' + state.preview.name;
+    fetch('/cart/add.js', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ attributes: (function(){ var a={}; a['Swatch request: '+DATA[state.group].label]=state.preview.name+' ('+money(state.preview.swatch)+')'; return a; })() })
-    }).then(function(){ btn.innerHTML='Added to cart ✓'; setTimeout(function(){ btn.innerHTML=old; btn.disabled=false; },1800); })
-      .catch(function(){ btn.innerHTML=old; btn.disabled=false; });
+      body: JSON.stringify({ items: [{ id: Number(vid), quantity: 1, properties: props }] })
+    }).then(function(r){ return r.json(); })
+      .then(function(){
+        btn.innerHTML='Added to cart ✓';
+        var cl=document.getElementById('aaCzCartLink'); if(cl) cl.style.display='inline';
+        document.dispatchEvent(new CustomEvent('aa:cart:added'));
+        setTimeout(function(){ btn.innerHTML=old; btn.disabled=false; },1800);
+      })
+      .catch(function(){ btn.innerHTML='Try again'; setTimeout(function(){ btn.innerHTML=old; btn.disabled=false; },1600); });
   });
 
   // write selections as hidden inputs into the product form so they become line item properties
