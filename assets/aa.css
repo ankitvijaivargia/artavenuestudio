@@ -280,6 +280,24 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-gallery__thumb{flex:0 0 54px;width:54px;height:54px;padding:0;border:1px solid var(--border-hairline);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity var(--dur-base);}
   .aa-gallery__thumb img{width:100%;height:100%;object-fit:cover;}
   .aa-gallery__thumb.is-active{opacity:1;border-color:var(--text-primary);}
+  /* sample tiles stay in one horizontal line: Fabric · Finish · Material */
+  .aa-samples__grid{display:flex !important;grid-template-columns:none !important;gap:8px;}
+  .aa-samples__grid > *{flex:1 1 0;min-width:0;}
+  .aa-samples__tile{flex-direction:row !important;justify-content:center;gap:6px;padding:11px 6px !important;}
+  .aa-samples__tile i{font-size:15px !important;}
+  .aa-samples__tile span{font-size:9.5px !important;}
+  /* description already shown above gallery; hide the duplicate in buybox */
+  .aa-buybox__desc{display:none;}
+  /* hide fulfillment/lead-time delivery cells that repeat the fulfillment bar */
+  .aa-delivery__dup{display:none;}
+  .aa-delivery{grid-template-columns:1fr 1fr !important;}
+  /* buy row on mobile: [qty] [Add to Cart] [heart] all on one line */
+  .aa-buyrow{flex-wrap:nowrap;gap:8px;}
+  .aa-buyrow form{flex:1 1 auto;gap:8px;}
+  .aa-qty button{width:30px;}
+  .aa-qty input{width:30px;}
+  .aa-buyrow form .btn{--_px:12px;font-size:11px;}
+  .aa-save{width:48px;min-width:48px;}
   /* PDP module 2-col editorial layouts → stack on mobile (fixes horizontal overflow) */
   .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
   /* PDP module card rows → horizontal swipe rails */
