@@ -37,6 +37,7 @@
 /* ============================ BASE ============================ */
 *{box-sizing:border-box;}
 html,body{margin:0;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{background:var(--surface-page);color:var(--text-primary);font-family:var(--font-sans);font-size:var(--text-body);-webkit-font-smoothing:antialiased;line-height:1.5;}
 a{color:inherit;text-decoration:none;}
 img{max-width:100%;display:block;}
@@ -276,6 +277,12 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-gallery__thumb{flex:0 0 56px;width:56px;height:56px;padding:0;border:1px solid var(--border-hairline);background:none;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity var(--dur-base);}
   .aa-gallery__thumb img{width:100%;height:100%;object-fit:cover;}
   .aa-gallery__thumb.is-active{opacity:1;border-color:var(--text-primary);}
+  /* PDP module 2-col editorial layouts → stack on mobile (fixes horizontal overflow) */
+  .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
+  /* PDP module card rows → horizontal swipe rails */
+  .aa-modrail{display:flex !important;grid-template-columns:none !important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .aa-modrail::-webkit-scrollbar{display:none;}
+  .aa-modrail > *{flex:0 0 72% !important;scroll-snap-align:start;}
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr 1fr !important;}
   .aa-delivery{grid-template-columns:1fr 1fr !important;}
   .aa-section{padding:clamp(40px,12vw,64px) 0;}
@@ -355,6 +362,9 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-stickybar__name span{font-family:var(--font-serif);font-size:18px;color:var(--text-secondary);white-space:nowrap;}
 .aa-stickybar form{display:flex;margin:0;}
 @media (max-width:600px){
-  .aa-stickybar__name b{font-size:16px;}.aa-stickybar__name span{display:none;}
-  .aa-stickybar .btn{--_px:16px;--_fs:11px;}
+  .aa-stickybar__in{gap:8px;padding:10px 12px;}
+  .aa-stickybar__name{display:none !important;}
+  .aa-stickybar .btn{--_px:14px;--_fs:11px;flex:1 1 0;white-space:nowrap;}
+  .aa-stickybar form{flex:1 1 0;}
+  .aa-stickybar form .btn{width:100%;}
 }

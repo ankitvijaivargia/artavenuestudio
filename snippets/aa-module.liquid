@@ -6,7 +6,7 @@
 {%- case key -%}
 
 {%- when 'whyLove' -%}
-<section class="aa-section" style="border-top:1px solid var(--border-hairline)"><div class="aa-wrap" style="display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(40px,6vw,90px);align-items:center">
+<section class="aa-section" style="border-top:1px solid var(--border-hairline)"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(40px,6vw,90px);align-items:center">
   {% render 'aa-figure', tone:'clay', ratio:'4/5', label:'Made by hand' %}
   <div>
     <span class="aa-eyebrow aa-eyebrow--rule">Why You'll Love It</span>
@@ -22,7 +22,7 @@
 </div></section>
 
 {%- when 'customization' -%}
-<section class="aa-section aa-dark"><div class="aa-wrap" style="display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,96px);align-items:center">
+<section class="aa-section aa-dark"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,96px);align-items:center">
   <div>
     <span class="aa-eyebrow aa-eyebrow--on-dark">Made For Your Space</span>
     <h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Most pieces can be <em class="accent">made to suit.</em></h2>
@@ -40,7 +40,7 @@
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Complete the Room</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Pieces our stylists pair with this</h2>
-  <div class="grid-4" style="margin-top:40px">
+  <div class="grid-4 aa-modrail" style="margin-top:40px">
     {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Lighting', ph_name:'Brass Meridian Pendant', ph_price:'₹ 64,000', ph_tone:'bronze' %}{% render 'aa-product-card', ph_cat:'Rugs', ph_name:'Aravalli Rug', ph_price:'₹ 2,20,000', ph_tone:'olive' %}{% render 'aa-product-card', ph_cat:'Tables', ph_name:'Udai Side Table', ph_price:'₹ 48,000', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Decor', ph_name:'Stone Vessel', ph_price:'₹ 12,000', ph_tone:'clay' %}{%- endif -%}
   </div>
@@ -51,7 +51,7 @@
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Frequently Styled Together</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Complete the room</h2>
-  <div class="grid-4" style="margin-top:40px">
+  <div class="grid-4 aa-modrail" style="margin-top:40px">
     {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Textiles', ph_name:'Handwoven Wool Throw', ph_price:'₹ 8,400', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Seating', ph_name:'Kashi Linen Sofa', ph_price:'₹ 3,20,000', ph_tone:'clay' %}{% render 'aa-product-card', ph_cat:'Decor', ph_name:'Stone Vessel', ph_price:'₹ 12,000', ph_tone:'bronze' %}{% render 'aa-product-card', ph_cat:'Rugs', ph_name:'Aravalli Rug', ph_price:'₹ 2,20,000', ph_tone:'olive' %}{%- endif -%}
   </div>
@@ -62,14 +62,14 @@
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Continue Exploring</span>
   <h2 class="aa-h1" style="margin:16px 0 0">You may also like</h2>
-  <div class="grid-4" style="margin-top:40px">
+  <div class="grid-4 aa-modrail" style="margin-top:40px">
     {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Seating', ph_name:'Kashi Linen Sofa', ph_price:'₹ 3,20,000', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Tables', ph_name:'Amer Marble Table', ph_price:'₹ 4,10,000', ph_tone:'clay' %}{% render 'aa-product-card', ph_cat:'Storage', ph_name:'Jodha Sideboard', ph_price:'₹ 2,60,000', ph_tone:'espresso' %}{% render 'aa-product-card', ph_cat:'Lighting', ph_name:'Brass Meridian Pendant', ph_price:'₹ 64,000', ph_tone:'bronze' %}{%- endif -%}
   </div>
 </div></section>
 
 {%- when 'faq' -%}
-<section class="aa-section"><div class="aa-wrap" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(40px,6vw,96px);align-items:start">
+<section class="aa-section"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(40px,6vw,96px);align-items:start">
   <div><span class="aa-eyebrow aa-eyebrow--rule">Good to Know</span><h2 class="aa-h2" style="margin-top:16px">Questions, answered.</h2><p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-top:16px">Still unsure? A design consultant is a tap away.</p><a class="btn btn--ghost" href="{{ consult_href | strip }}" target="_blank" rel="noopener" style="margin-top:8px">Speak with a Consultant <i class="ph ph-arrow-right"></i></a></div>
   <div class="aa-accordion" style="margin-top:0;border-top:1px solid var(--border-hairline)">
     <details><summary>How long does a made-to-order piece take?</summary><p>Most pieces are crafted and delivered within 3–4 weeks domestically. Your consultant confirms a precise timeline at order.</p></details>
@@ -83,7 +83,7 @@
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Rug Buying Guides</span>
   <h2 class="aa-h2" style="margin:16px 0 32px">Everything you need to choose well.</h2>
-  <div class="grid-5">
+  <div class="grid-5 aa-modrail">
     {%- assign gs = "Size Guide|Find the right size for your room|ph-ruler~Material Guide|Wool, cotton & chenille compared|ph-leaf~Construction Guide|Knotted, tufted, flat & loomed|ph-spiral~Placement Guide|Room-by-room sizing & layout|ph-squares-four~Care Guide|Keep it beautiful for decades|ph-sparkle" | split: "~" -%}
     {%- for g in gs -%}{%- assign gp = g | split: "|" -%}<div style="background:var(--surface-raised);border:1px solid var(--border-hairline);border-radius:var(--radius-sm);padding:22px 20px;min-height:172px;display:flex;flex-direction:column;gap:12px"><i class="ph-light {{ gp[2] }}" style="font-size:26px;color:var(--accent-deep)"></i><span style="margin-top:auto"><span class="serif" style="display:block;font-size:19px">{{ gp[0] }}</span><span style="display:block;font-size:12.5px;color:var(--text-secondary);margin-top:4px">{{ gp[1] }}</span></span></div>{%- endfor -%}
   </div>
@@ -93,7 +93,7 @@
 <section class="aa-section"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Specifications</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Every detail, on the record.</h2>
-  <div class="grid-3" style="margin-top:44px">
+  <div class="grid-3 aa-modrail" style="margin-top:44px">
     <div><div class="aa-eyebrow" style="padding-bottom:14px;border-bottom:1px solid var(--border-strong)">Construction</div><dl style="margin:0">{% assign rows="Construction|Hand-knotted,Knot density|100–120 knots / in²,Pile height|12 mm · medium-low,Shape|Rectangular · round to order"|split:"," %}{% for r in rows %}{% assign rp=r|split:"|" %}<div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)"><dt style="font-size:13px;color:var(--text-muted)">{{ rp[0] }}</dt><dd style="margin:0;font-size:13.5px">{{ rp[1] }}</dd></div>{% endfor %}</dl></div>
     <div><div class="aa-eyebrow" style="padding-bottom:14px;border-bottom:1px solid var(--border-strong)">Material &amp; colour</div><dl style="margin:0">{% assign rows="Pile|Hand-spun highland wool,Foundation|Mercerised cotton,Colour|Vegetable & low-impact dyes,Weight|≈ 3.2 kg / m²"|split:"," %}{% for r in rows %}{% assign rp=r|split:"|" %}<div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)"><dt style="font-size:13px;color:var(--text-muted)">{{ rp[0] }}</dt><dd style="margin:0;font-size:13.5px">{{ rp[1] }}</dd></div>{% endfor %}</dl></div>
     <div><div class="aa-eyebrow" style="padding-bottom:14px;border-bottom:1px solid var(--border-strong)">Use &amp; care</div><dl style="margin:0">{% assign rows="Suitability|Indoor · residential,Origin|Hand-knotted in India,Lead time|Made to order · 4–6 months,Care|Low-pile vacuum · rotate twice yearly"|split:"," %}{% for r in rows %}{% assign rp=r|split:"|" %}<div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)"><dt style="font-size:13px;color:var(--text-muted)">{{ rp[0] }}</dt><dd style="margin:0;font-size:13.5px">{{ rp[1] }}</dd></div>{% endfor %}</dl></div>
@@ -104,7 +104,7 @@
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Understand the Craft</span>
   <h2 class="aa-h1" style="margin:16px 0 0">How a rug is made changes everything.</h2>
-  <div class="grid-4" style="margin-top:40px">
+  <div class="grid-4 aa-modrail" style="margin-top:40px">
     {%- assign cs = "Hand-Knotted|Every knot tied by hand around the warp — the most enduring and collectible construction. Months on the loom; a rug made to be passed down.|Exceptional · decades|High-traffic living & dining~Hand-Tufted|Wool punched through a backing and sheared to a plush, even pile. Quicker to make and gentler on price, soft underfoot.|Good · 8–12 years|Bedrooms & low-traffic~Flat-Weave|Woven flat with no pile — reversible, light and crisp in pattern. Easy to lift, air and layer over a larger rug.|Hard-wearing · reversible|Layering, kitchens, entryways~Hand-Loomed|Woven on a loom with a subtle loop or cut pile — a quiet, contemporary texture between knotted and flat.|Very good|Living rooms & studies" | split: "~" -%}
     {%- for c in cs -%}{%- assign cp = c | split:"|" -%}<div style="position:relative;background:{% if forloop.first %}var(--surface-sand, var(--surface-raised)){% else %}var(--surface-raised){% endif %};border:1px solid {% if forloop.first %}var(--accent){% else %}var(--border-hairline){% endif %};border-radius:var(--radius-sm);padding:24px 22px">{% if forloop.first %}<span style="position:absolute;top:18px;right:20px;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-accent)">This rug</span>{% endif %}<h3 class="serif" style="font-size:21px">{{ cp[0] }}</h3><p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin:12px 0 18px">{{ cp[1] }}</p><div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px"><span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);align-self:center">Durability</span><span>{{ cp[2] }}</span><span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);align-self:center">Best for</span><span>{{ cp[3] }}</span></div></div>{%- endfor -%}
   </div>
@@ -114,7 +114,7 @@
 <section class="aa-section"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Material &amp; Texture</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Know the feel before you choose.</h2>
-  <div class="grid-3" style="margin-top:40px">
+  <div class="grid-3 aa-modrail" style="margin-top:40px">
     {%- assign mats = p.metafields.aav.materials.value -%}
     {%- if mats and mats.size > 0 -%}
       {%- for m in mats -%}<div style="background:var(--surface-raised);border:1px solid var(--border-hairline);border-radius:var(--radius-sm);overflow:hidden">{% if m.image %}<div class="aa-fig"><img src="{{ m.image | image_url: width:800 }}" alt="{{ m.name }}"></div>{% else %}{% render 'aa-figure', tone:'olive', ratio:'16/9' %}{% endif %}<div style="padding:20px 22px 24px"><h3 class="serif" style="font-size:21px">{{ m.name }}</h3><p style="font-size:13.5px;line-height:1.5;color:var(--text-secondary);margin-top:8px">{{ m.description }}</p></div></div>{%- endfor -%}
@@ -126,7 +126,7 @@
 </div></section>
 
 {%- when 'craft' -%}
-<section class="aa-section aa-alt"><div class="aa-wrap" style="display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,90px);align-items:center">
+<section class="aa-section aa-alt"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,90px);align-items:center">
   {% render 'aa-figure', tone:'espresso', ratio:'4/5', label:'On the loom' %}
   <div><span class="aa-eyebrow aa-eyebrow--rule">Craftsmanship</span><h2 class="aa-h1" style="margin-top:16px">Knotted entirely by hand, the old way.</h2><p style="font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:16px;max-width:56ch">A single piece passes through the hands of spinners, dyers and weavers, and can take months to finish. The gentle variation you see is the signature of that human hand, never a flaw.</p></div>
 </div></section>
@@ -135,14 +135,14 @@
 <section class="aa-section"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Will It Fit?</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Room-by-room sizing.</h2>
-  <div class="grid-4" style="margin-top:40px">
+  <div class="grid-4 aa-modrail" style="margin-top:40px">
     {%- assign rms = "Living Room|8×10 / 9×12 ft,Dining Room|8×10 (6-seat) · 9×12 (8-seat),Bedroom|8×10 (queen) · 9×12 (king),Runner / Hallway|2.5×8 / 2.5×10 ft" | split: "," -%}
     {%- for r in rms -%}{%- assign rp = r | split:"|" -%}<div>{% render 'aa-figure', tone:'stone', ratio:'1/1' %}<h3 class="serif" style="font-size:20px;margin:18px 0 0">{{ rp[0] }}</h3><div style="font-size:12px;font-weight:600;color:var(--text-accent);margin-top:6px">Recommended · {{ rp[1] }}</div></div>{%- endfor -%}
   </div>
 </div></section>
 
 {%- when 'consult' -%}
-<section class="aa-section aa-dark"><div class="aa-wrap" style="display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(40px,6vw,96px);align-items:center">
+<section class="aa-section aa-dark"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(40px,6vw,96px);align-items:center">
   <div><span class="aa-eyebrow aa-eyebrow--on-dark">Personal Service</span><h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Need help choosing the <em class="accent">right piece?</em></h2><p class="aa-lead" style="color:var(--text-on-dark-muted);margin-top:20px;max-width:48ch">A design consultant can guide you through size, material, placement, custom sizing, care and styling — before you spend a rupee. Complimentary, and unhurried.</p><div style="margin-top:24px"><a class="btn btn--primary" href="{{ consult_href | strip }}" target="_blank" rel="noopener"><i class="ph ph-chat-teardrop-dots"></i> Speak with a Design Consultant</a></div></div>
   <ul style="list-style:none;margin:0;padding:0;border-top:1px solid var(--border-on-dark)">
     {%- assign cf = "Handcrafted by skilled artisans~Made using premium, natural materials~Secure, insured delivery across India~International shipping available~Custom sizes available on select designs~Design consultation available before you buy" | split: "~" -%}
@@ -151,7 +151,7 @@
 </div></section>
 
 {%- when 'assembly' -%}
-<section class="aa-section--tight aa-alt" style="padding-top:var(--section-y-tight);padding-bottom:var(--section-y-tight)"><div class="aa-wrap" style="display:grid;grid-template-columns:1.3fr auto;gap:clamp(28px,4vw,64px);align-items:center">
+<section class="aa-section--tight aa-alt" style="padding-top:var(--section-y-tight);padding-bottom:var(--section-y-tight)"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:1.3fr auto;gap:clamp(28px,4vw,64px);align-items:center">
   <div style="max-width:60ch"><span class="aa-eyebrow aa-eyebrow--rule">Delivery &amp; Assembly</span><h3 class="aa-h3" style="margin-top:14px">Need assembly assistance?</h3><p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-top:12px">Most pieces arrive securely packed and ready to use. Some larger items may need simple assembly — speak with us before you order so we can confirm what your piece needs.</p></div>
   <a class="btn btn--secondary" href="{{ consult_href | strip }}" target="_blank" rel="noopener" style="white-space:nowrap"><i class="ph ph-chat-teardrop-dots" style="color:var(--accent-deep)"></i> Speak with a Consultant</a>
 </div></section>
