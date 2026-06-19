@@ -91,7 +91,7 @@
   {%- if d_mods contains 'upholstery' -%}{%- assign uphol_on = true -%}{%- endif -%}
   {%- if d_mods contains 'delivery' -%}{%- assign delivery_on = true -%}{%- endif -%}
 {%- endif -%}
-{%- assign ful = '' -%}{%- case fulfillment -%}{%- when 'in-stock' -%}{%- assign ful_lbl='In Stock' -%}{%- assign ful_icon='ph-package' -%}{%- assign ful_lead='Ships in 3–5 days' -%}{%- assign price_cap='In stock · ready to ship' -%}{%- when 'custom' -%}{%- assign ful_lbl='Custom Order' -%}{%- assign ful_icon='ph-pencil-ruler' -%}{%- assign ful_lead='Timeline at consultation' -%}{%- assign price_cap='Made to your specification' -%}{%- when 'project' -%}{%- assign ful_lbl='Project Enquiry' -%}{%- assign ful_icon='ph-buildings' -%}{%- assign ful_lead='To your project schedule' -%}{%- assign price_cap='Quoted per project' -%}{%- else -%}{%- assign ful_lbl='Made to Order' -%}{%- assign ful_icon='ph-hammer' -%}{%- assign ful_lead='Crafted in 3–4 weeks' -%}{%- assign price_cap='Made to order · crafted for your home' -%}{%- endcase -%}
+{%- assign ful = '' -%}{%- case fulfillment -%}{%- when 'in-stock' -%}{%- assign ful_lbl='In Stock' -%}{%- assign ful_icon='ph-package' -%}{%- assign ful_lead='Ships in 3–5 days' -%}{%- assign price_cap='In stock · ready to ship' -%}{%- when 'custom' -%}{%- assign ful_lbl='Custom Order' -%}{%- assign ful_icon='ph-pencil-ruler' -%}{%- assign ful_lead='Timeline at consultation' -%}{%- assign price_cap='Made to your specification' -%}{%- when 'project' -%}{%- assign ful_lbl='Project Enquiry' -%}{%- assign ful_icon='ph-buildings' -%}{%- assign ful_lead='To your project schedule' -%}{%- assign price_cap='Quoted per project' -%}{%- else -%}{%- assign ful_lbl='Made to Order' -%}{%- assign ful_icon='ph-hammer' -%}{%- assign ful_lead='Crafted in 3–4 weeks' -%}{%- assign price_cap='Crafted for your home' -%}{%- endcase -%}
 {%- if show_price -%}{%- capture price_text -%}{% render 'aa-money', cents: p.price %}{%- endcapture -%}{%- elsif visibility == 'project-only' -%}{%- assign price_text = 'Project pricing' -%}{%- else -%}{%- assign price_text = 'Price on request' -%}{%- endif -%}
 
 <section class="aa-product" data-preset="{{ preset }}" data-fulfillment="{{ fulfillment }}" data-visibility="{{ visibility }}" data-lifecycle="{{ lifecycle }}">
@@ -134,13 +134,14 @@
     {% render 'aa-lifecycle-banner', state: lifecycle %}
     {% render 'aa-trust' %}
     {% render 'aa-size', mode: size_mode, product: p %}
-    {% render 'aa-options', product: p, show_material: material_on, show_finish: finish_on, show_upholstery: uphol_on %}
-    {%- if samples_on -%}{% render 'aa-sample-request', product: p %}{%- endif -%}
+    {% render 'aa-customize', product: p, show_material: material_on, show_finish: finish_on, show_upholstery: uphol_on %}
     {% render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart %}
 
     {% render 'aa-pdp-details', product: p %}
   </div>
 </section>
+
+{% render 'aa-customize-modal' %}
 
 {% render 'aa-sticky-bar', product: p, show_cart: show_cart, price_text: price_text %}
 

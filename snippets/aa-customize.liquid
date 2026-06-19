@@ -1,0 +1,67 @@
+{%- comment -%}
+  Art Avenue — Customization rows + modal.
+  params: product, show_material, show_finish, show_upholstery
+  Tapping a row opens the modal (aa-customize-modal). No WhatsApp.
+  Data: tries product.metafields.aav.fabrics / .finishes / .materials_lib (list of metaobjects).
+  Falls back to editable SAMPLE data below so the UI works before real swatches are uploaded.
+{%- endcomment -%}
+
+{%- assign swatch_price_default = '999' -%}
+
+{%- comment -%} ---------- SAMPLE DATA (edit freely; swap for metaobjects later) ---------- {%- endcomment -%}
+{%- comment -%} format per item: Name|Category|hexcolor|swatchPrice|surcharge  (image optional later) {%- endcomment -%}
+{%- assign sample_fabrics = "Kilim Indigo|Kilim|#2f4858|999|0,Kilim Saffron|Kilim|#c8763c|999|0,Dhurrie Sand|Kilim|#cdb893|999|0,Block Print Rust|Printed|#a65336|999|0,Block Print Olive|Printed|#6b6440|999|0,Belgian Linen Oat|Linen|#d8cdb6|999|0,Belgian Linen Stone|Linen|#b7b09c|999|0,Cotton Solid Ivory|Solid|#ece4d4|999|0,Cotton Solid Charcoal|Solid|#3a3a3a|999|0,Performance Weave Pebble|Performance|#9a9384|1499|3000,Velvet Emerald|Velvet|#1f4d3f|1499|5000,Velvet Wine|Velvet|#5e2330|1499|5000" | split: "," -%}
+
+{%- assign sample_finishes = "Natural Teak|Wood Tone|#b9966a|999|0,Honey Oak|Wood Tone|#c89a5b|999|0,Walnut|Wood Tone|#6a4a2e|999|0,Dark Walnut|Wood Tone|#4a3422|999|0,Ebony|Wood Tone|#2c2824|999|0,Antique Brass|Metal|#9a7b4f|1499|2500,Brushed Black|Lacquer|#1c1b1a|1499|2000" | split: "," -%}
+
+{%- assign sample_materials = "Tan Leather|Leather|#a0673b|1999|8000,Cognac Leather|Leather|#7a4424|1999|8000,Espresso Leather|Leather|#3d2417|1999|9000,Black Leather|Leather|#211c19|1999|9000,Solid Teak|Wood|#b08043|999|0,Mango Wood|Wood|#9c6b3f|999|0,Carrara Marble|Stone|#e8e6e1|2999|15000,Travertine|Stone|#cdbda0|2999|12000" | split: "," -%}
+
+{%- comment -%} ---------- RENDER A TRIGGER ROW ---------- {%- endcomment -%}
+{%- capture rows -%}
+  {%- if show_upholstery -%}
+    {%- assign first = sample_fabrics.first | split: "|" -%}
+    <button type="button" class="aa-cz-row" data-cz-open="fabric" data-cz-group="Fabric">
+      <span class="aa-cz-row__k">Fabric</span>
+      <span class="aa-cz-row__v"><span class="aa-cz-row__sw" style="background:{{ first[2] }}"></span><span data-cz-selname="fabric">{{ first[0] }}</span><i class="ph ph-caret-right"></i></span>
+    </button>
+  {%- endif -%}
+  {%- if show_finish -%}
+    {%- assign first = sample_finishes.first | split: "|" -%}
+    <button type="button" class="aa-cz-row" data-cz-open="finish" data-cz-group="Finish">
+      <span class="aa-cz-row__k">Finish</span>
+      <span class="aa-cz-row__v"><span class="aa-cz-row__sw" style="background:{{ first[2] }}"></span><span data-cz-selname="finish">{{ first[0] }}</span><i class="ph ph-caret-right"></i></span>
+    </button>
+  {%- endif -%}
+  {%- if show_material -%}
+    {%- assign first = sample_materials.first | split: "|" -%}
+    <button type="button" class="aa-cz-row" data-cz-open="material" data-cz-group="Material">
+      <span class="aa-cz-row__k">Material</span>
+      <span class="aa-cz-row__v"><span class="aa-cz-row__sw" style="background:{{ first[2] }}"></span><span data-cz-selname="material">{{ first[0] }}</span><i class="ph ph-caret-right"></i></span>
+    </button>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if rows != blank -%}
+<div class="aa-cz">
+  <div class="aa-cz__head">
+    <div class="aa-cz__title">Customise this piece</div>
+    <div class="aa-cz__sub">Choose your fabric, finish &amp; material — or order a swatch from &#8377;999 to feel it first.</div>
+  </div>
+  {{ rows }}
+</div>
+
+{%- comment -%} ---------- BUILD JSON DATA FOR JS ---------- {%- endcomment -%}
+<script type="application/json" id="aa-cz-data">
+{
+  "fabric": { "label": "Fabric", "items": [
+    {%- for it in sample_fabrics -%}{%- assign p = it | split: "|" -%}{"name":{{ p[0] | json }},"cat":{{ p[1] | json }},"hex":{{ p[2] | json }},"swatch":{{ p[3] | json }},"surcharge":{{ p[4] | json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+  ]},
+  "finish": { "label": "Finish", "items": [
+    {%- for it in sample_finishes -%}{%- assign p = it | split: "|" -%}{"name":{{ p[0] | json }},"cat":{{ p[1] | json }},"hex":{{ p[2] | json }},"swatch":{{ p[3] | json }},"surcharge":{{ p[4] | json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+  ]},
+  "material": { "label": "Material", "items": [
+    {%- for it in sample_materials -%}{%- assign p = it | split: "|" -%}{"name":{{ p[0] | json }},"cat":{{ p[1] | json }},"hex":{{ p[2] | json }},"swatch":{{ p[3] | json }},"surcharge":{{ p[4] | json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+  ]}
+}
+</script>
+{%- endif -%}

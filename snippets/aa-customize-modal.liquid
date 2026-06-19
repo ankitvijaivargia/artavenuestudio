@@ -1,0 +1,174 @@
+{%- comment -%}
+  Art Avenue — Customization modal. Rendered once on the PDP.
+  Reads #aa-cz-data JSON, opened by [data-cz-open] buttons from aa-customize.liquid.
+{%- endcomment -%}
+<div class="aa-czm" id="aaCzModal" aria-hidden="true">
+  <div class="aa-czm__overlay" data-cz-close></div>
+  <div class="aa-czm__dialog" role="dialog" aria-modal="true" aria-labelledby="aaCzTitle">
+    <button type="button" class="aa-czm__x" data-cz-close aria-label="Close">&times;</button>
+    <div class="aa-czm__head">
+      <div class="aa-czm__eyebrow" id="aaCzGroup">Fabric</div>
+      <h3 class="serif aa-czm__title" id="aaCzTitle">Choose your fabric</h3>
+      <div class="aa-czm__cats" id="aaCzCats"></div>
+    </div>
+    <div class="aa-czm__body">
+      <div class="aa-czm__grid" id="aaCzGrid"></div>
+      <aside class="aa-czm__panel" id="aaCzPanel">
+        <div class="aa-czm__panel-sw" id="aaCzPanelSw"></div>
+        <div class="aa-czm__panel-name serif" id="aaCzPanelName">Select a swatch</div>
+        <div class="aa-czm__panel-cat" id="aaCzPanelCat"></div>
+        <div class="aa-czm__panel-sur" id="aaCzPanelSur"></div>
+        <button type="button" class="aa-czm__order" id="aaCzOrder">Order a swatch &middot; &#8377;999</button>
+        <button type="button" class="btn btn--primary btn--block aa-czm__choose" id="aaCzChoose">Choose this fabric</button>
+        <div class="aa-czm__note">Swatches ship in 3&ndash;5 days. The cost is credited back when you order the piece.</div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var modal = document.getElementById('aaCzModal');
+  var dataEl = document.getElementById('aa-cz-data');
+  if(!modal || !dataEl) return;
+  var DATA = {};
+  try { DATA = JSON.parse(dataEl.textContent); } catch(e){ return; }
+
+  var grid = document.getElementById('aaCzGrid');
+  var cats = document.getElementById('aaCzCats');
+  var panelSw = document.getElementById('aaCzPanelSw');
+  var panelName = document.getElementById('aaCzPanelName');
+  var panelCat = document.getElementById('aaCzPanelCat');
+  var panelSur = document.getElementById('aaCzPanelSur');
+  var orderBtn = document.getElementById('aaCzOrder');
+  var chooseBtn = document.getElementById('aaCzChoose');
+  var titleEl = document.getElementById('aaCzTitle');
+  var groupEl = document.getElementById('aaCzGroup');
+
+  var state = { group:'fabric', items:[], filter:'All', preview:null, selected:{} };
+
+  function money(v){ return '\u20B9 ' + Number(v||0).toLocaleString('en-IN'); }
+
+  function openModal(group){
+    var d = DATA[group]; if(!d) return;
+    state.group = group; state.items = d.items; state.filter = 'All';
+    groupEl.textContent = d.label;
+    titleEl.textContent = 'Choose your ' + d.label.toLowerCase();
+    chooseBtn.textContent = 'Choose this ' + d.label.toLowerCase();
+    buildCats(); renderGrid();
+    // preselect currently chosen (or first)
+    var cur = state.selected[group];
+    setPreview(cur ? findByName(cur.name) : state.items[0]);
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+  function findByName(n){ for(var i=0;i<state.items.length;i++){ if(state.items[i].name===n) return state.items[i]; } return null; }
+
+  function buildCats(){
+    var seen = {}, list = ['All'];
+    state.items.forEach(function(it){ if(it.cat && !seen[it.cat]){ seen[it.cat]=1; list.push(it.cat); } });
+    cats.innerHTML = '';
+    list.forEach(function(c){
+      var b = document.createElement('button');
+      b.type='button'; b.className='aa-czm__cat'+(c===state.filter?' is-active':''); b.textContent=c;
+      b.addEventListener('click', function(){ state.filter=c; buildCats(); renderGrid(); });
+      cats.appendChild(b);
+    });
+  }
+
+  function renderGrid(){
+    grid.innerHTML = '';
+    state.items.forEach(function(it){
+      if(state.filter!=='All' && it.cat!==state.filter) return;
+      var cell = document.createElement('button');
+      cell.type='button';
+      cell.className='aa-czm__cell'+(state.preview && state.preview.name===it.name?' is-active':'');
+      cell.innerHTML = '<span class="aa-czm__cell-sw" style="background:'+it.hex+'"></span>'+
+        '<span class="aa-czm__cell-nm">'+it.name+'</span>'+
+        '<span class="aa-czm__cell-pr">'+ (Number(it.surcharge)>0 ? '+'+money(it.surcharge) : 'No upcharge') +'</span>';
+      cell.addEventListener('click', function(){ setPreview(it); });
+      grid.appendChild(cell);
+    });
+  }
+
+  function setPreview(it){
+    if(!it) return;
+    state.preview = it;
+    panelSw.style.background = it.hex;
+    panelName.textContent = it.name;
+    panelCat.textContent = it.cat || '';
+    panelSur.innerHTML = Number(it.surcharge)>0 ? 'Adds <strong>'+money(it.surcharge)+'</strong> to the piece' : 'Included &mdash; no upcharge';
+    orderBtn.innerHTML = 'Order a swatch &middot; '+money(it.swatch);
+    // refresh active state in grid
+    Array.prototype.forEach.call(grid.children, function(c){
+      c.classList.toggle('is-active', c.querySelector('.aa-czm__cell-nm') && c.querySelector('.aa-czm__cell-nm').textContent===it.name);
+    });
+  }
+
+  // choose -> update PDP row + hidden line item property, close
+  chooseBtn.addEventListener('click', function(){
+    if(!state.preview) return;
+    state.selected[state.group] = state.preview;
+    var nameEl = document.querySelector('[data-cz-selname="'+state.group+'"]');
+    if(nameEl){ nameEl.textContent = state.preview.name; }
+    var row = document.querySelector('[data-cz-open="'+state.group+'"]');
+    if(row){ var sw = row.querySelector('.aa-cz-row__sw'); if(sw) sw.style.background = state.preview.hex; row.classList.add('is-chosen'); }
+    syncProps();
+    updateSurcharge();
+    closeModal();
+  });
+
+  // order swatch -> add the swatch sample to cart via AJAX (uses a generic line item)
+  orderBtn.addEventListener('click', function(){
+    if(!state.preview) return;
+    var label = DATA[state.group].label + ' swatch — ' + state.preview.name;
+    var btn = orderBtn; var old = btn.innerHTML; btn.disabled=true; btn.innerHTML='Adding…';
+    // Adds as a cart note-style property on the current product line is not ideal;
+    // instead we POST a $0 placeholder property add to cart attributes so staff see the swatch request.
+    fetch('/cart/update.js', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ attributes: (function(){ var a={}; a['Swatch request: '+DATA[state.group].label]=state.preview.name+' ('+money(state.preview.swatch)+')'; return a; })() })
+    }).then(function(){ btn.innerHTML='Added to cart ✓'; setTimeout(function(){ btn.innerHTML=old; btn.disabled=false; },1800); })
+      .catch(function(){ btn.innerHTML=old; btn.disabled=false; });
+  });
+
+  // write selections as hidden inputs into the product form so they become line item properties
+  function syncProps(){
+    var form = document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]');
+    if(!form) return;
+    ['fabric','finish','material'].forEach(function(g){
+      var sel = state.selected[g]; var id='aa-prop-'+g;
+      var input = form.querySelector('#'+id);
+      if(sel){
+        if(!input){ input=document.createElement('input'); input.type='hidden'; input.id=id; form.appendChild(input); }
+        input.name='properties['+DATA[g].label+']';
+        input.value=sel.name + (Number(sel.surcharge)>0?' (+'+money(sel.surcharge)+')':'');
+      } else if(input){ input.remove(); }
+    });
+  }
+
+  // surcharge -> reflect in the Add to Cart price text (visual only; real price needs a variant/draft order)
+  function updateSurcharge(){
+    var total=0; ['fabric','finish','material'].forEach(function(g){ var s=state.selected[g]; if(s) total+=Number(s.surcharge||0); });
+    var note=document.getElementById('aaCzSurNote');
+    if(total>0){
+      if(!note){ note=document.createElement('div'); note.id='aaCzSurNote'; note.className='aa-cz-sur';
+        var cz=document.querySelector('.aa-cz'); if(cz) cz.appendChild(note); }
+      note.innerHTML='Customisation adds <strong>'+money(total)+'</strong>, confirmed on your order.';
+    } else if(note){ note.remove(); }
+  }
+
+  document.addEventListener('click', function(e){
+    var open = e.target.closest('[data-cz-open]');
+    if(open){ e.preventDefault(); openModal(open.getAttribute('data-cz-open')); return; }
+    if(e.target.closest('[data-cz-close]')){ closeModal(); }
+  });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+})();
+</script>
