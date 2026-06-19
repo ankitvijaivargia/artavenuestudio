@@ -47,9 +47,10 @@
 
 {%- comment -%} Sticky toolbar {%- endcomment -%}
 <div style="border-top:1px solid var(--border-hairline);border-bottom:1px solid var(--border-hairline);position:sticky;top:76px;background:var(--surface-page);z-index:20;margin-top:var(--section-y-tight)">
-  <div class="aa-wrap" style="display:flex;justify-content:space-between;align-items:center;height:64px">
-    <span style="font-size:13px;color:var(--text-muted)">{{ col.products_count }} {% if col.products_count == 1 %}piece{% else %}pieces{% endif %}</span>
-    <form method="get" style="min-width:220px">
+  <div class="aa-wrap aa-col-toolbar" style="display:flex;justify-content:space-between;align-items:center;height:64px">
+    <span class="aa-col-count" style="font-size:13px;color:var(--text-muted)">{{ col.products_count }} {% if col.products_count == 1 %}piece{% else %}pieces{% endif %}</span>
+    {%- if col.filters.size > 0 -%}<button type="button" class="aa-col-filterbtn" onclick="window.aaToggleFilter&&window.aaToggleFilter()">Filter</button>{%- endif -%}
+    <form method="get" class="aa-col-sortform" style="min-width:220px">
       <select name="sort_by" class="aa-control" onchange="this.form.submit()">
         {%- assign sb = col.sort_by | default: col.default_sort_by -%}
         <option value="manual"{% if sb == 'manual' %} selected{% endif %}>Sort: Featured</option>
@@ -92,6 +93,7 @@
       var d=document.currentScript.parentNode.querySelector('.aa-col-filter__d');
       function sync(){ if(window.innerWidth<=782){ d.open=false; } else { d.open=true; } }
       sync();
+      window.aaToggleFilter=function(){ d.open=!d.open; if(d.open){ d.scrollIntoView({behavior:'smooth',block:'start'}); } };
     })();
   </script>
   {%- endif -%}
