@@ -106,7 +106,7 @@
     {%- if p.images.size > 0 -%}
       <div class="aa-gallery__main" id="aaGalMain">
         {%- for img in p.images -%}
-          <div class="aa-fig aa-gallery__slide" data-idx="{{ forloop.index0 }}" style="aspect-ratio:4/5;position:relative"><img src="{{ img | image_url: width: 1400 }}" alt="{{ p.title | escape }}"{% unless forloop.first %} loading="lazy"{% endunless %}>{%- if forloop.first -%}<span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span>{%- endif -%}</div>
+          <div class="aa-fig aa-gallery__slide" data-idx="{{ forloop.index0 }}" style="aspect-ratio:3/4;position:relative"><img src="{{ img | image_url: width: 1400 }}" alt="{{ p.title | escape }}"{% unless forloop.first %} loading="lazy"{% endunless %}>{%- if forloop.first -%}<span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span>{%- endif -%}</div>
         {%- endfor -%}
       </div>
       {%- if p.images.size > 1 -%}
