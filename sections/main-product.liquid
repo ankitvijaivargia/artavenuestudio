@@ -98,7 +98,8 @@
 
   <div class="aa-product__head">
     {%- if p.type != blank -%}<div class="aa-product__eyebrow" style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
-    <h1 class="serif aa-product__title" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
+    <h1 class="serif aa-product__title" style="font-size:clamp(28px,7vw,40px);line-height:1.1;letter-spacing:var(--tracking-tight);margin:10px 0 0">{{ p.title }}</h1>
+    {% render 'aa-price', product: p, show_price: show_price, visibility: visibility, caption: price_cap %}
   </div>
 
   <div class="aa-gallery">
@@ -125,7 +126,7 @@
   <div class="aa-buybox">
     {%- if p.type != blank -%}<div class="aa-buybox__eyebrow" style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
     <h1 class="serif aa-buybox__title" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
-    {% render 'aa-price', product: p, show_price: show_price, visibility: visibility, caption: price_cap %}
+    <div class="aa-buybox__price">{% render 'aa-price', product: p, show_price: show_price, visibility: visibility, caption: price_cap %}</div>
     {%- if p.description != blank -%}<div class="rte" style="font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:18px;max-width:46ch">{{ p.description }}</div>{%- endif -%}
 
     {% render 'aa-fulfillment-bar', type: fulfillment %}
