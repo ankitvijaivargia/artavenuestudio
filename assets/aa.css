@@ -361,7 +361,7 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-buyrow form{flex:1 1 auto;gap:8px;min-width:0;}
   .aa-buyrow form .btn{flex:1;min-width:0;}
   /* tighten button padding/tracking on mobile to prevent overflow */
-  .aa-buybox .btn{--_px:12px;--_fs:11.5px;letter-spacing:.04em;}
+  .aa-buybox .btn{--_px:14px;--_fs:12px;letter-spacing:.05em;text-align:center;}
   /* slightly smaller qty selector to give the Add to Cart button more room */
   .aa-qty{flex:none;}
   .aa-qty button{width:32px;height:46px;font-size:16px;}
