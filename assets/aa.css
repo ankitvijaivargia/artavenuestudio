@@ -339,9 +339,9 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-gallery__thumb img{width:100%;height:100%;object-fit:cover;}
   .aa-gallery__thumb.is-active{opacity:1;border-color:var(--text-primary);}
   /* swipe arrows over the main image */
-  .aa-gallery__nav{position:absolute;top:calc((100vw * 4 / 3) / 2);transform:translateY(-50%);z-index:4;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;border-radius:50%;background:rgba(250,246,239,.86);color:var(--aa-charcoal);backdrop-filter:blur(3px);box-shadow:0 2px 10px -4px rgba(43,40,36,.45);cursor:pointer;font-size:17px;transition:opacity var(--dur-base),background var(--dur-base);}
-  .aa-gallery__nav--prev{left:14px;}
-  .aa-gallery__nav--next{right:14px;}
+  .aa-gallery__nav{position:absolute;top:calc((100vw * 4 / 3) / 2);transform:translateY(-50%);z-index:4;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:none;border-radius:50%;background:rgba(250,246,239,.62);color:var(--aa-charcoal);backdrop-filter:blur(2px);box-shadow:0 1px 4px -2px rgba(43,40,36,.35);cursor:pointer;font-size:12px;opacity:.78;transition:opacity var(--dur-base),background var(--dur-base);}
+  .aa-gallery__nav--prev{left:8px;}
+  .aa-gallery__nav--next{right:8px;}
   .aa-gallery__nav.is-hidden{opacity:0;pointer-events:none;}
   /* sample tiles stay in one horizontal line: Fabric · Finish · Material */
   .aa-samples__grid{display:flex !important;grid-template-columns:none !important;gap:8px;}
