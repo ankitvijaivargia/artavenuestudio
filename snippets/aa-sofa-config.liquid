@@ -124,6 +124,9 @@
       if(el.classList.contains('aa-price--enquire')) return;
       el.textContent = money(v.price);
     });
+    // sticky bar: update its price text and its add-to-cart variant id
+    document.querySelectorAll('[data-sticky-price]').forEach(function(el){ el.textContent = money(v.price); });
+    document.querySelectorAll('[data-sticky-id]').forEach(function(el){ el.value = v.id; });
   }
   function refreshSwatchRow(){
     var isLeather = state.mat==='Leather';
