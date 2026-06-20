@@ -173,7 +173,7 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-gallery__thumbs{display:none;}
 .aa-product__head{display:none;}
 .aa-buybox{position:sticky;top:100px;align-self:start;}
-.aa-price{font-family:var(--font-serif);font-size:26px;margin-top:16px;}
+.aa-price{font-family:var(--font-sans);font-size:23px;font-weight:500;letter-spacing:.01em;font-feature-settings:"lnum" 1,"tnum" 1;margin-top:16px;}
 .aa-price--enquire{font-size:23px;}.aa-price--enquire span{font-size:12.5px;color:var(--text-muted);margin-left:10px;}
 .aa-fulfillment{margin-top:18px;padding:15px 17px;border-radius:var(--radius-sm);border:1px solid var(--border-hairline);background:var(--surface-raised);}
 .aa-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--radius-pill);background:var(--surface-accent-tint);border:1px solid var(--accent-soft);color:var(--text-accent);font-size:12px;}
@@ -326,9 +326,9 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-buybox{order:3;}
   .aa-buybox__eyebrow,.aa-buybox__title{display:none;}
   .aa-buybox__price{display:none;}
-  /* gallery → full-bleed horizontal swipe carousel + thumbnail strip */
-  .aa-gallery{display:block !important;width:calc(100% + 2 * var(--gutter));margin-left:calc(-1 * var(--gutter));margin-right:calc(-1 * var(--gutter));}
-  .aa-gallery__main{display:flex;overflow-x:auto;gap:0;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:flex-start;}
+  /* gallery → true full-bleed (escapes container + scrollbar gutter) */
+  .aa-gallery{display:block !important;position:relative;left:50%;right:50%;width:100vw;margin-left:-50vw;margin-right:-50vw;}
+  .aa-gallery__main{display:flex;overflow-x:auto;gap:0;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:flex-start;width:100vw;}
   .aa-gallery__main::-webkit-scrollbar{display:none;}
   .aa-gallery__slide{flex:0 0 100%;width:100%;scroll-snap-align:center;aspect-ratio:3/4 !important;height:auto !important;position:relative;}
   .aa-gallery__slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
