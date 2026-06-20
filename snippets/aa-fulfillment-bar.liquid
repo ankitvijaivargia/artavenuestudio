@@ -4,7 +4,7 @@
 {%- when 'in-stock' -%}{%- assign fl='In Stock' -%}{%- assign fi='ph-package' -%}{%- assign fd='Ships in 3–5 days' -%}{%- assign fm='In stock and ready to ship — dispatched within 3–5 business days, securely packed and insured.' -%}
 {%- when 'custom' -%}{%- assign fl='Custom Order' -%}{%- assign fi='ph-pencil-ruler' -%}{%- assign fd='Timeline set at consultation' -%}{%- assign fm='Made to your specification — dimensions, finish and materials of your choosing, shaped with a design consultant before you commit.' -%}
 {%- when 'project' -%}{%- assign fl='Project Enquiry' -%}{%- assign fi='ph-buildings' -%}{%- assign fd='Planned to your project schedule' -%}{%- assign fm='For multi-room, hospitality and contract orders — planned, sourced and delivered to your project timeline by a dedicated consultant.' -%}
-{%- else -%}{%- assign fl='Made to Order' -%}{%- assign fi='ph-hammer' -%}{%- if lead != blank -%}{%- assign fd=lead -%}{%- else -%}{%- assign fd='Crafted in 3–4 weeks' -%}{%- endif -%}{%- assign fm='Crafted by hand to order — made for you once you place your order, then securely packed and insured for delivery.' -%}
+{%- else -%}{%- assign fl='Made to Order' -%}{%- assign fi='ph-hammer' -%}{%- if lead != blank -%}{%- assign fd=lead -%}{%- else -%}{%- assign fd='Crafted in 3–4 weeks' -%}{%- endif -%}{%- assign fm='This piece isn’t kept in stock — your order sets our workshop to work, building it to your chosen size and finish. The wait is what makes it yours alone.' -%}
 {%- endcase -%}
 <div class="aa-fulfillment">
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
