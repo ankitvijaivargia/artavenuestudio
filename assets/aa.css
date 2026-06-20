@@ -461,9 +461,9 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-stickybar form{display:flex;margin:0;}
 @media (max-width:600px){
   .aa-stickybar__in{gap:8px;padding:9px 12px;}
-  .aa-stickybar__name{display:flex !important;flex:1 1 auto;min-width:0;flex-direction:column;gap:1px;}
-  .aa-stickybar__name b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
-  .aa-stickybar__name span{display:block !important;font-size:14px;}
+  .aa-stickybar__name{display:flex !important;flex:1 1 auto;min-width:0;flex-direction:column;gap:2px;}
+  .aa-stickybar__name b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;color:var(--text-muted);font-weight:500;}
+  .aa-stickybar__name span{display:block !important;font-family:var(--font-sans);font-size:16px;font-weight:600;letter-spacing:.01em;color:var(--text-primary);}
   .aa-stickybar__consult{flex:0 0 auto;width:46px;height:46px;padding:0 !important;}
   .aa-stickybar__consult-tx{display:none;}
   .aa-stickybar form{flex:0 0 auto;}
