@@ -53,13 +53,13 @@
     <div class="aa-sofa__swsub" data-sofa-swsub>Choose your leather colour, or order a swatch from &#8377;2,000 to feel it first.</div>
   </div>
 
-  {%- comment -%} variant map for JS: "Size||Material" -> {id, price, available} {%- endcomment -%}
+  {%- comment -%} variant data for JS: explicit size/material/price so lookups never mismatch {%- endcomment -%}
   <script type="application/json" id="aa-sofa-variants">
-  { {%- for v in product.variants -%}
+  [ {%- for v in product.variants -%}
     {%- assign sz = '' -%}{%- assign mt = '' -%}
     {%- for so in v.selected_options -%}{%- if so.name=='Size' -%}{%- assign sz = so.value -%}{%- elsif so.name=='Material' -%}{%- assign mt = so.value -%}{%- endif -%}{%- endfor -%}
-    {{ sz | append: '||' | append: mt | json }}:{"id":{{ v.id }},"price":{{ v.price | json }},"available":{{ v.available }}}{%- unless forloop.last -%},{%- endunless -%}
-  {%- endfor -%} }
+    {"size":{{ sz | json }},"mat":{{ mt | json }},"id":{{ v.id | json }},"price":{{ v.price | json }},"available":{{ v.available }}}{%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%} ]
   </script>
 
   {%- comment -%} swatch sets for the modal, keyed by material {%- endcomment -%}
@@ -79,16 +79,26 @@
 (function(){
   var root = document.getElementById('aaSofa');
   if(!root) return;
-  var vmap={}, sw={};
-  try{ vmap = JSON.parse(document.getElementById('aa-sofa-variants').textContent); }catch(e){}
+  var vlist=[], sw={};
+  try{ vlist = JSON.parse(document.getElementById('aa-sofa-variants').textContent); }catch(e){}
   try{ sw = JSON.parse(document.getElementById('aa-sofa-swatches').textContent); }catch(e){}
 
   var state = { size:null, mat:null, swatch:{} };
   var aSize=root.querySelector('[data-sofa-size].is-active'); if(aSize) state.size=aSize.getAttribute('data-sofa-size');
   var aMat=root.querySelector('[data-sofa-mat].is-active'); if(aMat) state.mat=aMat.getAttribute('data-sofa-mat');
 
-  function money(v){ return '\u20B9 ' + Math.round(Number(v||0)/100).toLocaleString('en-IN'); }
-  function currentVariant(){ return vmap[(state.size||'')+'||'+(state.mat||'')]; }
+  function norm(s){ return (s==null?'':String(s)).trim(); }
+  function money(v){
+    // theme prices are in cents/paise (see aa-money.liquid). Always /100.
+    var n=(Number(v)||0)/100;
+    return '\u20B9 ' + Math.round(n).toLocaleString('en-IN');
+  }
+  function currentVariant(){
+    for(var i=0;i<vlist.length;i++){
+      if(norm(vlist[i].size)===norm(state.size) && norm(vlist[i].mat)===norm(state.mat)) return vlist[i];
+    }
+    return null;
+  }
   function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
 
   function setHiddenId(id){
@@ -102,7 +112,6 @@
     setHiddenId(v.id);
     var f=form(); var btn=f && f.querySelector('button[type="submit"]');
     if(btn){ btn.innerHTML = 'Add to Cart &middot; ' + money(v.price); }
-    // update the visible price (.aa-price appears in head + buybox)
     document.querySelectorAll('.aa-price').forEach(function(el){
       if(el.classList.contains('aa-price--enquire')) return;
       el.textContent = money(v.price);

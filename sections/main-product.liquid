@@ -133,12 +133,12 @@
     {% render 'aa-fulfillment-bar', type: fulfillment %}
     {% render 'aa-lifecycle-banner', state: lifecycle %}
     {% render 'aa-trust' %}
-    {% render 'aa-size', mode: size_mode, product: p %}
     {%- assign has_size_opt = false -%}{%- assign has_mat_opt = false -%}
     {%- for o in p.options -%}{%- if o == 'Size' -%}{%- assign has_size_opt = true -%}{%- elsif o == 'Material' -%}{%- assign has_mat_opt = true -%}{%- endif -%}{%- endfor -%}
     {%- if has_size_opt and has_mat_opt -%}
       {% render 'aa-sofa-config', product: p %}
     {%- else -%}
+      {% render 'aa-size', mode: size_mode, product: p %}
       {% render 'aa-customize', product: p, show_material: material_on, show_finish: finish_on, show_upholstery: uphol_on %}
     {%- endif -%}
     {% render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart %}
