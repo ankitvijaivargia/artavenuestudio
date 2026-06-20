@@ -180,6 +180,25 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
+  // --- TEMP DEBUG (remove after diagnosis) ---
+  function aaDebug(){
+    var d=document.getElementById('aaSofaDebug');
+    if(!d){ d=document.createElement('div'); d.id='aaSofaDebug';
+      d.style.cssText='margin-top:12px;padding:10px;border:1px dashed #b00;font:12px monospace;color:#b00;white-space:pre-wrap;line-height:1.4;background:#fff8f8';
+      root.appendChild(d); }
+    var v=currentVariant();
+    var keys=[]; for(var k in vmap){ keys.push(k); }
+    d.textContent =
+      'size='+state.size+' | mat='+state.mat+'\n'+
+      'lookupKey='+(norm(state.size)+'|||'+norm(state.mat))+'\n'+
+      'variantsLoaded='+keys.length+'\n'+
+      'keys='+keys.join(' , ')+'\n'+
+      'matched='+(v?('YES price='+v.price+' -> '+money(v.price)):'NO MATCH');
+  }
+  var _up=updatePrice;
+  updatePrice=function(){ _up(); aaDebug(); };
+  // --- END DEBUG ---
+
   updatePrice(); refreshSwatchRow();
 })();
 </script>
