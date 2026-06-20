@@ -13,9 +13,10 @@
 {%- assign sofa_fabrics = "Belgian Linen Oat|Linen|#d8cdb6|2000|0,Belgian Linen Stone|Linen|#b7b09c|2000|0,Cotton Ivory|Solid|#ece4d4|2000|0,Cotton Charcoal|Solid|#3a3a3a|2000|0,Performance Pebble|Performance|#9a9384|2000|0,Boucle Cream|Boucle|#e3dccb|2000|0,Velvet Emerald|Velvet|#1f4d3f|2000|0,Velvet Wine|Velvet|#5e2330|2000|0" | split: "," -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
+{%- assign size_pos = 0 -%}{%- assign mat_pos = 0 -%}
 {%- for o in product.options_with_values -%}
-  {%- if o.name == 'Size' -%}{%- assign opt_size = o -%}{%- endif -%}
-  {%- if o.name == 'Material' -%}{%- assign opt_mat = o -%}{%- endif -%}
+  {%- if o.name == 'Size' -%}{%- assign opt_size = o -%}{%- assign size_pos = o.position -%}{%- endif -%}
+  {%- if o.name == 'Material' -%}{%- assign opt_mat = o -%}{%- assign mat_pos = o.position -%}{%- endif -%}
 {%- endfor -%}
 
 {%- if opt_size != '' and opt_mat != '' -%}
@@ -58,8 +59,8 @@
   window.AA_SOFA_VARIANTS = window.AA_SOFA_VARIANTS || {};
   window.AA_SOFA_VARIANTS["{{ product.id }}"] = {
     {%- for v in product.variants -%}
-      {%- assign sz = '' -%}{%- assign mt = '' -%}
-      {%- for so in v.selected_options -%}{%- if so.name == 'Size' -%}{%- assign sz = so.value -%}{%- elsif so.name == 'Material' -%}{%- assign mt = so.value -%}{%- endif -%}{%- endfor -%}
+      {%- if size_pos == 1 -%}{%- assign sz = v.option1 -%}{%- elsif size_pos == 2 -%}{%- assign sz = v.option2 -%}{%- else -%}{%- assign sz = v.option3 -%}{%- endif -%}
+      {%- if mat_pos == 1 -%}{%- assign mt = v.option1 -%}{%- elsif mat_pos == 2 -%}{%- assign mt = v.option2 -%}{%- else -%}{%- assign mt = v.option3 -%}{%- endif -%}
       {{ sz | append: '|||' | append: mt | json }}: { id: {{ v.id }}, price: {{ v.price | times: 1 }}, available: {{ v.available }} }{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor -%}
   };
@@ -179,25 +180,6 @@
     var consult=document.querySelector('.aa-cta-secondary a, a[href*="/pages/enquiry"], a[href*="wa.me"]');
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
-
-  // --- TEMP DEBUG (remove after diagnosis) ---
-  function aaDebug(){
-    var d=document.getElementById('aaSofaDebug');
-    if(!d){ d=document.createElement('div'); d.id='aaSofaDebug';
-      d.style.cssText='margin-top:12px;padding:10px;border:1px dashed #b00;font:12px monospace;color:#b00;white-space:pre-wrap;line-height:1.4;background:#fff8f8';
-      root.appendChild(d); }
-    var v=currentVariant();
-    var keys=[]; for(var k in vmap){ keys.push(k); }
-    d.textContent =
-      'size='+state.size+' | mat='+state.mat+'\n'+
-      'lookupKey='+(norm(state.size)+'|||'+norm(state.mat))+'\n'+
-      'variantsLoaded='+keys.length+'\n'+
-      'keys='+keys.join(' , ')+'\n'+
-      'matched='+(v?('YES price='+v.price+' -> '+money(v.price)):'NO MATCH');
-  }
-  var _up=updatePrice;
-  updatePrice=function(){ _up(); aaDebug(); };
-  // --- END DEBUG ---
 
   updatePrice(); refreshSwatchRow();
 })();
