@@ -327,7 +327,7 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-buybox__eyebrow,.aa-buybox__title{display:none;}
   .aa-buybox__price{display:none;}
   /* gallery → full-bleed horizontal swipe carousel + thumbnail strip */
-  .aa-gallery{display:block !important;margin-left:calc(-1 * var(--gutter));margin-right:calc(-1 * var(--gutter));}
+  .aa-gallery{display:block !important;width:calc(100% + 2 * var(--gutter));margin-left:calc(-1 * var(--gutter));margin-right:calc(-1 * var(--gutter));}
   .aa-gallery__main{display:flex;overflow-x:auto;gap:0;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:flex-start;}
   .aa-gallery__main::-webkit-scrollbar{display:none;}
   .aa-gallery__slide{flex:0 0 100%;width:100%;scroll-snap-align:center;aspect-ratio:3/4 !important;height:auto !important;position:relative;}
