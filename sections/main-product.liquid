@@ -112,6 +112,10 @@
         {%- endfor -%}
       </div>
       {%- if p.images.size > 1 -%}
+      <button type="button" class="aa-gallery__nav aa-gallery__nav--prev" id="aaGalPrev" aria-label="Previous image"><i class="ph ph-caret-left"></i></button>
+      <button type="button" class="aa-gallery__nav aa-gallery__nav--next" id="aaGalNext" aria-label="Next image"><i class="ph ph-caret-right"></i></button>
+      {%- endif -%}
+      {%- if p.images.size > 1 -%}
       <div class="aa-gallery__thumbs" id="aaGalThumbs">
         {%- for img in p.images -%}
           <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
@@ -168,6 +172,25 @@
       entries.forEach(function(en){ if(en.isIntersecting){ setActive(+en.target.getAttribute('data-idx')); } });
     },{root:main,threshold:0.6});
     slides.forEach(function(s){ obs.observe(s); });
+
+    // prev/next arrows
+    var prev=document.getElementById('aaGalPrev'), next=document.getElementById('aaGalNext');
+    function curIdx(){
+      var c=main.scrollLeft + main.clientWidth/2, best=0, bestD=Infinity;
+      slides.forEach(function(s,n){ var center=s.offsetLeft + s.offsetWidth/2; var d=Math.abs(center-c); if(d<bestD){ bestD=d; best=n; } });
+      return best;
+    }
+    function go(i){ if(i<0||i>=slides.length) return; slides[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); setActive(i); }
+    function updateArrows(){
+      if(!prev||!next) return;
+      var i=curIdx();
+      prev.classList.toggle('is-hidden', i<=0);
+      next.classList.toggle('is-hidden', i>=slides.length-1);
+    }
+    if(prev) prev.addEventListener('click', function(){ go(curIdx()-1); });
+    if(next) next.addEventListener('click', function(){ go(curIdx()+1); });
+    main.addEventListener('scroll', function(){ window.requestAnimationFrame(updateArrows); });
+    updateArrows();
   })();
 </script>
 
