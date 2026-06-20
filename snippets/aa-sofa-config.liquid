@@ -58,7 +58,7 @@
   [ {%- for v in product.variants -%}
     {%- assign sz = '' -%}{%- assign mt = '' -%}
     {%- for so in v.selected_options -%}{%- if so.name=='Size' -%}{%- assign sz = so.value -%}{%- elsif so.name=='Material' -%}{%- assign mt = so.value -%}{%- endif -%}{%- endfor -%}
-    {"size":{{ sz | json }},"mat":{{ mt | json }},"id":{{ v.id | json }},"price":{{ v.price | json }},"available":{{ v.available }}}{%- unless forloop.last -%},{%- endunless -%}
+    {"size":{{ sz | json }},"mat":{{ mt | json }},"id":{{ v.id | json }},"price":{{ v.price | times: 1 }},"available":{{ v.available }}}{%- unless forloop.last -%},{%- endunless -%}
   {%- endfor -%} ]
   </script>
 
@@ -86,6 +86,9 @@
   var state = { size:null, mat:null, swatch:{} };
   var aSize=root.querySelector('[data-sofa-size].is-active'); if(aSize) state.size=aSize.getAttribute('data-sofa-size');
   var aMat=root.querySelector('[data-sofa-mat].is-active'); if(aMat) state.mat=aMat.getAttribute('data-sofa-mat');
+  // Fallback: if nothing seeded as active, use the first variant + first buttons
+  if(!state.size){ var fs=root.querySelector('[data-sofa-size]'); if(fs){ state.size=fs.getAttribute('data-sofa-size'); fs.classList.add('is-active'); } }
+  if(!state.mat){ var fm=root.querySelector('[data-sofa-mat]'); if(fm){ state.mat=fm.getAttribute('data-sofa-mat'); fm.classList.add('is-active'); } }
 
   function norm(s){ return (s==null?'':String(s)).trim(); }
   function money(v){

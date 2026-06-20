@@ -356,11 +356,21 @@ em.accent{color:var(--accent);font-style:italic;}
   /* hide fulfillment/lead-time delivery cells that repeat the fulfillment bar */
   .aa-delivery__dup{display:none;}
   .aa-delivery{grid-template-columns:1fr 1fr !important;}
-  /* buy row on mobile */
-  .aa-buyrow{flex-wrap:nowrap;gap:10px;}
-  .aa-buyrow form{flex:1 1 auto;gap:10px;}
-  .aa-buyrow form .btn{flex:1;}
-  .aa-cta-secondary{gap:10px !important;}
+  /* buy row on mobile — fit fully inside viewport, no right-edge clipping */
+  .aa-buyrow{flex-wrap:nowrap;gap:8px;}
+  .aa-buyrow form{flex:1 1 auto;gap:8px;min-width:0;}
+  .aa-buyrow form .btn{flex:1;min-width:0;}
+  /* tighten button padding/tracking on mobile to prevent overflow */
+  .aa-buybox .btn{--_px:12px;--_fs:11.5px;letter-spacing:.04em;}
+  /* slightly smaller qty selector to give the Add to Cart button more room */
+  .aa-qty{flex:none;}
+  .aa-qty button{width:32px;height:46px;font-size:16px;}
+  .aa-qty input{width:30px;font-size:14px;}
+  .aa-cta-secondary{gap:8px !important;}
+  .aa-cta-secondary .btn{min-width:0;}
+  /* guarantee the buybox children never exceed the screen width */
+  .aa-buybox{max-width:100%;overflow:hidden;}
+  .aa-buybox > *{max-width:100%;}
   /* PDP module 2-col editorial layouts → stack on mobile (fixes horizontal overflow) */
   .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
   /* PDP module card rows → horizontal swipe rails */
