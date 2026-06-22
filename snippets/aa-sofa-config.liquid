@@ -5,12 +5,12 @@
   Colour / Fabric picker that opens the customize modal with the right set.
   params: product
   Requires options named "Size" and "Material" with Material values Fabric / Leather.
-{%- endcomment -%}
 
-{%- comment -%} ----- EDITABLE PLACEHOLDER SWATCH DATA (swap for metaobjects later) ----- {%- endcomment -%}
-{%- comment -%} format: Name|Category|hex|swatchPrice|surcharge|imageURL  (imageURL optional; falls back to hex) {%- endcomment -%}
-{%- assign sofa_leathers = "Espresso|Leather|#3d2417|2000|0|https://picsum.photos/seed/leather1/400/400,Cognac|Leather|#7a4424|2000|0|https://picsum.photos/seed/leather2/400/400,Tan|Leather|#a0673b|2000|0|https://picsum.photos/seed/leather3/400/400,Black|Leather|#211c19|2000|0,Forest Green|Leather|#2f4034|2000|0,Oxblood|Leather|#5e2330|2000|0" | split: "," -%}
-{%- assign sofa_fabrics = "Belgian Linen Oat|Linen|#d8cdb6|2000|0|https://picsum.photos/seed/fabric1/400/400,Belgian Linen Stone|Linen|#b7b09c|2000|0|https://picsum.photos/seed/fabric2/400/400,Cotton Ivory|Solid|#ece4d4|2000|0|https://picsum.photos/seed/fabric3/400/400,Cotton Charcoal|Solid|#3a3a3a|2000|0,Performance Pebble|Performance|#9a9384|2000|0,Boucle Cream|Boucle|#e3dccb|2000|0,Velvet Emerald|Velvet|#1f4d3f|2000|0,Velvet Wine|Velvet|#5e2330|2000|0" | split: "," -%}
+  SWATCHES: reads product.metafields.aav.swatches (list of 'swatch' metaobjects).
+  Each swatch entry provides name / category / photo / hex / swatch_price / surcharge.
+  Leather-category swatches feed the Leather set; everything else feeds Fabric.
+  Falls back to a small placeholder list if the product has no swatches linked.
+{%- endcomment -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
 {%- assign size_pos = 0 -%}{%- assign mat_pos = 0 -%}
@@ -18,6 +18,11 @@
   {%- if o.name == 'Size' -%}{%- assign opt_size = o -%}{%- assign size_pos = o.position -%}{%- endif -%}
   {%- if o.name == 'Material' -%}{%- assign opt_mat = o -%}{%- assign mat_pos = o.position -%}{%- endif -%}
 {%- endfor -%}
+
+{%- comment -%} Collect linked swatches into leather vs fabric groups {%- endcomment -%}
+{%- assign sw_list = product.metafields.aav.swatches.value -%}
+{%- assign has_swatches = false -%}
+{%- if sw_list and sw_list.size > 0 -%}{%- assign has_swatches = true -%}{%- endif -%}
 
 {%- if opt_size != '' and opt_mat != '' -%}
 <div class="aa-sofa" id="aaSofa">
@@ -70,10 +75,34 @@
   <script type="application/json" id="aa-sofa-swatches">
   {
     "Leather": { "label":"Leather colour", "items":[
-      {%- for it in sofa_leathers -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}{%- if p[5] -%},"img":{{ p[5]|json }}{%- endif -%}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+      {%- if has_swatches -%}
+        {%- assign first_l = true -%}
+        {%- for s in sw_list -%}
+          {%- assign cat = s.category.value | default: '' -%}
+          {%- if cat == 'Leather' -%}
+            {%- unless first_l -%},{%- endunless -%}{%- assign first_l = false -%}
+            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image.src -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {"name":"Espresso","cat":"Leather","hex":"#3d2417","swatch":2000,"surcharge":0},{"name":"Cognac","cat":"Leather","hex":"#7a4424","swatch":2000,"surcharge":0},{"name":"Tan","cat":"Leather","hex":"#a0673b","swatch":2000,"surcharge":0}
+      {%- endif -%}
     ]},
     "Fabric": { "label":"Fabric", "items":[
-      {%- for it in sofa_fabrics -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}{%- if p[5] -%},"img":{{ p[5]|json }}{%- endif -%}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+      {%- if has_swatches -%}
+        {%- assign first_f = true -%}
+        {%- for s in sw_list -%}
+          {%- assign cat = s.category.value | default: '' -%}
+          {%- unless cat == 'Leather' -%}
+            {%- unless first_f -%},{%- endunless -%}{%- assign first_f = false -%}
+            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image.src -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- else -%}
+        {"name":"Belgian Linen Oat","cat":"Linen","hex":"#d8cdb6","swatch":2000,"surcharge":0},{"name":"Cotton Ivory","cat":"Solid","hex":"#ece4d4","swatch":2000,"surcharge":0}
+      {%- endif -%}
     ]}
   }
   </script>
