@@ -7,8 +7,10 @@
   Requires options named "Size" and "Material" with Material values Fabric / Leather.
 
   SWATCHES: reads product.metafields.aav.swatches (list of 'swatch' metaobjects).
-  DIMENSIONS: reads product.metafields.aav.size_dimensions (json map keyed by
-  Size value -> { cm, in }). Shown in the SIZE label row and updated live.
+  DIMENSIONS: reads per-VARIANT metafields aav.dim_w / aav.dim_d / aav.dim_h
+  (whole cm). Keyed by Size value (materials share footprint, first variant per
+  size wins). Inch values auto-derived from cm. Falls back to the legacy
+  product JSON aav.size_dimensions if a size has no variant dims yet.
 {%- endcomment -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
@@ -23,8 +25,17 @@
 {%- assign has_swatches = false -%}
 {%- if sw_list and sw_list.size > 0 -%}{%- assign has_swatches = true -%}{%- endif -%}
 
-{%- comment -%} Dimensions metafield -> read object form so we can index by size {%- endcomment -%}
+{%- comment -%} Legacy product-JSON fallback (object keyed by size -> {cm,in}) {%- endcomment -%}
 {%- assign dims_obj = product.metafields.aav.size_dimensions.value -%}
+
+{%- comment -%} Detect whether ANY variant carries dimension metafields {%- endcomment -%}
+{%- assign has_var_dims = false -%}
+{%- for v in product.variants -%}
+  {%- if v.metafields.aav.dim_w != blank and v.metafields.aav.dim_d != blank and v.metafields.aav.dim_h != blank -%}{%- assign has_var_dims = true -%}{%- break -%}{%- endif -%}
+{%- endfor -%}
+
+{%- assign show_dims = false -%}
+{%- if has_var_dims or dims_obj != blank -%}{%- assign show_dims = true -%}{%- endif -%}
 
 {%- if opt_size != '' and opt_mat != '' -%}
 <div class="aa-sofa" id="aaSofa">
@@ -32,7 +43,7 @@
   {%- comment -%} SIZE {%- endcomment -%}
   <div class="aa-sofa__group">
     <div class="aa-sofa__label"><span>Size</span><span class="aa-sofa__hint" data-sofa-sizehint>{{ opt_size.selected_value }}</span></div>
-    {%- if dims_obj != blank -%}
+    {%- if show_dims -%}
     <div class="aa-sofa__dims" data-sofa-dims hidden>
       <i class="ph ph-ruler"></i>
       <span class="aa-sofa__dims-cm" data-sofa-dims-cm></span>
@@ -78,13 +89,45 @@
       {{ sz | append: '|||' | append: mt | json }}: { id: {{ v.id }}, price: {{ v.price | times: 1 }}, available: {{ v.available }} }{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor -%}
   };
-  {%- comment -%} dimensions map written directly as JS, keyed by size value {%- endcomment -%}
+  {%- comment -%}
+    dimensions map keyed by size value. Built from per-variant cm metafields;
+    inch auto-derived (cm / 2.54, 1 decimal). First variant seen per size wins.
+  {%- endcomment -%}
   window.AA_SOFA_DIMS = window.AA_SOFA_DIMS || {};
   window.AA_SOFA_DIMS["{{ product.id }}"] = {
+    {%- assign done_sizes = '' -%}
+    {%- assign first_dim = true -%}
+    {%- for v in product.variants -%}
+      {%- if size_pos == 1 -%}{%- assign sz = v.option1 -%}{%- elsif size_pos == 2 -%}{%- assign sz = v.option2 -%}{%- else -%}{%- assign sz = v.option3 -%}{%- endif -%}
+      {%- assign sz_key = '[[' | append: sz | append: ']]' -%}
+      {%- unless done_sizes contains sz_key -%}
+        {%- assign w = v.metafields.aav.dim_w.value -%}
+        {%- assign d = v.metafields.aav.dim_d.value -%}
+        {%- assign h = v.metafields.aav.dim_h.value -%}
+        {%- if w != blank and d != blank and h != blank -%}
+          {%- assign done_sizes = done_sizes | append: sz_key -%}
+          {%- assign wi = w | times: 100 | divided_by: 254.0 | round: 1 -%}
+          {%- assign di = d | times: 100 | divided_by: 254.0 | round: 1 -%}
+          {%- assign hi = h | times: 100 | divided_by: 254.0 | round: 1 -%}
+          {%- capture cm_str -%}{{ w }} cm W × {{ d }} cm D × {{ h }} cm H{%- endcapture -%}
+          {%- capture in_str -%}{{ wi }} in W × {{ di }} in D × {{ hi }} in H{%- endcapture -%}
+          {%- unless first_dim -%},{%- endunless -%}{%- assign first_dim = false -%}
+          {{ sz | json }}: { cm: {{ cm_str | json }}, in: {{ in_str | json }} }
+        {%- endif -%}
+      {%- endunless -%}
+    {%- endfor -%}
+    {%- comment -%} legacy JSON fallback for any size not covered by variant dims {%- endcomment -%}
     {%- if dims_obj != blank -%}
       {%- for v in opt_size.values -%}
-        {%- assign d = dims_obj[v] -%}
-        {%- if d -%}{{ v | json }}: { cm: {{ d.cm | json }}, in: {{ d.in | json }} }{%- unless forloop.last -%},{%- endunless -%}{%- endif -%}
+        {%- assign sz_key = '[[' | append: v | append: ']]' -%}
+        {%- unless done_sizes contains sz_key -%}
+          {%- assign legacy = dims_obj[v] -%}
+          {%- if legacy -%}
+            {%- assign done_sizes = done_sizes | append: sz_key -%}
+            {%- unless first_dim -%},{%- endunless -%}{%- assign first_dim = false -%}
+            {{ v | json }}: { cm: {{ legacy.cm | json }}, in: {{ legacy.in | json }} }
+          {%- endif -%}
+        {%- endunless -%}
       {%- endfor -%}
     {%- endif -%}
   };
