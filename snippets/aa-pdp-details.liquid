@@ -1,16 +1,19 @@
 {%- comment -%} Rich PDP detail accordion. params: product {%- endcomment -%}
-{%- comment -%} detect whether this product offers any leather swatch, to show the leather note {%- endcomment -%}
-{%- assign has_leather = false -%}
+{%- comment -%} detect which materials this product offers, to show the right care sections {%- endcomment -%}
+{%- assign has_leather = false -%}{%- assign has_fabric = false -%}
 {%- assign sw_list = product.metafields.aav.swatches.value -%}
-{%- if sw_list -%}{%- for s in sw_list -%}{%- if s.category.value == 'Leather' -%}{%- assign has_leather = true -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
-<div class="aa-accordion">
+{%- if sw_list -%}{%- for s in sw_list -%}{%- if s.category.value == 'Leather' -%}{%- assign has_leather = true -%}{%- else -%}{%- assign has_fabric = true -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+<div class="aa-accordion" id="aaPdpDetails">
   {%- if product.description != blank -%}
   <details open><summary>Description <i class="ph ph-plus aa-acc-pm"></i></summary><div class="rte" style="padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary)">{{ product.description }}</div></details>
   {%- endif -%}
   <details><summary>Materials <i class="ph ph-plus aa-acc-pm"></i></summary><p>Built from carefully selected, natural materials — kiln-dried hardwoods, hand-spun textiles, cast metal and quarried stone, chosen to last for decades. Naturally occurring grain and tone variation is intrinsic to each handmade piece.</p></details>
   {%- if has_leather -%}
-  <details><summary>About our leather <i class="ph ph-plus aa-acc-pm"></i></summary><p>Our leathers are genuine and natural. Because every hide is unique, colour, depth of tone, grain and surface character vary from piece to piece — and small marks, scars, wrinkles and uneven tones are part of the material, not defects. Your piece won&rsquo;t look exactly like the photograph, and that individuality is the mark of real leather. To feel a colour and texture in person before you commit, order a swatch from the colour picker above.</p></details>
-  <details><summary>Leather care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust regularly with a soft, dry cloth and wipe spills at once with a clean, slightly damp cloth — never soak. Keep leather out of prolonged direct sunlight and away from direct heat to prevent fading and drying. Condition with a quality leather balm once or twice a year to keep the hide supple. Avoid solvents, polishes and abrasive cleaners.</p></details>
+  <details data-mat-section="Leather"><summary>About our leather <i class="ph ph-plus aa-acc-pm"></i></summary><p>Our leathers are genuine and natural. Because every hide is unique, colour, depth of tone, grain and surface character vary from piece to piece — and small marks, scars, wrinkles and uneven tones are part of the material, not defects. Your piece won&rsquo;t look exactly like the photograph, and that individuality is the mark of real leather. To feel a colour and texture in person before you commit, order a swatch from the colour picker above.</p></details>
+  <details data-mat-section="Leather"><summary>Leather care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust regularly with a soft, dry cloth and wipe spills at once with a clean, slightly damp cloth — never soak. Keep leather out of prolonged direct sunlight and away from direct heat to prevent fading and drying. Condition with a quality leather balm once or twice a year to keep the hide supple. Avoid solvents, polishes and abrasive cleaners.</p></details>
+  {%- endif -%}
+  {%- if has_fabric -%}
+  <details data-mat-section="Fabric"><summary>Fabric care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Vacuum gently and regularly with an upholstery attachment to lift dust before it settles. Blot spills immediately with a clean, dry cloth — press, don&rsquo;t rub — and avoid soaking the fabric. Plump and rotate loose cushions so they wear evenly. Keep out of prolonged direct sunlight to preserve colour, and have delicate weaves cleaned professionally rather than machine-washed.</p></details>
   {%- endif -%}
   <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary><p>Carved, joined and finished by hand in our workshops, passing through the hands of several craftspeople. Joinery is mortise-and-tenon — never glued shortcuts — so the piece is made to be kept and passed down.</p></details>
   <details><summary>Dimensions &amp; Specifications <i class="ph ph-plus aa-acc-pm"></i></summary><p>Generous, considered proportions drawn for real homes. Custom dimensions are available on most pieces through our design consultants. Share your space and we will confirm exact measurements before you order.</p></details>
@@ -19,3 +22,28 @@
   <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>Made-to-order pieces ship in 3&ndash;4 weeks via safe, insured delivery, securely packed for transit. Assembly assistance is available on selected pieces. International freight is quoted at checkout.</p></details>
   <details><summary>Designer Notes <i class="ph ph-plus aa-acc-pm"></i></summary><p>&ldquo;We design for the way you actually live &mdash; pieces generous enough to sink into, detailed enough to reward a second look, and made to age beautifully.&rdquo; &mdash; Art Avenue Design Studio</p></details>
 </div>
+
+{%- if has_leather or has_fabric -%}
+<script>
+(function(){
+  var box = document.getElementById('aaPdpDetails');
+  if(!box) return;
+  var secs = box.querySelectorAll('[data-mat-section]');
+  if(!secs.length) return;
+  // Show only the care sections that match the current material. Defaults to
+  // whatever the configurator broadcasts; before any event we show all present
+  // so the content is never hidden from crawlers or no-JS users.
+  function apply(mat){
+    secs.forEach(function(d){
+      var match = d.getAttribute('data-mat-section') === mat;
+      d.style.display = match ? '' : 'none';
+      if(!match){ d.open = false; }
+    });
+  }
+  document.addEventListener('aa:material', function(e){
+    var mat = e && e.detail && e.detail.mat;
+    if(mat) apply(mat);
+  });
+})();
+</script>
+{%- endif -%}
