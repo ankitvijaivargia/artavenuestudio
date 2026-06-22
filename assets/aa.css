@@ -237,6 +237,11 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-accordion summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:18px 0;font-family:var(--font-serif);font-size:19px;font-weight:500;}
 .aa-accordion summary::-webkit-details-marker{display:none;}
 .aa-accordion p{padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary);max-width:62ch;}
+.aa-accordion table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14px;}
+.aa-accordion th,.aa-accordion td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border-hairline);color:var(--text-secondary);}
+.aa-accordion th{font-family:var(--font-sans);font-weight:500;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);}
+.aa-accordion td:first-child{font-weight:500;color:var(--text-primary);}
+.aa-accordion td{font-feature-settings:"lnum" 1,"tnum" 1;}
 
 /* ===== PDP options / qty / wishlist / details ===== */
 .aa-opt{margin-top:24px;}
@@ -270,6 +275,11 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-sofa__btn{flex:1 1 auto;min-width:84px;padding:13px 16px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-family:var(--font-sans);font-size:13.5px;cursor:pointer;transition:border-color var(--dur-base),background var(--dur-base);}
 .aa-sofa__btn:hover{border-color:var(--accent);}
 .aa-sofa__btn.is-active{background:var(--text-primary);color:var(--surface-page,#f5f0e6);border-color:var(--text-primary);}
+.aa-sofa__dims{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;margin-top:12px;padding:10px 13px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);}
+.aa-sofa__dims[hidden]{display:none;}
+.aa-sofa__dims .ph-ruler{color:var(--accent-deep);font-size:15px;align-self:center;}
+.aa-sofa__dims-cm{font-family:var(--font-sans);font-size:13.5px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;}
+.aa-sofa__dims-in{font-size:12px;color:var(--text-muted);font-feature-settings:"lnum" 1,"tnum" 1;}
 .aa-sofa__custom{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:none;border:none;padding:0;cursor:pointer;font-size:12.5px;color:var(--text-secondary);}
 .aa-sofa__custom i{color:var(--accent-deep);font-size:15px;}
 .aa-sofa__custom span{color:var(--text-accent);}
