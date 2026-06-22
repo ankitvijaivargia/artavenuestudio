@@ -21,6 +21,7 @@
         <div class="aa-czm__panel-name serif" id="aaCzPanelName">Select a swatch</div>
         <div class="aa-czm__panel-cat" id="aaCzPanelCat"></div>
         <div class="aa-czm__panel-sur" id="aaCzPanelSur"></div>
+        <div class="aa-czm__panel-craft" id="aaCzPanelCraft" hidden></div>
         <button type="button" class="aa-czm__order" id="aaCzOrder">Order a swatch &middot; &#8377;999</button>
         <button type="button" class="btn btn--primary btn--block aa-czm__choose" id="aaCzChoose">Choose this fabric</button>
         <div class="aa-czm__note">Order as many swatches as you like to compare. Each ships in 3&ndash;5 days, and the cost is credited back when you order the piece. <a href="/cart" id="aaCzCartLink" style="display:none;color:var(--text-accent)">View cart &rsaquo;</a></div>
@@ -52,6 +53,7 @@
   var panelName = document.getElementById('aaCzPanelName');
   var panelCat = document.getElementById('aaCzPanelCat');
   var panelSur = document.getElementById('aaCzPanelSur');
+  var panelCraft = document.getElementById('aaCzPanelCraft');
   var orderBtn = document.getElementById('aaCzOrder');
   var chooseBtn = document.getElementById('aaCzChoose');
   var titleEl = document.getElementById('aaCzTitle');
@@ -122,6 +124,16 @@
     panelCat.textContent = it.cat || '';
     panelSur.innerHTML = Number(it.surcharge)>0 ? 'Adds <strong>'+money(it.surcharge)+'</strong> to the piece' : 'Included &mdash; no upcharge';
     orderBtn.innerHTML = 'Order a swatch &middot; '+money(it.swatch);
+    // genuine-leather authenticity note (only for leather swatches)
+    if(panelCraft){
+      if(it.cat==='Leather'){
+        panelCraft.innerHTML = 'This is genuine, full-grain leather. Each hide is unique \u2014 natural tone, grain and small marks or scars will vary, so your piece won\u2019t look exactly like the photo. These traits are the mark of real leather, not flaws.';
+        panelCraft.hidden = false;
+      } else {
+        panelCraft.hidden = true;
+        panelCraft.innerHTML = '';
+      }
+    }
     // refresh active state in grid
     Array.prototype.forEach.call(grid.children, function(c){
       c.classList.toggle('is-active', c.querySelector('.aa-czm__cell-nm') && c.querySelector('.aa-czm__cell-nm').textContent===it.name);
