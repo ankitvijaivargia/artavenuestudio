@@ -81,7 +81,7 @@
           {%- assign cat = s.category.value | default: '' -%}
           {%- if cat == 'Leather' -%}
             {%- unless first_l -%},{%- endunless -%}{%- assign first_l = false -%}
-            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image.src -%}{%- endif -%}
+            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- endif -%}
             {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
           {%- endif -%}
         {%- endfor -%}
@@ -96,7 +96,7 @@
           {%- assign cat = s.category.value | default: '' -%}
           {%- unless cat == 'Leather' -%}
             {%- unless first_f -%},{%- endunless -%}{%- assign first_f = false -%}
-            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image.src -%}{%- endif -%}
+            {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- endif -%}
             {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
           {%- endunless -%}
         {%- endfor -%}
