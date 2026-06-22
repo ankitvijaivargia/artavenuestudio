@@ -7,12 +7,8 @@
   Requires options named "Size" and "Material" with Material values Fabric / Leather.
 
   SWATCHES: reads product.metafields.aav.swatches (list of 'swatch' metaobjects).
-  Each swatch entry provides name / category / photo / hex / swatch_price / surcharge.
-  Leather-category swatches feed the Leather set; everything else feeds Fabric.
-  Falls back to a small placeholder list if the product has no swatches linked.
-
   DIMENSIONS: reads product.metafields.aav.size_dimensions (json map keyed by
-  Size value -> { cm, in }). Shown live under the Size row as the size changes.
+  Size value -> { cm, in }). Shown in the SIZE label row and updated live.
 {%- endcomment -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
@@ -27,8 +23,8 @@
 {%- assign has_swatches = false -%}
 {%- if sw_list and sw_list.size > 0 -%}{%- assign has_swatches = true -%}{%- endif -%}
 
-{%- comment -%} Dimensions metafield (json string) {%- endcomment -%}
-{%- assign dims_raw = product.metafields.aav.size_dimensions.value -%}
+{%- comment -%} Dimensions metafield -> read object form so we can index by size {%- endcomment -%}
+{%- assign dims_obj = product.metafields.aav.size_dimensions.value -%}
 
 {%- if opt_size != '' and opt_mat != '' -%}
 <div class="aa-sofa" id="aaSofa">
@@ -36,18 +32,18 @@
   {%- comment -%} SIZE {%- endcomment -%}
   <div class="aa-sofa__group">
     <div class="aa-sofa__label"><span>Size</span><span class="aa-sofa__hint" data-sofa-sizehint>{{ opt_size.selected_value }}</span></div>
-    <div class="aa-sofa__btns">
-      {%- for v in opt_size.values -%}
-        <button type="button" class="aa-sofa__btn{% if v == opt_size.selected_value %} is-active{% endif %}" data-sofa-size="{{ v | escape }}">{{ v }}</button>
-      {%- endfor -%}
-    </div>
-    {%- if dims_raw != blank -%}
+    {%- if dims_obj != blank -%}
     <div class="aa-sofa__dims" data-sofa-dims hidden>
       <i class="ph ph-ruler"></i>
       <span class="aa-sofa__dims-cm" data-sofa-dims-cm></span>
       <span class="aa-sofa__dims-in" data-sofa-dims-in></span>
     </div>
     {%- endif -%}
+    <div class="aa-sofa__btns">
+      {%- for v in opt_size.values -%}
+        <button type="button" class="aa-sofa__btn{% if v == opt_size.selected_value %} is-active{% endif %}" data-sofa-size="{{ v | escape }}">{{ v }}</button>
+      {%- endfor -%}
+    </div>
     <button type="button" class="aa-sofa__custom" data-cz-consult>
       <i class="ph ph-ruler"></i> Need an L-shape or a custom size? <span>Speak with a design consultant ›</span>
     </button>
@@ -72,7 +68,7 @@
     <div class="aa-sofa__swsub" data-sofa-swsub>Choose your leather colour, or order a swatch from &#8377;2,000 to feel it first.</div>
   </div>
 
-  {%- comment -%} variant price map written directly as JS (no JSON.parse, no escaping risk) {%- endcomment -%}
+  {%- comment -%} variant price map written directly as JS {%- endcomment -%}
   <script>
   window.AA_SOFA_VARIANTS = window.AA_SOFA_VARIANTS || {};
   window.AA_SOFA_VARIANTS["{{ product.id }}"] = {
@@ -82,12 +78,17 @@
       {{ sz | append: '|||' | append: mt | json }}: { id: {{ v.id }}, price: {{ v.price | times: 1 }}, available: {{ v.available }} }{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor -%}
   };
+  {%- comment -%} dimensions map written directly as JS, keyed by size value {%- endcomment -%}
+  window.AA_SOFA_DIMS = window.AA_SOFA_DIMS || {};
+  window.AA_SOFA_DIMS["{{ product.id }}"] = {
+    {%- if dims_obj != blank -%}
+      {%- for v in opt_size.values -%}
+        {%- assign d = dims_obj[v] -%}
+        {%- if d -%}{{ v | json }}: { cm: {{ d.cm | json }}, in: {{ d.in | json }} }{%- unless forloop.last -%},{%- endunless -%}{%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  };
   </script>
-
-  {%- comment -%} dimensions map from metafield, keyed by Size value {%- endcomment -%}
-  {%- if dims_raw != blank -%}
-  <script type="application/json" id="aa-sofa-dims">{{ dims_raw }}</script>
-  {%- endif -%}
 
   {%- comment -%} swatch sets for the modal, keyed by material {%- endcomment -%}
   <script type="application/json" id="aa-sofa-swatches">
@@ -131,51 +132,44 @@
   var root = document.getElementById('aaSofa');
   if(!root) return;
   var vmap = (window.AA_SOFA_VARIANTS && window.AA_SOFA_VARIANTS["{{ product.id }}"]) || {};
+  var dims = (window.AA_SOFA_DIMS && window.AA_SOFA_DIMS["{{ product.id }}"]) || {};
   var sw={};
   try{ sw = JSON.parse(document.getElementById('aa-sofa-swatches').textContent); }catch(e){}
-  var dims={};
-  try{ var dn=document.getElementById('aa-sofa-dims'); if(dn) dims = JSON.parse(dn.textContent); }catch(e){}
 
   var state = { size:null, mat:null, swatch:{} };
   var aSize=root.querySelector('[data-sofa-size].is-active'); if(aSize) state.size=aSize.getAttribute('data-sofa-size');
   var aMat=root.querySelector('[data-sofa-mat].is-active'); if(aMat) state.mat=aMat.getAttribute('data-sofa-mat');
-  // Fallback: if nothing seeded as active, use the first buttons
   if(!state.size){ var fs=root.querySelector('[data-sofa-size]'); if(fs){ state.size=fs.getAttribute('data-sofa-size'); fs.classList.add('is-active'); } }
   if(!state.mat){ var fm=root.querySelector('[data-sofa-mat]'); if(fm){ state.mat=fm.getAttribute('data-sofa-mat'); fm.classList.add('is-active'); } }
 
   function norm(s){ return (s==null?'':String(s)).trim(); }
-  function money(v){
-    // theme prices are in cents/paise (see aa-money.liquid). Always /100.
-    var n=(Number(v)||0)/100;
-    return '\u20B9 ' + Math.round(n).toLocaleString('en-IN');
-  }
-  // tell the rest of the page which material is active (PDP detail accordion listens)
-  function broadcastMat(){
-    try{ document.dispatchEvent(new CustomEvent('aa:material', { detail: { mat: state.mat } })); }catch(e){}
+  function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
+  function broadcastMat(){ try{ document.dispatchEvent(new CustomEvent('aa:material', { detail: { mat: state.mat } })); }catch(e){} }
+
+  function lookupDim(){
+    if(dims[state.size]) return dims[state.size];
+    var key=norm(state.size).toLowerCase();
+    for(var k in dims){ if(norm(k).toLowerCase()===key) return dims[k]; }
+    return null;
   }
   function updateDims(){
     var box=root.querySelector('[data-sofa-dims]'); if(!box) return;
-    var d = dims[state.size];
-    if(!d){ // try case/space-insensitive match
-      var key=norm(state.size).toLowerCase();
-      for(var k in dims){ if(norm(k).toLowerCase()===key){ d=dims[k]; break; } }
-    }
+    var d = lookupDim();
     if(d){
       var cm=box.querySelector('[data-sofa-dims-cm]'); var inch=box.querySelector('[data-sofa-dims-in]');
       if(cm) cm.textContent = d.cm || '';
-      if(inch) inch.textContent = d.in ? ('('+d.in+')') : '';
+      if(inch) inch.textContent = d['in'] ? ('('+d['in']+')') : '';
       box.hidden = false;
     } else { box.hidden = true; }
   }
+
   function currentVariant(){
     var key = norm(state.size)+'|||'+norm(state.mat);
     if(vmap[key]) return vmap[key];
-    // fallback: scan keys ignoring case/space
     for(var k in vmap){ if(norm(k).toLowerCase()===key.toLowerCase()) return vmap[k]; }
     return null;
   }
   function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
-
   function setHiddenId(id){
     var f=form(); if(!f) return;
     var inp=f.querySelector('input[name="id"], select[name="id"]');
@@ -187,11 +181,7 @@
     setHiddenId(v.id);
     var f=form(); var btn=f && f.querySelector('button[type="submit"]');
     if(btn){ btn.innerHTML = 'Add to Cart &middot; ' + money(v.price); }
-    document.querySelectorAll('.aa-price').forEach(function(el){
-      if(el.classList.contains('aa-price--enquire')) return;
-      el.textContent = money(v.price);
-    });
-    // sticky bar: update its price text and its add-to-cart variant id
+    document.querySelectorAll('.aa-price').forEach(function(el){ if(el.classList.contains('aa-price--enquire')) return; el.textContent = money(v.price); });
     document.querySelectorAll('[data-sticky-price]').forEach(function(el){ el.textContent = money(v.price); });
     document.querySelectorAll('[data-sticky-id]').forEach(function(el){ el.value = v.id; });
   }
