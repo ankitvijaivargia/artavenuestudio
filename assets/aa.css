@@ -394,6 +394,8 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-cta-secondary .btn{min-width:0;}
   .aa-buybox{max-width:100%;overflow:hidden;}
   .aa-buybox > *{max-width:100%;}
+  /* sofa configurator → center the size + dimension content on mobile */
+  .aa-sofa__dims{justify-content:center;text-align:center;}
   .aa-modwrap{grid-template-columns:1fr !important;gap:28px !important;}
   .aa-modrail{display:flex !important;grid-template-columns:none !important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:stretch;}
   .aa-modrail::-webkit-scrollbar{display:none;}
