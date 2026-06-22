@@ -60,6 +60,11 @@
   var state = { group:'fabric', items:[], filter:'All', preview:null, selected:{} };
 
   function money(v){ return '\u20B9 ' + Number(v||0).toLocaleString('en-IN'); }
+  // swatch background: real photo when present, else solid hex colour
+  function swBg(it){
+    if(it && it.img){ return "center/cover no-repeat url('" + it.img + "')"; }
+    return (it && it.hex) ? it.hex : 'transparent';
+  }
 
   function openModal(group){
     var d = DATA[group]; if(!d) return;
@@ -101,7 +106,7 @@
       var cell = document.createElement('button');
       cell.type='button';
       cell.className='aa-czm__cell'+(state.preview && state.preview.name===it.name?' is-active':'');
-      cell.innerHTML = '<span class="aa-czm__cell-sw" style="background:'+it.hex+'"></span>'+
+      cell.innerHTML = '<span class="aa-czm__cell-sw" style="background:'+swBg(it)+'"></span>'+
         '<span class="aa-czm__cell-nm">'+it.name+'</span>'+
         '<span class="aa-czm__cell-pr">'+ (Number(it.surcharge)>0 ? '+'+money(it.surcharge) : 'No upcharge') +'</span>';
       cell.addEventListener('click', function(){ setPreview(it); });
@@ -112,7 +117,7 @@
   function setPreview(it){
     if(!it) return;
     state.preview = it;
-    panelSw.style.background = it.hex;
+    panelSw.style.background = swBg(it);
     panelName.textContent = it.name;
     panelCat.textContent = it.cat || '';
     panelSur.innerHTML = Number(it.surcharge)>0 ? 'Adds <strong>'+money(it.surcharge)+'</strong> to the piece' : 'Included &mdash; no upcharge';
@@ -130,7 +135,7 @@
     var nameEl = document.querySelector('[data-cz-selname="'+state.group+'"]');
     if(nameEl){ nameEl.textContent = state.preview.name; }
     var row = document.querySelector('[data-cz-open="'+state.group+'"]');
-    if(row){ var sw = row.querySelector('.aa-cz-row__sw'); if(sw) sw.style.background = state.preview.hex; row.classList.add('is-chosen'); }
+    if(row){ var sw = row.querySelector('.aa-cz-row__sw'); if(sw) sw.style.background = swBg(state.preview); row.classList.add('is-chosen'); }
     syncProps();
     updateSurcharge();
     if(typeof onChoose==='function'){ try{ onChoose(state.group, state.preview); }catch(e){} }
