@@ -8,9 +8,9 @@
 {%- endcomment -%}
 
 {%- comment -%} ----- EDITABLE PLACEHOLDER SWATCH DATA (swap for metaobjects later) ----- {%- endcomment -%}
-{%- comment -%} format: Name|Category|hex|swatchPrice|surcharge {%- endcomment -%}
-{%- assign sofa_leathers = "Espresso|Leather|#3d2417|2000|0,Cognac|Leather|#7a4424|2000|0,Tan|Leather|#a0673b|2000|0,Black|Leather|#211c19|2000|0,Forest Green|Leather|#2f4034|2000|0,Oxblood|Leather|#5e2330|2000|0" | split: "," -%}
-{%- assign sofa_fabrics = "Belgian Linen Oat|Linen|#d8cdb6|2000|0,Belgian Linen Stone|Linen|#b7b09c|2000|0,Cotton Ivory|Solid|#ece4d4|2000|0,Cotton Charcoal|Solid|#3a3a3a|2000|0,Performance Pebble|Performance|#9a9384|2000|0,Boucle Cream|Boucle|#e3dccb|2000|0,Velvet Emerald|Velvet|#1f4d3f|2000|0,Velvet Wine|Velvet|#5e2330|2000|0" | split: "," -%}
+{%- comment -%} format: Name|Category|hex|swatchPrice|surcharge|imageURL  (imageURL optional; falls back to hex) {%- endcomment -%}
+{%- assign sofa_leathers = "Espresso|Leather|#3d2417|2000|0|https://picsum.photos/seed/leather1/400/400,Cognac|Leather|#7a4424|2000|0|https://picsum.photos/seed/leather2/400/400,Tan|Leather|#a0673b|2000|0|https://picsum.photos/seed/leather3/400/400,Black|Leather|#211c19|2000|0,Forest Green|Leather|#2f4034|2000|0,Oxblood|Leather|#5e2330|2000|0" | split: "," -%}
+{%- assign sofa_fabrics = "Belgian Linen Oat|Linen|#d8cdb6|2000|0|https://picsum.photos/seed/fabric1/400/400,Belgian Linen Stone|Linen|#b7b09c|2000|0|https://picsum.photos/seed/fabric2/400/400,Cotton Ivory|Solid|#ece4d4|2000|0|https://picsum.photos/seed/fabric3/400/400,Cotton Charcoal|Solid|#3a3a3a|2000|0,Performance Pebble|Performance|#9a9384|2000|0,Boucle Cream|Boucle|#e3dccb|2000|0,Velvet Emerald|Velvet|#1f4d3f|2000|0,Velvet Wine|Velvet|#5e2330|2000|0" | split: "," -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
 {%- assign size_pos = 0 -%}{%- assign mat_pos = 0 -%}
@@ -70,10 +70,10 @@
   <script type="application/json" id="aa-sofa-swatches">
   {
     "Leather": { "label":"Leather colour", "items":[
-      {%- for it in sofa_leathers -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+      {%- for it in sofa_leathers -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}{%- if p[5] -%},"img":{{ p[5]|json }}{%- endif -%}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
     ]},
     "Fabric": { "label":"Fabric", "items":[
-      {%- for it in sofa_fabrics -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+      {%- for it in sofa_fabrics -%}{%- assign p = it | split:'|' -%}{"name":{{ p[0]|json }},"cat":{{ p[1]|json }},"hex":{{ p[2]|json }},"swatch":{{ p[3]|json }},"surcharge":{{ p[4]|json }}{%- if p[5] -%},"img":{{ p[5]|json }}{%- endif -%}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
     ]}
   }
   </script>
@@ -142,7 +142,7 @@
     var dot=root.querySelector('[data-sofa-swcolor]');
     var show = chosen || first;
     if(nm) nm.textContent = chosen ? chosen.name : 'Choose';
-    if(dot && show) dot.style.background = show.hex;
+    if(dot && show){ dot.style.background = show.img ? ("center/cover no-repeat url('"+show.img+"')") : show.hex; }
   }
 
   root.addEventListener('click', function(e){
@@ -168,7 +168,7 @@
       if(group!=='sofaopt') return;
       state.swatch[state.mat]=item;
       var nm=root.querySelector('[data-cz-selname="sofaopt"]'); if(nm) nm.textContent=item.name;
-      var dot=root.querySelector('[data-sofa-swcolor]'); if(dot) dot.style.background=item.hex;
+      var dot=root.querySelector('[data-sofa-swcolor]'); if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : item.hex; }
       var f=form(); if(f){
         var id='aa-prop-sofaopt'; var inp=f.querySelector('#'+id);
         if(!inp){ inp=document.createElement('input'); inp.type='hidden'; inp.id=id; f.appendChild(inp); }
