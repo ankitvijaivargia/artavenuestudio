@@ -1,9 +1,17 @@
 {%- comment -%} Rich PDP detail accordion. params: product {%- endcomment -%}
+{%- comment -%} detect whether this product offers any leather swatch, to show the leather note {%- endcomment -%}
+{%- assign has_leather = false -%}
+{%- assign sw_list = product.metafields.aav.swatches.value -%}
+{%- if sw_list -%}{%- for s in sw_list -%}{%- if s.category.value == 'Leather' -%}{%- assign has_leather = true -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
 <div class="aa-accordion">
   {%- if product.description != blank -%}
   <details open><summary>Description <i class="ph ph-plus aa-acc-pm"></i></summary><div class="rte" style="padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary)">{{ product.description }}</div></details>
   {%- endif -%}
   <details><summary>Materials <i class="ph ph-plus aa-acc-pm"></i></summary><p>Built from carefully selected, natural materials — kiln-dried hardwoods, hand-spun textiles, cast metal and quarried stone, chosen to last for decades. Naturally occurring grain and tone variation is intrinsic to each handmade piece.</p></details>
+  {%- if has_leather -%}
+  <details><summary>About our leather <i class="ph ph-plus aa-acc-pm"></i></summary><p>Our leathers are genuine and natural. Because every hide is unique, colour, depth of tone, grain and surface character vary from piece to piece — and small marks, scars, wrinkles and uneven tones are part of the material, not defects. Your piece won&rsquo;t look exactly like the photograph, and that individuality is the mark of real leather. To feel a colour and texture in person before you commit, order a swatch from the colour picker above.</p></details>
+  <details><summary>Leather care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust regularly with a soft, dry cloth and wipe spills at once with a clean, slightly damp cloth — never soak. Keep leather out of prolonged direct sunlight and away from direct heat to prevent fading and drying. Condition with a quality leather balm once or twice a year to keep the hide supple. Avoid solvents, polishes and abrasive cleaners.</p></details>
+  {%- endif -%}
   <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary><p>Carved, joined and finished by hand in our workshops, passing through the hands of several craftspeople. Joinery is mortise-and-tenon — never glued shortcuts — so the piece is made to be kept and passed down.</p></details>
   <details><summary>Dimensions &amp; Specifications <i class="ph ph-plus aa-acc-pm"></i></summary><p>Generous, considered proportions drawn for real homes. Custom dimensions are available on most pieces through our design consultants. Share your space and we will confirm exact measurements before you order.</p></details>
   <details><summary>Assembly &amp; Installation <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most pieces arrive securely packed and ready to use. Some larger items may require simple assembly; installation assistance may be available depending on the product and your location — speak with a consultant to confirm before ordering.</p></details>
