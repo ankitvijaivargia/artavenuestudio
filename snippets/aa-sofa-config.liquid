@@ -129,6 +129,10 @@
     var n=(Number(v)||0)/100;
     return '\u20B9 ' + Math.round(n).toLocaleString('en-IN');
   }
+  // tell the rest of the page which material is active (PDP detail accordion listens)
+  function broadcastMat(){
+    try{ document.dispatchEvent(new CustomEvent('aa:material', { detail: { mat: state.mat } })); }catch(e){}
+  }
   function currentVariant(){
     var key = norm(state.size)+'|||'+norm(state.mat);
     if(vmap[key]) return vmap[key];
@@ -189,6 +193,7 @@
       var h2=root.querySelector('[data-sofa-mathint]'); if(h2) h2.textContent=state.mat;
       updatePrice();
       refreshSwatchRow();
+      broadcastMat();
     }
   });
 
@@ -213,7 +218,7 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
-  updatePrice(); refreshSwatchRow();
+  updatePrice(); refreshSwatchRow(); broadcastMat();
 })();
 </script>
 {%- endif -%}
