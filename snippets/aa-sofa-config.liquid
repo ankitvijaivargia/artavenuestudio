@@ -10,6 +10,9 @@
   Each swatch entry provides name / category / photo / hex / swatch_price / surcharge.
   Leather-category swatches feed the Leather set; everything else feeds Fabric.
   Falls back to a small placeholder list if the product has no swatches linked.
+
+  DIMENSIONS: reads product.metafields.aav.size_dimensions (json map keyed by
+  Size value -> { cm, in }). Shown live under the Size row as the size changes.
 {%- endcomment -%}
 
 {%- assign opt_size = '' -%}{%- assign opt_mat = '' -%}
@@ -24,6 +27,9 @@
 {%- assign has_swatches = false -%}
 {%- if sw_list and sw_list.size > 0 -%}{%- assign has_swatches = true -%}{%- endif -%}
 
+{%- comment -%} Dimensions metafield (json string) {%- endcomment -%}
+{%- assign dims_raw = product.metafields.aav.size_dimensions.value -%}
+
 {%- if opt_size != '' and opt_mat != '' -%}
 <div class="aa-sofa" id="aaSofa">
 
@@ -35,6 +41,13 @@
         <button type="button" class="aa-sofa__btn{% if v == opt_size.selected_value %} is-active{% endif %}" data-sofa-size="{{ v | escape }}">{{ v }}</button>
       {%- endfor -%}
     </div>
+    {%- if dims_raw != blank -%}
+    <div class="aa-sofa__dims" data-sofa-dims hidden>
+      <i class="ph ph-ruler"></i>
+      <span class="aa-sofa__dims-cm" data-sofa-dims-cm></span>
+      <span class="aa-sofa__dims-in" data-sofa-dims-in></span>
+    </div>
+    {%- endif -%}
     <button type="button" class="aa-sofa__custom" data-cz-consult>
       <i class="ph ph-ruler"></i> Need an L-shape or a custom size? <span>Speak with a design consultant ›</span>
     </button>
@@ -70,6 +83,11 @@
     {%- endfor -%}
   };
   </script>
+
+  {%- comment -%} dimensions map from metafield, keyed by Size value {%- endcomment -%}
+  {%- if dims_raw != blank -%}
+  <script type="application/json" id="aa-sofa-dims">{{ dims_raw }}</script>
+  {%- endif -%}
 
   {%- comment -%} swatch sets for the modal, keyed by material {%- endcomment -%}
   <script type="application/json" id="aa-sofa-swatches">
@@ -115,6 +133,8 @@
   var vmap = (window.AA_SOFA_VARIANTS && window.AA_SOFA_VARIANTS["{{ product.id }}"]) || {};
   var sw={};
   try{ sw = JSON.parse(document.getElementById('aa-sofa-swatches').textContent); }catch(e){}
+  var dims={};
+  try{ var dn=document.getElementById('aa-sofa-dims'); if(dn) dims = JSON.parse(dn.textContent); }catch(e){}
 
   var state = { size:null, mat:null, swatch:{} };
   var aSize=root.querySelector('[data-sofa-size].is-active'); if(aSize) state.size=aSize.getAttribute('data-sofa-size');
@@ -132,6 +152,20 @@
   // tell the rest of the page which material is active (PDP detail accordion listens)
   function broadcastMat(){
     try{ document.dispatchEvent(new CustomEvent('aa:material', { detail: { mat: state.mat } })); }catch(e){}
+  }
+  function updateDims(){
+    var box=root.querySelector('[data-sofa-dims]'); if(!box) return;
+    var d = dims[state.size];
+    if(!d){ // try case/space-insensitive match
+      var key=norm(state.size).toLowerCase();
+      for(var k in dims){ if(norm(k).toLowerCase()===key){ d=dims[k]; break; } }
+    }
+    if(d){
+      var cm=box.querySelector('[data-sofa-dims-cm]'); var inch=box.querySelector('[data-sofa-dims-in]');
+      if(cm) cm.textContent = d.cm || '';
+      if(inch) inch.textContent = d.in ? ('('+d.in+')') : '';
+      box.hidden = false;
+    } else { box.hidden = true; }
   }
   function currentVariant(){
     var key = norm(state.size)+'|||'+norm(state.mat);
@@ -186,6 +220,7 @@
       root.querySelectorAll('[data-sofa-size]').forEach(function(b){ b.classList.toggle('is-active', b===s); });
       var h=root.querySelector('[data-sofa-sizehint]'); if(h) h.textContent=state.size;
       updatePrice();
+      updateDims();
     }
     if(m){
       state.mat=m.getAttribute('data-sofa-mat');
@@ -218,7 +253,7 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
-  updatePrice(); refreshSwatchRow(); broadcastMat();
+  updatePrice(); refreshSwatchRow(); broadcastMat(); updateDims();
 })();
 </script>
 {%- endif -%}
