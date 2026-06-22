@@ -275,11 +275,11 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-sofa__btn{flex:1 1 auto;min-width:84px;padding:13px 16px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-family:var(--font-sans);font-size:13.5px;cursor:pointer;transition:border-color var(--dur-base),background var(--dur-base);}
 .aa-sofa__btn:hover{border-color:var(--accent);}
 .aa-sofa__btn.is-active{background:var(--text-primary);color:var(--surface-page,#f5f0e6);border-color:var(--text-primary);}
-.aa-sofa__dims{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;margin:0 0 14px;padding:11px 14px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);}
+.aa-sofa__dims{display:flex;justify-content:center;align-items:baseline;flex-wrap:wrap;gap:6px 10px;margin:0 0 14px;padding:11px 14px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);text-align:center;}
 .aa-sofa__dims[hidden]{display:none;}
 .aa-sofa__dims .ph-ruler{color:var(--accent-deep);font-size:15px;align-self:center;}
-.aa-sofa__dims-cm{font-family:var(--font-sans);font-size:13.5px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;}
-.aa-sofa__dims-in{font-size:12px;color:var(--text-muted);font-feature-settings:"lnum" 1,"tnum" 1;}
+.aa-sofa__dims-cm{font-family:var(--font-sans);font-size:13.5px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;white-space:nowrap;}
+.aa-sofa__dims-in{font-size:12px;color:var(--text-muted);font-feature-settings:"lnum" 1,"tnum" 1;white-space:nowrap;}
 .aa-sofa__custom{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:none;border:none;padding:0;cursor:pointer;font-size:12.5px;color:var(--text-secondary);}
 .aa-sofa__custom i{color:var(--accent-deep);font-size:15px;}
 .aa-sofa__custom span{color:var(--text-accent);}
