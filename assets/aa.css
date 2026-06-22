@@ -300,6 +300,7 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-czm__panel-name{font-size:22px;line-height:1.15;margin-top:16px;}
 .aa-czm__panel-cat{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent);margin-top:4px;}
 .aa-czm__panel-sur{font-size:13px;color:var(--text-secondary);margin-top:12px;}
+.aa-czm__panel-craft{margin-top:14px;padding-top:13px;border-top:1px solid var(--border-hairline);font-family:var(--font-serif);font-style:italic;font-size:13.5px;line-height:1.5;color:var(--text-muted);}
 .aa-czm__order{margin-top:auto;padding:13px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;cursor:pointer;}
 .aa-czm__order:hover{border-color:var(--accent);}
 .aa-czm__choose{margin-top:10px;}
@@ -367,6 +368,7 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-czm__panel{border-left:none;border-top:1px solid var(--border-hairline);position:sticky;bottom:0;background:var(--surface-page,#f5f0e6);}
   .aa-czm__panel-sw{aspect-ratio:16/9;}
   .aa-czm__panel-name{font-size:18px;margin-top:12px;}
+  .aa-czm__panel-craft{font-size:12.5px;margin-top:10px;padding-top:10px;}
   .aa-czm__order{margin-top:14px;}
   .aa-buybox__desc{display:none;}
   .aa-delivery__dup{display:none;}
