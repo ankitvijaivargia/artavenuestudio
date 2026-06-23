@@ -148,6 +148,7 @@
 
 <script>
 (function(){
+  function init(){
   var root = document.getElementById('aaChair');
   if(!root) return;
   var pid = root.getAttribute('data-pid');
@@ -209,6 +210,7 @@
     var items=itemsForAxis(axisKey);
     if(items && items.length){ window.aaCz.register(groupForAxis(axisKey), { label: a.label, items: items }); }
   }
+  function registerAll(){ for(var k in sets){ registerAxis(k); } }
   function applyPick(axisKey, item){
     if(!axisKey || !item) return;
     var a=sets[axisKey]; if(!a) return;
@@ -267,13 +269,16 @@
     }
   });
 
-  if(window.aaCz){
+  {%- comment -%} Bind onChoose once aaCz is present {%- endcomment -%}
+  function bindChoose(){
+    if(!window.aaCz || !window.aaCz.onChoose) return false;
     window.aaCz.onChoose(function(group, item){
       var axisKey=null;
       for(var k in sets){ if(groupForAxis(k)===group){ axisKey=k; break; } }
       if(!axisKey) return;
       applyPick(axisKey, item);
     });
+    return true;
   }
 
   var consultBtn=root.querySelector('[data-cz-consult]');
@@ -282,11 +287,25 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
-  for(var k in sets){ registerAxis(k); }
+  {%- comment -%} layout + default selections don't need aaCz {%- endcomment -%}
   for(var k in sets){ layoutAxis(k); }
   for(var k in sets){ defaultPick(k); }
   var lbl0=root.querySelector('[data-chair-tierswlabel]'); if(lbl0) lbl0.textContent=tierLabelWord();
   updatePrice();
+
+  {%- comment -%} aaCz may load AFTER this script (modal rendered later). Poll briefly to register + bind. {%- endcomment -%}
+  var tries=0;
+  (function waitForCz(){
+    if(window.aaCz && window.aaCz.register){
+      registerAll();
+      bindChoose();
+      return;
+    }
+    if(tries++ < 50){ setTimeout(waitForCz, 50); }
+  })();
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
 })();
 </script>
 {%- endif -%}
