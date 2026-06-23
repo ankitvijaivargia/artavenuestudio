@@ -191,14 +191,36 @@
     if(a.type==='tier'){ return (a.sets && a.sets[state.tier]) || null; }
     return a.items || null;
   }
+  function groupForAxis(axisKey){
+    var a=sets[axisKey]; if(!a) return null;
+    return (a.type==='tier') ? 'chair-tier' : ('chair-'+axisKey);
+  }
   function registerAxis(axisKey){
     var a=sets[axisKey]; if(!a || !window.aaCz) return;
     var items=itemsForAxis(axisKey);
-    var group = (a.type==='tier') ? 'chair-tier' : ('chair-'+axisKey);
-    if(items){ window.aaCz.register(group, { label: a.label, items: items }); }
+    if(items){ window.aaCz.register(groupForAxis(axisKey), { label: a.label, items: items }); }
   }
+
+  {%- comment -%} shared: reflect a chosen item into the row UI + line-item property {%- endcomment -%}
+  function applyPick(axisKey, item){
+    if(!axisKey || !item) return;
+    var a=sets[axisKey]; if(!a) return;
+    var group=groupForAxis(axisKey);
+    state.picks[axisKey]=item;
+    var nm=root.querySelector('[data-cz-selname="'+group+'"]'); if(nm) nm.textContent=item.name;
+    var hint=root.querySelector('[data-cz-selname="'+group+'-hint"]'); if(hint) hint.textContent=item.name;
+    var dot=root.querySelector('[data-chair-swdot="'+axisKey+'"]');
+    if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
+    if(a.property) setProp(a.property, item.name);
+  }
+
+  {%- comment -%} default-select the first item of an axis (for current tier set) {%- endcomment -%}
+  function defaultPick(axisKey){
+    var items=itemsForAxis(axisKey);
+    if(items && items.length){ applyPick(axisKey, items[0]); }
+  }
+
   function tierLabelWord(){
-    {%- comment -%} 'Leather'-ish tiers say Colour; fabric tiers say Fabric {%- endcomment -%}
     var t=(state.tier||'').toLowerCase();
     if(t.indexOf('leather')>-1) return 'Colour';
     if(t.indexOf('fabric')>-1) return 'Fabric';
@@ -210,10 +232,8 @@
     var lbl=root.querySelector('[data-chair-tierswlabel]'); if(lbl) lbl.textContent=word;
     var sub=root.querySelector('[data-chair-tiersub]');
     if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from \u20B92,000 to feel it first.';
-    {%- comment -%} reset the displayed pick name when tier changes (set may differ) {%- endcomment -%}
-    var nm=root.querySelector('[data-cz-selname="chair-tier"]'); if(nm) nm.textContent='Choose';
-    var dot=root.querySelector('[data-chair-swdot="'+tierKey+'"]'); if(dot) dot.style.background='transparent';
-    delete state.picks[tierKey];
+    {%- comment -%} re-default the tier colour to the first swatch of the new tier set {%- endcomment -%}
+    defaultPick(tierKey);
   }
 
   root.addEventListener('click', function(e){
@@ -230,19 +250,10 @@
 
   if(window.aaCz){
     window.aaCz.onChoose(function(group, item){
-      var axisKey=null, propName=null;
-      for(var k in sets){
-        var a=sets[k];
-        var g=(a.type==='tier')?'chair-tier':('chair-'+k);
-        if(g===group){ axisKey=k; propName=a.property; break; }
-      }
+      var axisKey=null;
+      for(var k in sets){ if(groupForAxis(k)===group){ axisKey=k; break; } }
       if(!axisKey) return;
-      state.picks[axisKey]=item;
-      var nm=root.querySelector('[data-cz-selname="'+group+'"]'); if(nm) nm.textContent=item.name;
-      var hint=root.querySelector('[data-cz-selname="'+group+'-hint"]'); if(hint) hint.textContent=item.name;
-      var dot=root.querySelector('[data-chair-swdot="'+axisKey+'"]');
-      if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
-      if(propName) setProp(propName, item.name);
+      applyPick(axisKey, item);
     });
   }
 
@@ -252,8 +263,10 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
+  {%- comment -%} init: register every axis, pre-select first swatch in each, set price {%- endcomment -%}
   for(var k in sets){ registerAxis(k); }
-  refreshTierRow();
+  for(var k in sets){ defaultPick(k); }
+  var lbl0=root.querySelector('[data-chair-tierswlabel]'); if(lbl0) lbl0.textContent=tierLabelWord();
   updatePrice();
 })();
 </script>
