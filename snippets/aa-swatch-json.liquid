@@ -1,0 +1,33 @@
+{%- comment -%}
+  Art Avenue — normalize a swatch-like metaobject into the configurator item JSON.
+  Handles three metaobject types with differing field names:
+    swatch:     image in `photo`, has `hex` fallback
+    finish:     image in `swatch`, no hex (wood/metal)
+    upholstery: image in `swatch`, no hex, has composition/performance
+  Emits a single JSON object: {"name","cat","hex","img","swatch","surcharge","meta"}
+  params: mo (metaobject), stype (string: swatch|finish|upholstery)
+{%- endcomment -%}
+{%- liquid
+  assign nm = mo.name.value | default: mo.handle
+  assign cat = mo.category.value | default: ''
+  assign hex = mo.hex.value | default: ''
+  assign img = ''
+  if stype == 'swatch'
+    if mo.photo.value != blank
+      assign img = mo.photo.value.image | image_url: width: 600
+    endif
+  else
+    if mo.swatch.value != blank
+      assign img = mo.swatch.value.image | image_url: width: 600
+    endif
+  endif
+  assign sp = mo.swatch_price.value.amount | default: 2000
+  assign su = mo.surcharge.value.amount | default: 0
+  assign meta = ''
+  if stype == 'upholstery'
+    assign meta = mo.composition.value | default: ''
+  elsif stype == 'finish'
+    assign meta = mo.description.value | default: ''
+  endif
+-%}
+{ "name": {{ nm | json }}, "cat": {{ cat | json }}, "hex": {{ hex | default: '#cccccc' | json }}{% if img != '' %}, "img": {{ img | json }}{% endif %}, "swatch": {{ sp | json }}, "surcharge": {{ su | json }}{% if meta != '' %}, "meta": {{ meta | json }}{% endif %} }
