@@ -3,18 +3,11 @@
   Reads product.metafields.aav.configurator (JSON schema) + metaobject-reference
   metafields (aav.swatches, aav.wood_finishes) for the actual swatch data.
 
-  Schema shape:
-  {
-    "priced_option": "Upholstery",
-    "axes": [
-      { "key":"upholstery", "label":"Upholstery", "type":"tier", "option":"Upholstery",
-        "property":"Upholstery colour", "source":"swatches",
-        "tier_filters": { "Fabric":{"exclude_category":"Leather"}, "Genuine Leather":{"category":"Leather"} } },
-      { "key":"wood_finish", "label":"Wood Finish", "type":"finish",
-        "property":"Wood Finish", "source":"wood_finishes" }
-    ]
-  }
-  source = swatches | wood_finishes (literal metafield keys resolved below).
+  Schema shape (per axis):
+    key, label, type (tier|finish|...), option (for tier), property,
+    source (swatches|wood_finishes), order_swatch (bool, default true),
+    tier_filters (for tier).
+  order_swatch:false hides the “Order a swatch” action in the modal (e.g. wood finish).
   An axis with a single available item renders as a fixed line (no picker).
   params: product
 {%- endcomment -%}
@@ -27,7 +20,6 @@
   {%- for o in product.options_with_values -%}{%- if o.name == priced_option -%}{%- assign priced_pos = o.position -%}{%- endif -%}{%- endfor -%}
 {%- endif -%}
 
-{%- comment -%} Resolve the two reference metafields with LITERAL access (dynamic aav[src] is unreliable) {%- endcomment -%}
 {%- assign mf_swatches = product.metafields.aav.swatches.value -%}
 {%- assign mf_wood = product.metafields.aav.wood_finishes.value -%}
 
@@ -55,7 +47,6 @@
       </div>
       {%- endif -%}
     {%- else -%}
-      {%- comment -%} non-priced axis: picker if >1 item, fixed line if exactly 1, hidden if 0 {%- endcomment -%}
       <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}" hidden>
         <div class="aa-sofa__label"><span>{{ axis.label }}</span><span class="aa-sofa__hint" data-cz-selname="chair-{{ axis.key | escape }}-hint"></span></div>
         <button type="button" class="aa-cz-row" data-cz-open="chair-{{ axis.key | escape }}" data-chair-pickrow="{{ axis.key | escape }}">
@@ -84,21 +75,21 @@
   };
   </script>
 
-  {%- comment -%} ===== swatch sets from metafield references; null-safe money handling ===== {%- endcomment -%}
   <script type="application/json" id="aa-chair-sets-{{ product.id }}">
   {
     {%- assign first_axis = true -%}
     {%- for axis in cfg.axes -%}
-      {%- comment -%} pick the right reference list by literal source key {%- endcomment -%}
       {%- assign list = '' -%}
       {%- if axis.source == 'swatches' -%}{%- assign list = mf_swatches -%}
       {%- elsif axis.source == 'wood_finishes' -%}{%- assign list = mf_wood -%}
       {%- endif -%}
+      {%- assign order_sw = true -%}{%- if axis.order_swatch == false -%}{%- assign order_sw = false -%}{%- endif -%}
       {%- unless first_axis -%},{%- endunless -%}{%- assign first_axis = false -%}
       {{ axis.key | json }}: {
         "type": {{ axis.type | json }},
         "label": {{ axis.label | json }},
         "property": {{ axis.property | default: axis.label | json }},
+        "orderSwatch": {{ order_sw | json }},
         {%- if axis.type == 'tier' -%}
         "sets": {
           {%- assign tf = axis.tier_filters -%}
@@ -208,7 +199,7 @@
   function registerAxis(axisKey){
     var a=sets[axisKey]; if(!a || !window.aaCz) return;
     var items=itemsForAxis(axisKey);
-    if(items && items.length){ window.aaCz.register(groupForAxis(axisKey), { label: a.label, items: items }); }
+    if(items && items.length){ window.aaCz.register(groupForAxis(axisKey), { label: a.label, items: items, orderSwatch: a.orderSwatch !== false }); }
   }
   function registerAll(){ for(var k in sets){ registerAxis(k); } }
   function applyPick(axisKey, item){
@@ -269,7 +260,6 @@
     }
   });
 
-  {%- comment -%} Bind onChoose once aaCz is present {%- endcomment -%}
   function bindChoose(){
     if(!window.aaCz || !window.aaCz.onChoose) return false;
     window.aaCz.onChoose(function(group, item){
@@ -287,13 +277,11 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
-  {%- comment -%} layout + default selections don't need aaCz {%- endcomment -%}
   for(var k in sets){ layoutAxis(k); }
   for(var k in sets){ defaultPick(k); }
   var lbl0=root.querySelector('[data-chair-tierswlabel]'); if(lbl0) lbl0.textContent=tierLabelWord();
   updatePrice();
 
-  {%- comment -%} aaCz may load AFTER this script (modal rendered later). Poll briefly to register + bind. {%- endcomment -%}
   var tries=0;
   (function waitForCz(){
     if(window.aaCz && window.aaCz.register){
