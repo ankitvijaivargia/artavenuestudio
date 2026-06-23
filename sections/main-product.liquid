@@ -136,7 +136,10 @@
     {% render 'aa-trust' %}
     {%- assign has_size_opt = false -%}{%- assign has_mat_opt = false -%}
     {%- for o in p.options -%}{%- if o == 'Size' -%}{%- assign has_size_opt = true -%}{%- elsif o == 'Material' -%}{%- assign has_mat_opt = true -%}{%- endif -%}{%- endfor -%}
-    {%- if has_size_opt and has_mat_opt -%}
+    {%- assign has_cfg = false -%}{%- if p.metafields.aav.configurator.value != blank -%}{%- assign has_cfg = true -%}{%- endif -%}
+    {%- if has_cfg -%}
+      {% render 'aa-chair-config', product: p %}
+    {%- elsif has_size_opt and has_mat_opt -%}
       {% render 'aa-sofa-config', product: p %}
     {%- else -%}
       {% render 'aa-size', mode: size_mode, product: p %}
