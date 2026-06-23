@@ -2,8 +2,6 @@
   Art Avenue — Generic chair configurator (schema-driven, metafield-reference based).
   Reads product.metafields.aav.configurator (JSON schema) + metaobject-reference
   metafields (aav.swatches, aav.wood_finishes) for the actual swatch data.
-  Liquid can only access metaobject fields via real references, so swatch data is
-  pulled from list.metaobject_reference metafields — NOT by resolving GIDs in JSON.
 
   Schema shape:
   {
@@ -16,7 +14,7 @@
         "property":"Wood Finish", "source":"wood_finishes" }
     ]
   }
-  source = key of a list.metaobject_reference metafield under aav.
+  An axis with a single available item renders as a fixed line (no picker).
   params: product
 {%- endcomment -%}
 
@@ -52,12 +50,17 @@
       </div>
       {%- endif -%}
     {%- else -%}
-      <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}">
+      {%- comment -%} non-priced axis: picker if >1 item, fixed line if exactly 1, hidden if 0 {%- endcomment -%}
+      <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}" hidden>
         <div class="aa-sofa__label"><span>{{ axis.label }}</span><span class="aa-sofa__hint" data-cz-selname="chair-{{ axis.key | escape }}-hint"></span></div>
-        <button type="button" class="aa-cz-row" data-cz-open="chair-{{ axis.key | escape }}">
+        <button type="button" class="aa-cz-row" data-cz-open="chair-{{ axis.key | escape }}" data-chair-pickrow="{{ axis.key | escape }}">
           <span class="aa-cz-row__k">{{ axis.label }}</span>
           <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-chair-swdot="{{ axis.key | escape }}"></span><span data-cz-selname="chair-{{ axis.key | escape }}">Choose</span><i class="ph ph-caret-right"></i></span>
         </button>
+        <div class="aa-chair__fixed" data-chair-fixedrow="{{ axis.key | escape }}" hidden>
+          <span class="aa-cz-row__sw" data-chair-fixeddot="{{ axis.key | escape }}"></span>
+          <span data-chair-fixedname="{{ axis.key | escape }}"></span>
+        </div>
       </div>
     {%- endif -%}
   {%- endfor -%}
@@ -76,7 +79,7 @@
   };
   </script>
 
-  {%- comment -%} ===== swatch sets, built from metafield references (field access works here) ===== {%- endcomment -%}
+  {%- comment -%} ===== swatch sets from metafield references; null-safe money handling ===== {%- endcomment -%}
   <script type="application/json" id="aa-chair-sets-{{ product.id }}">
   {
     {%- assign first_axis = true -%}
@@ -107,7 +110,10 @@
                 {%- if keep -%}
                   {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
                   {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
-                  {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+                  {%- assign hexv = s.hex.value | default: '#cccccc' -%}
+                  {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
+                  {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
+                  {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
                 {%- endif -%}
               {%- endfor -%}{%- endif -%}
             ]
@@ -119,7 +125,10 @@
           {%- if list -%}{%- for s in list -%}
             {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
             {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
-            {"name":{{ s.name.value | json }},"cat":{{ s.category.value | default: '' | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+            {%- assign hexv = s.hex.value | default: '#cccccc' -%}
+            {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
+            {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ s.category.value | default: '' | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
           {%- endfor -%}{%- endif -%}
         ]
         {%- endif -%}
@@ -136,7 +145,7 @@
   var pid = root.getAttribute('data-pid');
   var vmap = (window.AA_CHAIR_VARIANTS && window.AA_CHAIR_VARIANTS[pid]) || {};
   var sets = {};
-  try { sets = JSON.parse(document.getElementById('aa-chair-sets-'+pid).textContent); } catch(e){}
+  try { sets = JSON.parse(document.getElementById('aa-chair-sets-'+pid).textContent); } catch(e){ sets = {}; }
 
   function norm(s){ return (s==null?'':String(s)).trim(); }
   function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
@@ -201,12 +210,30 @@
     var hint=root.querySelector('[data-cz-selname="'+group+'-hint"]'); if(hint) hint.textContent=item.name;
     var dot=root.querySelector('[data-chair-swdot="'+axisKey+'"]');
     if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
+    var fdot=root.querySelector('[data-chair-fixeddot="'+axisKey+'"]');
+    if(fdot){ fdot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
+    var fname=root.querySelector('[data-chair-fixedname="'+axisKey+'"]'); if(fname) fname.textContent=item.name;
     if(a.property) setProp(a.property, item.name);
   }
   function defaultPick(axisKey){
     var items=itemsForAxis(axisKey);
     if(items && items.length){ applyPick(axisKey, items[0]); }
   }
+
+  {%- comment -%} show/hide each non-tier axis group: picker if >1, fixed line if exactly 1, hidden if 0 {%- endcomment -%}
+  function layoutAxis(axisKey){
+    var a=sets[axisKey]; if(!a || a.type==='tier') return;
+    var group=root.querySelector('[data-chair-axis="prop"][data-axis-key="'+axisKey+'"]');
+    if(!group) return;
+    var items=a.items||[];
+    var pick=group.querySelector('[data-chair-pickrow="'+axisKey+'"]');
+    var fixed=group.querySelector('[data-chair-fixedrow="'+axisKey+'"]');
+    if(items.length===0){ group.hidden=true; return; }
+    group.hidden=false;
+    if(items.length===1){ if(pick) pick.hidden=true; if(fixed) fixed.hidden=false; }
+    else { if(pick) pick.hidden=false; if(fixed) fixed.hidden=true; }
+  }
+
   function tierLabelWord(){
     var t=(state.tier||'').toLowerCase();
     if(t.indexOf('leather')>-1) return 'Colour';
@@ -250,6 +277,7 @@
   }); }
 
   for(var k in sets){ registerAxis(k); }
+  for(var k in sets){ layoutAxis(k); }
   for(var k in sets){ defaultPick(k); }
   var lbl0=root.querySelector('[data-chair-tierswlabel]'); if(lbl0) lbl0.textContent=tierLabelWord();
   updatePrice();
