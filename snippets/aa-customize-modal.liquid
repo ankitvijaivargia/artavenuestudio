@@ -2,6 +2,8 @@
   Art Avenue — Customization modal. Rendered once on the PDP.
   Reads #aa-cz-data JSON, opened by [data-cz-open] buttons from aa-customize.liquid.
   Swatch orders add the 'swatch' product to cart with the swatch name as a property.
+  A registered group may set orderSwatch:false to hide the “Order a swatch” action
+  (e.g. wood finish, where a physical sample isn't meaningful).
 {%- endcomment -%}
 {%- assign swatch_product = all_products['swatch'] -%}
 {%- if swatch_product and swatch_product.first_available_variant -%}{%- assign swatch_vid = swatch_product.first_available_variant.id -%}{%- else -%}{%- assign swatch_vid = '' -%}{%- endif -%}
@@ -24,7 +26,7 @@
         <div class="aa-czm__panel-craft" id="aaCzPanelCraft" hidden></div>
         <button type="button" class="aa-czm__order" id="aaCzOrder">Order a swatch &middot; &#8377;999</button>
         <button type="button" class="btn btn--primary btn--block aa-czm__choose" id="aaCzChoose">Choose this fabric</button>
-        <div class="aa-czm__note">Order as many swatches as you like to compare. Each ships in 3&ndash;5 days, and the cost is credited back when you order the piece. <a href="/cart" id="aaCzCartLink" style="display:none;color:var(--text-accent)">View cart &rsaquo;</a></div>
+        <div class="aa-czm__note" id="aaCzNote">Order as many swatches as you like to compare. Each ships in 3&ndash;5 days, and the cost is credited back when you order the piece. <a href="/cart" id="aaCzCartLink" style="display:none;color:var(--text-accent)">View cart &rsaquo;</a></div>
       </aside>
     </div>
   </div>
@@ -38,8 +40,6 @@
   var DATA = {};
   if(dataEl){ try { DATA = JSON.parse(dataEl.textContent); } catch(e){ DATA = {}; } }
 
-  // Public hooks so other configurators (e.g. sofa) can register option sets
-  // and react to a choice. window.aaCz.register('sofaopt', {label, items});
   var onChoose = null;
   window.aaCz = {
     register: function(group, obj){ DATA[group] = obj; },
@@ -56,13 +56,13 @@
   var panelCraft = document.getElementById('aaCzPanelCraft');
   var orderBtn = document.getElementById('aaCzOrder');
   var chooseBtn = document.getElementById('aaCzChoose');
+  var noteEl = document.getElementById('aaCzNote');
   var titleEl = document.getElementById('aaCzTitle');
   var groupEl = document.getElementById('aaCzGroup');
 
   var state = { group:'fabric', items:[], filter:'All', preview:null, selected:{} };
 
   function money(v){ return '\u20B9 ' + Number(v||0).toLocaleString('en-IN'); }
-  // swatch background: real photo when present, else solid hex colour
   function swBg(it){
     if(it && it.img){ return "center/cover no-repeat url('" + it.img + "')"; }
     return (it && it.hex) ? it.hex : 'transparent';
@@ -70,12 +70,15 @@
 
   function openModal(group){
     var d = DATA[group]; if(!d) return;
-    state.group = group; state.items = d.items; state.filter = 'All';
+    state.group = group; state.items = d.items || []; state.filter = 'All';
     groupEl.textContent = d.label;
     titleEl.textContent = 'Choose your ' + d.label.toLowerCase();
     chooseBtn.textContent = 'Choose this ' + d.label.toLowerCase();
+    {%- comment -%} hide swatch-ordering UI when the group opts out (e.g. wood finish) {%- endcomment -%}
+    var allowOrder = (d.orderSwatch !== false);
+    if(orderBtn){ orderBtn.style.display = allowOrder ? '' : 'none'; }
+    if(noteEl){ noteEl.style.display = allowOrder ? '' : 'none'; }
     buildCats(); renderGrid();
-    // preselect currently chosen (or first)
     var cur = state.selected[group];
     setPreview(cur ? findByName(cur.name) : state.items[0]);
     modal.classList.add('is-open');
@@ -124,7 +127,6 @@
     panelCat.textContent = it.cat || '';
     panelSur.innerHTML = Number(it.surcharge)>0 ? 'Adds <strong>'+money(it.surcharge)+'</strong> to the piece' : 'Included &mdash; no upcharge';
     orderBtn.innerHTML = 'Order a swatch &middot; '+money(it.swatch);
-    // genuine-leather authenticity note (only for leather swatches)
     if(panelCraft){
       if(it.cat==='Leather'){
         panelCraft.innerHTML = 'This is genuine leather. Each hide is unique \u2014 natural tone, grain and small marks or scars will vary, so your piece won\u2019t look exactly like the photo. These traits are the mark of real leather, not flaws.';
@@ -134,13 +136,11 @@
         panelCraft.innerHTML = '';
       }
     }
-    // refresh active state in grid
     Array.prototype.forEach.call(grid.children, function(c){
       c.classList.toggle('is-active', c.querySelector('.aa-czm__cell-nm') && c.querySelector('.aa-czm__cell-nm').textContent===it.name);
     });
   }
 
-  // choose -> update PDP row + hidden line item property, close
   chooseBtn.addEventListener('click', function(){
     if(!state.preview) return;
     state.selected[state.group] = state.preview;
@@ -154,7 +154,6 @@
     closeModal();
   });
 
-  // order swatch -> add the swatch sample to cart via AJAX (uses a generic line item)
   orderBtn.addEventListener('click', function(){
     if(!state.preview) return;
     var vid = modal.getAttribute('data-swatch-vid');
@@ -176,7 +175,6 @@
       .catch(function(){ btn.innerHTML='Try again'; setTimeout(function(){ btn.innerHTML=old; btn.disabled=false; },1600); });
   });
 
-  // write selections as hidden inputs into the product form so they become line item properties
   function syncProps(){
     var form = document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]');
     if(!form) return;
@@ -191,7 +189,6 @@
     });
   }
 
-  // surcharge -> reflect in the Add to Cart price text (visual only; real price needs a variant/draft order)
   function updateSurcharge(){
     var total=0; ['fabric','finish','material'].forEach(function(g){ var s=state.selected[g]; if(s) total+=Number(s.surcharge||0); });
     var note=document.getElementById('aaCzSurNote');
