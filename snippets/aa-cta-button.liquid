@@ -15,6 +15,8 @@
     {%- assign _hs = false -%}{%- assign _hm = false -%}
     {%- for o in product.options -%}{%- if o == 'Size' -%}{%- assign _hs = true -%}{%- elsif o == 'Material' -%}{%- assign _hm = true -%}{%- endif -%}{%- endfor -%}
     {%- if _hs and _hm -%}{%- assign sofa_style = true -%}{%- endif -%}
+    {%- comment -%} chair configurator also drives the variant id via a hidden input {%- endcomment -%}
+    {%- if product.metafields.aav.configurator.value != blank -%}{%- assign sofa_style = true -%}{%- endif -%}
     {%- if sofa_style -%}
         <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
       {%- elsif product.variants.size > 1 -%}
