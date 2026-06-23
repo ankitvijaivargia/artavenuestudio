@@ -6,7 +6,7 @@
 
   Schema shape:
   {
-    "priced_option": "Upholstery",            // product option name that drives variant+price (optional)
+    "priced_option": "Upholstery",
     "axes": [
       { "key":"upholstery", "label":"Upholstery", "type":"tier",
         "option":"Upholstery", "property":"Upholstery colour", "swatch_type":"swatch",
@@ -26,10 +26,10 @@
 {%- assign priced_option = cfg.priced_option -%}
 
 {%- comment -%} find the priced option object + its variant position {%- endcomment -%}
-{%- assign priced_pos = 0 -%}{%- assign priced_obj = '' -%}
+{%- assign priced_pos = 0 -%}
 {%- if priced_option != blank -%}
   {%- for o in product.options_with_values -%}
-    {%- if o.name == priced_option -%}{%- assign priced_obj = o -%}{%- assign priced_pos = o.position -%}{%- endif -%}
+    {%- if o.name == priced_option -%}{%- assign priced_pos = o.position -%}{%- endif -%}
   {%- endfor -%}
 {%- endif -%}
 
@@ -39,7 +39,7 @@
     {%- assign atype = axis.type -%}
 
     {%- if atype == 'tier' -%}
-      {%- comment -%} PRICED TIER — buttons that switch the real variant {%- endcomment -%}
+      {%- comment -%} PRICED TIER — buttons switch the real variant; row below picks the colour/fabric within the tier {%- endcomment -%}
       {%- assign topt = '' -%}
       {%- for o in product.options_with_values -%}{%- if o.name == axis.option -%}{%- assign topt = o -%}{%- endif -%}{%- endfor -%}
       {%- if topt != '' -%}
@@ -50,12 +50,20 @@
             <button type="button" class="aa-sofa__btn{% if v == topt.selected_value %} is-active{% endif %}" data-chair-tier="{{ v | escape }}">{{ v }}</button>
           {%- endfor -%}
         </div>
+        {%- if axis.property != blank -%}
+        <button type="button" class="aa-cz-row" data-cz-open="chair-tier" style="margin-top:12px">
+          <span class="aa-cz-row__k" data-chair-tierswlabel>Colour</span>
+          <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-chair-swdot="{{ axis.key | escape }}"></span><span data-cz-selname="chair-tier">Choose</span><i class="ph ph-caret-right"></i></span>
+        </button>
+        <div class="aa-sofa__swsub" data-chair-tiersub>Choose your finish, or order a swatch from &#8377;2,000 to feel it first.</div>
+        {%- endif -%}
       </div>
       {%- endif -%}
 
     {%- else -%}
       {%- comment -%} CUSTOMIZATION AXIS — opens modal, writes a line-item property {%- endcomment -%}
-      <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}" data-axis-prop="{{ axis.property | default: axis.label | escape }}">
+      <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}">
+        <div class="aa-sofa__label"><span>{{ axis.label }}</span><span class="aa-sofa__hint" data-cz-selname="chair-{{ axis.key | escape }}-hint"></span></div>
         <button type="button" class="aa-cz-row" data-cz-open="chair-{{ axis.key | escape }}">
           <span class="aa-cz-row__k">{{ axis.label }}</span>
           <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-chair-swdot="{{ axis.key | escape }}"></span><span data-cz-selname="chair-{{ axis.key | escape }}">Choose</span><i class="ph ph-caret-right"></i></span>
@@ -138,16 +146,16 @@
   function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
   function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
 
+  {%- comment -%} find the tier axis key (if any) {%- endcomment -%}
+  var tierKey=null; for(var k in sets){ if(sets[k].type==='tier'){ tierKey=k; break; } }
+
   var state = { tier:null, picks:{} };
   var aTier = root.querySelector('[data-chair-tier].is-active');
   if(aTier){ state.tier = aTier.getAttribute('data-chair-tier'); }
   if(!state.tier){ var ft=root.querySelector('[data-chair-tier]'); if(ft){ state.tier=ft.getAttribute('data-chair-tier'); ft.classList.add('is-active'); } }
 
   function currentVariant(){
-    if(state.tier==null) {
-      for(var k in vmap){ return vmap[k]; }
-      return null;
-    }
+    if(state.tier==null){ for(var k in vmap){ return vmap[k]; } return null; }
     if(vmap[state.tier]) return vmap[state.tier];
     var key=norm(state.tier).toLowerCase();
     for(var k in vmap){ if(norm(k).toLowerCase()===key) return vmap[k]; }
@@ -183,19 +191,31 @@
     if(a.type==='tier'){ return (a.sets && a.sets[state.tier]) || null; }
     return a.items || null;
   }
-
   function registerAxis(axisKey){
     var a=sets[axisKey]; if(!a || !window.aaCz) return;
     var items=itemsForAxis(axisKey);
     var group = (a.type==='tier') ? 'chair-tier' : ('chair-'+axisKey);
     if(items){ window.aaCz.register(group, { label: a.label, items: items }); }
   }
-
-  function tierSwatchRow(){
-    {%- comment -%} the tier's own colour/fabric picker lives under its tier label as a cz-row only if schema gave it a property {%- endcomment -%}
+  function tierLabelWord(){
+    {%- comment -%} 'Leather'-ish tiers say Colour; fabric tiers say Fabric {%- endcomment -%}
+    var t=(state.tier||'').toLowerCase();
+    if(t.indexOf('leather')>-1) return 'Colour';
+    if(t.indexOf('fabric')>-1) return 'Fabric';
+    return 'Finish';
+  }
+  function refreshTierRow(){
+    if(!tierKey) return;
+    var word=tierLabelWord();
+    var lbl=root.querySelector('[data-chair-tierswlabel]'); if(lbl) lbl.textContent=word;
+    var sub=root.querySelector('[data-chair-tiersub]');
+    if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from \u20B92,000 to feel it first.';
+    {%- comment -%} reset the displayed pick name when tier changes (set may differ) {%- endcomment -%}
+    var nm=root.querySelector('[data-cz-selname="chair-tier"]'); if(nm) nm.textContent='Choose';
+    var dot=root.querySelector('[data-chair-swdot="'+tierKey+'"]'); if(dot) dot.style.background='transparent';
+    delete state.picks[tierKey];
   }
 
-  {%- comment -%} TIER buttons {%- endcomment -%}
   root.addEventListener('click', function(e){
     var t=e.target.closest('[data-chair-tier]');
     if(t){
@@ -203,14 +223,13 @@
       root.querySelectorAll('[data-chair-tier]').forEach(function(b){ b.classList.toggle('is-active', b===t); });
       var h=root.querySelector('[data-chair-tierhint]'); if(h) h.textContent=state.tier;
       updatePrice();
-      {%- comment -%} re-register the tier picker with the new tier's set {%- endcomment -%}
-      for(var k in sets){ if(sets[k].type==='tier'){ registerAxis(k); } }
+      if(tierKey) registerAxis(tierKey);
+      refreshTierRow();
     }
   });
 
   if(window.aaCz){
     window.aaCz.onChoose(function(group, item){
-      {%- comment -%} map group back to axis {%- endcomment -%}
       var axisKey=null, propName=null;
       for(var k in sets){
         var a=sets[k];
@@ -220,6 +239,7 @@
       if(!axisKey) return;
       state.picks[axisKey]=item;
       var nm=root.querySelector('[data-cz-selname="'+group+'"]'); if(nm) nm.textContent=item.name;
+      var hint=root.querySelector('[data-cz-selname="'+group+'-hint"]'); if(hint) hint.textContent=item.name;
       var dot=root.querySelector('[data-chair-swdot="'+axisKey+'"]');
       if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
       if(propName) setProp(propName, item.name);
@@ -232,8 +252,8 @@
     if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
   }); }
 
-  {%- comment -%} init: register every axis, set price {%- endcomment -%}
   for(var k in sets){ registerAxis(k); }
+  refreshTierRow();
   updatePrice();
 })();
 </script>
