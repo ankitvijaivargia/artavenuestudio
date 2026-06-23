@@ -1,0 +1,240 @@
+{%- comment -%}
+  Art Avenue — Generic chair configurator (schema-driven).
+  Reads product.metafields.aav.configurator (JSON) to render any combination of
+  option axes: a priced tier (real variants) + free customization properties
+  (wood finish, leather colour, fabric print, etc.).
+
+  Schema shape:
+  {
+    "priced_option": "Upholstery",            // product option name that drives variant+price (optional)
+    "axes": [
+      { "key":"upholstery", "label":"Upholstery", "type":"tier",
+        "option":"Upholstery", "property":"Upholstery colour", "swatch_type":"swatch",
+        "sets": { "Fabric":[gid,...], "Genuine Leather":[gid,...] } },
+      { "key":"wood_finish", "label":"Wood Finish", "type":"finish",
+        "property":"Wood Finish", "swatch_type":"finish", "items":[gid,...] }
+    ]
+  }
+
+  Reuses the customize modal API: window.aaCz.register(group,{label,items}) +
+  window.aaCz.onChoose(group,item). Item shape: {name,cat,hex,img,swatch,surcharge}.
+  params: product
+{%- endcomment -%}
+
+{%- assign cfg = product.metafields.aav.configurator.value -%}
+{%- if cfg == blank -%}{%- else -%}
+{%- assign priced_option = cfg.priced_option -%}
+
+{%- comment -%} find the priced option object + its variant position {%- endcomment -%}
+{%- assign priced_pos = 0 -%}{%- assign priced_obj = '' -%}
+{%- if priced_option != blank -%}
+  {%- for o in product.options_with_values -%}
+    {%- if o.name == priced_option -%}{%- assign priced_obj = o -%}{%- assign priced_pos = o.position -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+<div class="aa-chair" id="aaChair" data-pid="{{ product.id }}">
+
+  {%- for axis in cfg.axes -%}
+    {%- assign atype = axis.type -%}
+
+    {%- if atype == 'tier' -%}
+      {%- comment -%} PRICED TIER — buttons that switch the real variant {%- endcomment -%}
+      {%- assign topt = '' -%}
+      {%- for o in product.options_with_values -%}{%- if o.name == axis.option -%}{%- assign topt = o -%}{%- endif -%}{%- endfor -%}
+      {%- if topt != '' -%}
+      <div class="aa-sofa__group" data-chair-axis="tier" data-axis-key="{{ axis.key | escape }}">
+        <div class="aa-sofa__label"><span>{{ axis.label | default: topt.name }}</span><span class="aa-sofa__hint" data-chair-tierhint>{{ topt.selected_value }}</span></div>
+        <div class="aa-sofa__btns">
+          {%- for v in topt.values -%}
+            <button type="button" class="aa-sofa__btn{% if v == topt.selected_value %} is-active{% endif %}" data-chair-tier="{{ v | escape }}">{{ v }}</button>
+          {%- endfor -%}
+        </div>
+      </div>
+      {%- endif -%}
+
+    {%- else -%}
+      {%- comment -%} CUSTOMIZATION AXIS — opens modal, writes a line-item property {%- endcomment -%}
+      <div class="aa-sofa__group" data-chair-axis="prop" data-axis-key="{{ axis.key | escape }}" data-axis-prop="{{ axis.property | default: axis.label | escape }}">
+        <button type="button" class="aa-cz-row" data-cz-open="chair-{{ axis.key | escape }}">
+          <span class="aa-cz-row__k">{{ axis.label }}</span>
+          <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-chair-swdot="{{ axis.key | escape }}"></span><span data-cz-selname="chair-{{ axis.key | escape }}">Choose</span><i class="ph ph-caret-right"></i></span>
+        </button>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+  <button type="button" class="aa-sofa__custom" data-cz-consult>
+    <i class="ph ph-ruler"></i> Want a bespoke finish or your own fabric? <span>Speak with a design consultant ›</span>
+  </button>
+
+  {%- comment -%} ===== DATA: variant price map keyed by priced-option value ===== {%- endcomment -%}
+  <script>
+  window.AA_CHAIR_VARIANTS = window.AA_CHAIR_VARIANTS || {};
+  window.AA_CHAIR_VARIANTS["{{ product.id }}"] = {
+    {%- for v in product.variants -%}
+      {%- if priced_pos == 1 -%}{%- assign pv = v.option1 -%}{%- elsif priced_pos == 2 -%}{%- assign pv = v.option2 -%}{%- elsif priced_pos == 3 -%}{%- assign pv = v.option3 -%}{%- else -%}{%- assign pv = v.title -%}{%- endif -%}
+      {{ pv | json }}: { id: {{ v.id }}, price: {{ v.price | times: 1 }}, available: {{ v.available }} }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
+  </script>
+
+  {%- comment -%} ===== DATA: swatch sets per axis ===== {%- endcomment -%}
+  <script type="application/json" id="aa-chair-sets-{{ product.id }}">
+  {
+    {%- assign first_axis = true -%}
+    {%- for axis in cfg.axes -%}
+      {%- assign stype = axis.swatch_type | default: 'swatch' -%}
+      {%- unless first_axis -%},{%- endunless -%}{%- assign first_axis = false -%}
+      {{ axis.key | json }}: {
+        "type": {{ axis.type | json }},
+        "label": {{ axis.label | json }},
+        "property": {{ axis.property | default: axis.label | json }},
+        {%- if axis.type == 'tier' -%}
+        "sets": {
+          {%- assign first_set = true -%}
+          {%- for pair in axis.sets -%}
+            {%- unless first_set -%},{%- endunless -%}{%- assign first_set = false -%}
+            {{ pair[0] | json }}: [
+              {%- assign first_it = true -%}
+              {%- for gid in pair[1] -%}
+                {%- assign mo = gid | metaobject -%}
+                {%- if mo != blank -%}
+                  {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
+                  {%- render 'aa-swatch-json', mo: mo, stype: stype -%}
+                {%- endif -%}
+              {%- endfor -%}
+            ]
+          {%- endfor -%}
+        }
+        {%- else -%}
+        "items": [
+          {%- assign first_it = true -%}
+          {%- for gid in axis.items -%}
+            {%- assign mo = gid | metaobject -%}
+            {%- if mo != blank -%}
+              {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
+              {%- render 'aa-swatch-json', mo: mo, stype: stype -%}
+            {%- endif -%}
+          {%- endfor -%}
+        ]
+        {%- endif -%}
+      }
+    {%- endfor -%}
+  }
+  </script>
+</div>
+
+<script>
+(function(){
+  var root = document.getElementById('aaChair');
+  if(!root) return;
+  var pid = root.getAttribute('data-pid');
+  var vmap = (window.AA_CHAIR_VARIANTS && window.AA_CHAIR_VARIANTS[pid]) || {};
+  var sets = {};
+  try { sets = JSON.parse(document.getElementById('aa-chair-sets-'+pid).textContent); } catch(e){}
+
+  function norm(s){ return (s==null?'':String(s)).trim(); }
+  function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
+  function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
+
+  var state = { tier:null, picks:{} };
+  var aTier = root.querySelector('[data-chair-tier].is-active');
+  if(aTier){ state.tier = aTier.getAttribute('data-chair-tier'); }
+  if(!state.tier){ var ft=root.querySelector('[data-chair-tier]'); if(ft){ state.tier=ft.getAttribute('data-chair-tier'); ft.classList.add('is-active'); } }
+
+  function currentVariant(){
+    if(state.tier==null) {
+      for(var k in vmap){ return vmap[k]; }
+      return null;
+    }
+    if(vmap[state.tier]) return vmap[state.tier];
+    var key=norm(state.tier).toLowerCase();
+    for(var k in vmap){ if(norm(k).toLowerCase()===key) return vmap[k]; }
+    return null;
+  }
+  function setHiddenId(id){
+    var f=form(); if(!f) return;
+    var inp=f.querySelector('input[name="id"], select[name="id"]');
+    if(inp && inp.tagName==='SELECT'){ inp.value=id; }
+    else { if(!inp){ inp=document.createElement('input'); inp.type='hidden'; inp.name='id'; f.appendChild(inp); } inp.value=id; }
+  }
+  function updatePrice(){
+    var v=currentVariant(); if(!v) return;
+    setHiddenId(v.id);
+    var f=form(); var btn=f && f.querySelector('button[type="submit"]');
+    if(btn){ btn.innerHTML = 'Add to Cart &middot; ' + money(v.price); }
+    document.querySelectorAll('.aa-price').forEach(function(el){ if(el.classList.contains('aa-price--enquire')) return; el.textContent = money(v.price); });
+    document.querySelectorAll('[data-sticky-price]').forEach(function(el){ el.textContent = money(v.price); });
+    document.querySelectorAll('[data-sticky-id]').forEach(function(el){ el.value = v.id; });
+  }
+
+  function setProp(propName, value){
+    var f=form(); if(!f) return;
+    var safe = 'aa-prop-' + propName.replace(/[^a-z0-9]/gi,'-').toLowerCase();
+    var inp=f.querySelector('#'+safe);
+    if(!inp){ inp=document.createElement('input'); inp.type='hidden'; inp.id=safe; f.appendChild(inp); }
+    inp.name='properties['+propName+']';
+    inp.value=value;
+  }
+
+  function itemsForAxis(axisKey){
+    var a = sets[axisKey]; if(!a) return null;
+    if(a.type==='tier'){ return (a.sets && a.sets[state.tier]) || null; }
+    return a.items || null;
+  }
+
+  function registerAxis(axisKey){
+    var a=sets[axisKey]; if(!a || !window.aaCz) return;
+    var items=itemsForAxis(axisKey);
+    var group = (a.type==='tier') ? 'chair-tier' : ('chair-'+axisKey);
+    if(items){ window.aaCz.register(group, { label: a.label, items: items }); }
+  }
+
+  function tierSwatchRow(){
+    {%- comment -%} the tier's own colour/fabric picker lives under its tier label as a cz-row only if schema gave it a property {%- endcomment -%}
+  }
+
+  {%- comment -%} TIER buttons {%- endcomment -%}
+  root.addEventListener('click', function(e){
+    var t=e.target.closest('[data-chair-tier]');
+    if(t){
+      state.tier=t.getAttribute('data-chair-tier');
+      root.querySelectorAll('[data-chair-tier]').forEach(function(b){ b.classList.toggle('is-active', b===t); });
+      var h=root.querySelector('[data-chair-tierhint]'); if(h) h.textContent=state.tier;
+      updatePrice();
+      {%- comment -%} re-register the tier picker with the new tier's set {%- endcomment -%}
+      for(var k in sets){ if(sets[k].type==='tier'){ registerAxis(k); } }
+    }
+  });
+
+  if(window.aaCz){
+    window.aaCz.onChoose(function(group, item){
+      {%- comment -%} map group back to axis {%- endcomment -%}
+      var axisKey=null, propName=null;
+      for(var k in sets){
+        var a=sets[k];
+        var g=(a.type==='tier')?'chair-tier':('chair-'+k);
+        if(g===group){ axisKey=k; propName=a.property; break; }
+      }
+      if(!axisKey) return;
+      state.picks[axisKey]=item;
+      var nm=root.querySelector('[data-cz-selname="'+group+'"]'); if(nm) nm.textContent=item.name;
+      var dot=root.querySelector('[data-chair-swdot="'+axisKey+'"]');
+      if(dot){ dot.style.background = item.img ? ("center/cover no-repeat url('"+item.img+"')") : (item.hex||'#cccccc'); }
+      if(propName) setProp(propName, item.name);
+    });
+  }
+
+  var consultBtn=root.querySelector('[data-cz-consult]');
+  if(consultBtn){ consultBtn.addEventListener('click', function(){
+    var consult=document.querySelector('.aa-cta-secondary a, a[href*="/pages/enquiry"], a[href*="wa.me"]');
+    if(consult){ consult.scrollIntoView({behavior:'smooth',block:'center'}); }
+  }); }
+
+  {%- comment -%} init: register every axis, set price {%- endcomment -%}
+  for(var k in sets){ registerAxis(k); }
+  updatePrice();
+})();
+</script>
+{%- endif -%}
