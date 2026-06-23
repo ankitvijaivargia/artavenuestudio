@@ -14,6 +14,7 @@
         "property":"Wood Finish", "source":"wood_finishes" }
     ]
   }
+  source = swatches | wood_finishes (literal metafield keys resolved below).
   An axis with a single available item renders as a fixed line (no picker).
   params: product
 {%- endcomment -%}
@@ -25,6 +26,10 @@
 {%- if priced_option != blank -%}
   {%- for o in product.options_with_values -%}{%- if o.name == priced_option -%}{%- assign priced_pos = o.position -%}{%- endif -%}{%- endfor -%}
 {%- endif -%}
+
+{%- comment -%} Resolve the two reference metafields with LITERAL access (dynamic aav[src] is unreliable) {%- endcomment -%}
+{%- assign mf_swatches = product.metafields.aav.swatches.value -%}
+{%- assign mf_wood = product.metafields.aav.wood_finishes.value -%}
 
 <div class="aa-chair" id="aaChair" data-pid="{{ product.id }}">
 
@@ -84,8 +89,11 @@
   {
     {%- assign first_axis = true -%}
     {%- for axis in cfg.axes -%}
-      {%- assign src = axis.source -%}
-      {%- assign list = product.metafields.aav[src].value -%}
+      {%- comment -%} pick the right reference list by literal source key {%- endcomment -%}
+      {%- assign list = '' -%}
+      {%- if axis.source == 'swatches' -%}{%- assign list = mf_swatches -%}
+      {%- elsif axis.source == 'wood_finishes' -%}{%- assign list = mf_wood -%}
+      {%- endif -%}
       {%- unless first_axis -%},{%- endunless -%}{%- assign first_axis = false -%}
       {{ axis.key | json }}: {
         "type": {{ axis.type | json }},
@@ -102,7 +110,7 @@
             {%- unless first_tier -%},{%- endunless -%}{%- assign first_tier = false -%}
             {{ tv | json }}: [
               {%- assign first_it = true -%}
-              {%- if list -%}{%- for s in list -%}
+              {%- if list != '' and list != blank -%}{%- for s in list -%}
                 {%- assign cat = s.category.value | default: '' -%}
                 {%- assign keep = true -%}
                 {%- if filt.category != blank and cat != filt.category -%}{%- assign keep = false -%}{%- endif -%}
@@ -122,7 +130,7 @@
         {%- else -%}
         "items": [
           {%- assign first_it = true -%}
-          {%- if list -%}{%- for s in list -%}
+          {%- if list != '' and list != blank -%}{%- for s in list -%}
             {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
             {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
             {%- assign hexv = s.hex.value | default: '#cccccc' -%}
@@ -219,8 +227,6 @@
     var items=itemsForAxis(axisKey);
     if(items && items.length){ applyPick(axisKey, items[0]); }
   }
-
-  {%- comment -%} show/hide each non-tier axis group: picker if >1, fixed line if exactly 1, hidden if 0 {%- endcomment -%}
   function layoutAxis(axisKey){
     var a=sets[axisKey]; if(!a || a.type==='tier') return;
     var group=root.querySelector('[data-chair-axis="prop"][data-axis-key="'+axisKey+'"]');
