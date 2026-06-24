@@ -9,6 +9,7 @@
     tier_filters (for tier).
   order_swatch:false hides the “Order a swatch” action in the modal (e.g. wood finish).
   An axis with a single available item renders as a fixed line (no picker).
+  Each item may carry “meta” (a short description) shown in the modal detail panel.
 
   SIZE: shown as a static, non-variant display read from product metafields
   aav.dim_w / aav.dim_d / aav.dim_h (whole cm). Inches auto-derived. Hidden if absent.
@@ -136,7 +137,8 @@
                   {%- assign hexv = s.hex.value | default: '#cccccc' -%}
                   {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
                   {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
-                  {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+                  {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
+                  {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
                 {%- endif -%}
               {%- endfor -%}{%- endif -%}
             ]
@@ -151,7 +153,8 @@
             {%- assign hexv = s.hex.value | default: '#cccccc' -%}
             {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
             {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
-            {"name":{{ s.name.value | json }},"cat":{{ s.category.value | default: '' | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+            {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ s.category.value | default: '' | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
           {%- endfor -%}{%- endif -%}
         ]
         {%- endif -%}
