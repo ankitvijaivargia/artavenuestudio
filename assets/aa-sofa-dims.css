@@ -13,6 +13,12 @@
 /* single-value non-size priced axis: static display line */
 .aa-sofa__fixedline{font-size:14px;color:var(--text-primary);padding:2px 0;}
 
+/* ===== GRID engine: disabled (unavailable) material/size button ===== */
+.aa-chair--grid .aa-sofa__btn.is-disabled,.aa-chair--grid .aa-sofa__btn:disabled{opacity:.38;cursor:not-allowed;text-decoration:line-through;text-decoration-thickness:1px;}
+.aa-chair--grid .aa-sofa__btn.is-disabled:hover,.aa-chair--grid .aa-sofa__btn:disabled:hover{border-color:var(--border-hairline);background:transparent;}
+/* grid size buttons: even multi-up grid, compact single-line */
+.aa-chair--grid .aa-sofa__btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+
 /* ===== TABLET: size buttons in an even 3-up grid so long dual-unit labels don't wrap raggedly ===== */
 @media (max-width:1024px) and (min-width:783px){
   .aa-chair .aa-sofa__btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -30,6 +36,8 @@
   .aa-chair .aa-sofa__btn-met{font-size:12px;white-space:nowrap;}
   .aa-chair .aa-sofa__dims{justify-content:flex-start;text-align:left;padding:12px 14px;}
   .aa-chair .aa-sofa__dims-cm,.aa-chair .aa-sofa__dims-in{font-size:13px;}
+  /* grid material buttons stay 2-up on mobile; size buttons go 2-up too for sofas */
+  .aa-chair--grid .aa-sofa__btns{grid-template-columns:1fr 1fr;}
   /* touch-friendly swatch + fixed rows */
   .aa-chair .aa-cz-row{padding:15px 16px;}
   .aa-chair .aa-cz-row__v{font-size:14px;}
