@@ -1,8 +1,5 @@
 {%- comment -%}
   Art Avenue — Generic chair configurator (schema-driven, metafield-reference based).
-  Reads product.metafields.aav.configurator (JSON schema) + metaobject-reference
-  metafields (aav.swatches, aav.wood_finishes) for the actual swatch data.
-
   TWO ENGINES IN ONE FILE, gated on cfg.engine:
    - cfg.engine == 'grid'  -> TWO-AXIS priced grid (Size x Material). Availability AND
      price both derive from variants. Per-size material availability greys out
@@ -30,33 +27,38 @@
 {%- assign size_count = size_o.values | size -%}
 {%- assign mat_count = mat_o.values | size -%}
 {%- assign has_wood = false -%}{%- if cfg.wood != blank -%}{%- assign has_wood = true -%}{%- endif -%}
+{%- assign dims_obj = product.metafields.aav.size_dimensions.value -%}
 
 <div class="aa-chair aa-chair--grid" id="aaChair" data-pid="{{ product.id }}">
 
-  {%- comment -%} SIZE axis: compact single-line buttons; dims shown on the line below {%- endcomment -%}
+  {%- comment -%} SIZE axis: dims box on top (cm + inch), compact buttons below {%- endcomment -%}
   <div class="aa-sofa__group" data-grid-axis="size">
     <div class="aa-sofa__label"><span>{{ cfg.size_label | default: size_opt_name }}</span><span class="aa-sofa__hint" data-grid-sizehint></span></div>
-    {%- if size_count == 1 -%}
-      {%- assign only_s = size_o.values | first -%}
-      {%- assign m_only = cfg.unit_map[only_s] -%}
-      <button type="button" class="aa-sofa__btn is-active" data-grid-size="{{ only_s | escape }}" data-dim="{{ m_only | escape }}" hidden></button>
-      <div class="aa-sofa__dims">
-        <i class="ph ph-ruler"></i>
-        <span class="aa-sofa__dims-cm">{{ only_s }}</span>
-        {%- if m_only != blank -%}<span class="aa-sofa__dims-in">{{ m_only }}</span>{%- endif -%}
-      </div>
-    {%- else -%}
+
+    {%- comment -%} dims box reflects selected size (cm headline + inch sub-line) {%- endcomment -%}
+    <div class="aa-sofa__dims" data-grid-dims>
+      <i class="ph ph-ruler"></i>
+      <span class="aa-sofa__dims-cm" data-grid-dims-cm></span>
+      <span class="aa-sofa__dims-in" data-grid-dims-in></span>
+    </div>
+
+    {%- if size_count > 1 -%}
       <div class="aa-sofa__btns">
         {%- for v in size_o.values -%}
-          {%- assign m_v = cfg.unit_map[v] -%}
-          <button type="button" class="aa-sofa__btn{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}" data-dim="{{ m_v | escape }}">{{ v }}</button>
+          {%- assign dcm = '' -%}{%- assign din = '' -%}
+          {%- if dims_obj != blank and dims_obj[v] -%}{%- assign dcm = dims_obj[v].cm -%}{%- assign din = dims_obj[v].in -%}{%- endif -%}
+          {%- if dcm == blank -%}{%- assign dcm = cfg.unit_map[v] -%}{%- endif -%}
+          <button type="button" class="aa-sofa__btn{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}" data-dim-cm="{{ dcm | escape }}" data-dim-in="{{ din | escape }}">{{ v }}</button>
         {%- endfor -%}
       </div>
-      <div class="aa-sofa__dims" data-grid-dims hidden>
-        <i class="ph ph-ruler"></i>
-        <span class="aa-sofa__dims-cm" data-grid-dims-cm></span>
-      </div>
+    {%- else -%}
+      {%- assign only_s = size_o.values | first -%}
+      {%- assign dcm = '' -%}{%- assign din = '' -%}
+      {%- if dims_obj != blank and dims_obj[only_s] -%}{%- assign dcm = dims_obj[only_s].cm -%}{%- assign din = dims_obj[only_s].in -%}{%- endif -%}
+      {%- if dcm == blank -%}{%- assign dcm = cfg.unit_map[only_s] -%}{%- endif -%}
+      <button type="button" class="aa-sofa__btn is-active" data-grid-size="{{ only_s | escape }}" data-dim-cm="{{ dcm | escape }}" data-dim-in="{{ din | escape }}" hidden></button>
     {%- endif -%}
+
     <button type="button" class="aa-sofa__custom" data-cz-consult>
       <i class="ph ph-ruler"></i> Need an L-shape or a custom size? <span>Speak with a design consultant ›</span>
     </button>
@@ -219,9 +221,13 @@
     function updateDims(){
       var box=root.querySelector('[data-grid-dims]'); if(!box) return;
       var cm=box.querySelector('[data-grid-dims-cm]');
+      var inch=box.querySelector('[data-grid-dims-in]');
       var btn=root.querySelector('[data-grid-size].is-active');
-      var d=btn?btn.getAttribute('data-dim'):'';
-      if(d){ if(cm) cm.textContent=d; box.hidden=false; } else { box.hidden=true; }
+      var dcm=btn?btn.getAttribute('data-dim-cm'):'';
+      var din=btn?btn.getAttribute('data-dim-in'):'';
+      if(cm) cm.textContent=dcm||'';
+      if(inch) inch.textContent=din?('('+din+')'):'';
+      box.hidden = !(dcm||din);
     }
     function matLabelWord(){
       var t=(state.mat||'').toLowerCase();
