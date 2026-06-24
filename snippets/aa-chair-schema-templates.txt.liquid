@@ -1,0 +1,70 @@
+ART AVENUE — ARMCHAIR CONFIGURATOR SCHEMA TEMPLATES
+====================================================
+This is a REFERENCE file (not rendered). Copy the matching JSON into a chair's
+product metafield: Metafields > "Configurator schema" (aav.configurator).
+
+HOW THE CONFIGURATOR WORKS
+--------------------------
+- priced_option: the product OPTION name whose value switches the real variant + price.
+  Omit entirely for single-price chairs (e.g. wood+rattan only).
+- axes[]: each choice shown to the customer.
+    type:"tier"   -> the priced upholstery axis (reads real variants).
+    type:"finish" -> a free customization axis (line-item property).
+    source: which reference metafield supplies swatches:
+              "swatches"      = aav.swatches (shared fabric+leather library)
+              "wood_finishes" = aav.wood_finishes (shared wood finish library)
+    property: the line-item property name written to the cart.
+    order_swatch: true  -> shows “Order a swatch” in the modal (fabric/leather)
+                  false -> hides it (wood finish)
+    tier_filters: per upholstery value, which swatch category to show:
+              Fabric          -> {"exclude_category":"Leather"}
+              Genuine Leather -> {"category":"Leather"}
+
+AVAILABILITY IS CONTROLLED PER PRODUCT (not here):
+  Tick the specific fabrics/leathers under "Swatches offered" and the finishes
+  under "Wood finishes offered". >1 ticked = picker; exactly 1 = fixed line; 0 = hidden.
+
+VARIANTS TO CREATE (Step 2) must match the tier_filters keys:
+  Template A/B: option "Upholstery" with value Fabric (+ Genuine Leather for A/C/D)
+  Template E:   no variants; just set one price.
+
+----------------------------------------------------
+TEMPLATE A — Fabric + Genuine Leather + Wood Finish  (Marwar type)
+Variants: Upholstery = Fabric, Genuine Leather
+----------------------------------------------------
+{"priced_option":"Upholstery","axes":[{"key":"upholstery","label":"Upholstery","type":"tier","option":"Upholstery","property":"Upholstery colour","source":"swatches","order_swatch":true,"tier_filters":{"Fabric":{"exclude_category":"Leather"},"Genuine Leather":{"category":"Leather"}}},{"key":"wood_finish","label":"Wood Finish","type":"finish","property":"Wood Finish","source":"wood_finishes","order_swatch":false}]}
+
+----------------------------------------------------
+TEMPLATE B — Fabric only + Wood Finish  (Munnar / Milan type)
+Variants: Upholstery = Fabric
+----------------------------------------------------
+{"priced_option":"Upholstery","axes":[{"key":"upholstery","label":"Upholstery","type":"tier","option":"Upholstery","property":"Fabric","source":"swatches","order_swatch":true,"tier_filters":{"Fabric":{"exclude_category":"Leather"}}},{"key":"wood_finish","label":"Wood Finish","type":"finish","property":"Wood Finish","source":"wood_finishes","order_swatch":false}]}
+
+----------------------------------------------------
+TEMPLATE C — Genuine Leather only + Wood Finish  (Assagao / Carlton type)
+Variants: Upholstery = Genuine Leather
+----------------------------------------------------
+{"priced_option":"Upholstery","axes":[{"key":"upholstery","label":"Upholstery","type":"tier","option":"Upholstery","property":"Leather colour","source":"swatches","order_swatch":true,"tier_filters":{"Genuine Leather":{"category":"Leather"}}},{"key":"wood_finish","label":"Wood Finish","type":"finish","property":"Wood Finish","source":"wood_finishes","order_swatch":false}]}
+
+----------------------------------------------------
+TEMPLATE D — Leather only, no wood  (Norway / Newyork type, fully upholstered)
+Variants: Upholstery = Genuine Leather
+----------------------------------------------------
+{"priced_option":"Upholstery","axes":[{"key":"upholstery","label":"Upholstery","type":"tier","option":"Upholstery","property":"Leather colour","source":"swatches","order_swatch":true,"tier_filters":{"Genuine Leather":{"category":"Leather"}}}]}
+
+----------------------------------------------------
+TEMPLATE E — Wood + Rattan only, no upholstery  (Newport / Tao type)
+Variants: none (single price)
+----------------------------------------------------
+{"axes":[{"key":"wood_finish","label":"Wood Finish","type":"finish","property":"Wood Finish","source":"wood_finishes","order_swatch":false}]}
+
+----------------------------------------------------
+EXTENDING
+----------------------------------------------------
+- Vegan Leather tier later: add a "Vegan Leather" variant value + a tier_filters
+  entry. You’ll need a category on those swatches (e.g. "Vegan") and a filter
+  {"category":"Vegan"}. Tell Claude and the swatches/filters can be added.
+- Fabric prints unique to one chair: add new swatch metaobjects to the shared
+  library, then tick them under "Swatches offered" for that chair only.
+- A second free axis (e.g. "Leg Finish", "Base"): add another axis object with its
+  own source metafield. New source metafields require a one-time setup by Claude.
