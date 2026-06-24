@@ -9,17 +9,6 @@
      impossible combinations. Used by sofas.
    - otherwise              -> single-priced-axis path (tier | size) + property pickers.
      Used by armchairs (tier) and ottomans/benches (size). UNCHANGED.
-
-  Schema shape (single-axis path, per axis):
-    key, label, type (tier|finish|size|...), option (for tier/size), property,
-    source (swatches|wood_finishes), order_swatch (bool, default true),
-    tier_filters (for tier), unit_map (for size: imperial value -> metric string).
-
-  Grid schema shape (cfg.engine == 'grid'):
-    size_option, material_option, size_label, material_label,
-    unit_map (size value -> dimension string), swatch_property,
-    tier_filters (material value -> {category|exclude_category}),
-    wood ({source, property, order_swatch}) optional.
   params: product
 {%- endcomment -%}
 
@@ -40,28 +29,29 @@
 {%- endfor -%}
 {%- assign size_count = size_o.values | size -%}
 {%- assign mat_count = mat_o.values | size -%}
+{%- assign has_wood = false -%}{%- if cfg.wood != blank -%}{%- assign has_wood = true -%}{%- endif -%}
 
 <div class="aa-chair aa-chair--grid" id="aaChair" data-pid="{{ product.id }}">
 
-  {%- comment -%} SIZE axis: buttons when >1, static dims line when ==1 {%- endcomment -%}
+  {%- comment -%} SIZE axis: compact single-line buttons; dims shown on the line below {%- endcomment -%}
   <div class="aa-sofa__group" data-grid-axis="size">
     <div class="aa-sofa__label"><span>{{ cfg.size_label | default: size_opt_name }}</span><span class="aa-sofa__hint" data-grid-sizehint></span></div>
     {%- if size_count == 1 -%}
       {%- assign only_s = size_o.values | first -%}
-      <button type="button" class="aa-sofa__btn is-active" data-grid-size="{{ only_s | escape }}" hidden></button>
+      {%- assign m_only = cfg.unit_map[only_s] -%}
+      <button type="button" class="aa-sofa__btn is-active" data-grid-size="{{ only_s | escape }}" data-dim="{{ m_only | escape }}" hidden></button>
       <div class="aa-sofa__dims">
         <i class="ph ph-ruler"></i>
         <span class="aa-sofa__dims-cm">{{ only_s }}</span>
-        {%- assign m_only = cfg.unit_map[only_s] -%}{%- if m_only != blank -%}<span class="aa-sofa__dims-in">{{ m_only }}</span>{%- endif -%}
+        {%- if m_only != blank -%}<span class="aa-sofa__dims-in">{{ m_only }}</span>{%- endif -%}
       </div>
     {%- else -%}
       <div class="aa-sofa__btns">
         {%- for v in size_o.values -%}
           {%- assign m_v = cfg.unit_map[v] -%}
-          <button type="button" class="aa-sofa__btn aa-sofa__btn--size{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}">{%- if m_v != blank -%}<span class="aa-sofa__btn-imp">{{ v }}</span><span class="aa-sofa__btn-met">{{ m_v }}</span>{%- else -%}{{ v }}{%- endif -%}</button>
+          <button type="button" class="aa-sofa__btn{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}" data-dim="{{ m_v | escape }}">{{ v }}</button>
         {%- endfor -%}
       </div>
-      {%- comment -%} dims line reflects selected size {%- endcomment -%}
       <div class="aa-sofa__dims" data-grid-dims hidden>
         <i class="ph ph-ruler"></i>
         <span class="aa-sofa__dims-cm" data-grid-dims-cm></span>
@@ -97,8 +87,7 @@
     <div class="aa-sofa__swsub" data-grid-swsub>Choose your finish, or order a swatch from &#8377;2,000 to feel it first.</div>
   </div>
 
-  {%- comment -%} optional WOOD axis (property picker; single -> static, none -> hidden) {%- endcomment -%}
-  {%- if cfg.wood != blank -%}
+  {%- if has_wood -%}
   <div class="aa-sofa__group" data-grid-wood hidden>
     <div class="aa-sofa__label"><span>{{ cfg.wood.label | default: 'Wood Finish' }}</span><span class="aa-sofa__hint" data-cz-selname="gridwood-hint"></span></div>
     <button type="button" class="aa-cz-row" data-cz-open="gridwood" data-grid-woodpick>
@@ -153,7 +142,7 @@
         ]
       {%- endfor -%}
     }
-    {%- if cfg.wood != blank -%},
+    {%- if has_wood -%},
     "wood": [
       {%- assign first_w = true -%}
       {%- if mf_wood != blank -%}{%- for s in mf_wood -%}
@@ -179,8 +168,9 @@
     var mats=sets.materials||{};
     var woodItems=sets.wood||null;
     var swProp={{ cfg.swatch_property | default: 'Upholstery' | json }};
-    var woodProp={{ cfg.wood.property | default: 'Wood Finish' | json }};
-    var woodOrderSwatch={% if cfg.wood.order_swatch == false %}false{% else %}true{% endif %};
+    var woodProp={% if has_wood %}{{ cfg.wood.property | default: 'Wood Finish' | json }}{% else %}'Wood Finish'{% endif %};
+    var woodLabel={% if has_wood %}{{ cfg.wood.label | default: 'Wood Finish' | json }}{% else %}'Wood Finish'{% endif %};
+    var woodOrderSwatch={% if has_wood and cfg.wood.order_swatch == false %}false{% else %}true{% endif %};
 
     function norm(s){ return (s==null?'':String(s)).trim(); }
     function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
@@ -229,8 +219,8 @@
     function updateDims(){
       var box=root.querySelector('[data-grid-dims]'); if(!box) return;
       var cm=box.querySelector('[data-grid-dims-cm]');
-      var map={{ cfg.unit_map | json }};
-      var d=map && map[state.size];
+      var btn=root.querySelector('[data-grid-size].is-active');
+      var d=btn?btn.getAttribute('data-dim'):'';
       if(d){ if(cm) cm.textContent=d; box.hidden=false; } else { box.hidden=true; }
     }
     function matLabelWord(){
@@ -240,7 +230,6 @@
       return 'Finish';
     }
 
-    {%- comment -%} cross-axis greying: disable materials with no variant for the active size {%- endcomment -%}
     function refreshMaterialAvailability(){
       var avail=matsForSize(state.size);
       var btns=root.querySelectorAll('[data-grid-mat]');
@@ -257,12 +246,12 @@
       }
     }
 
-    var aaCzReg=false;
     function registerSwatch(){
       if(!window.aaCz || !window.aaCz.register) return;
       var items=mats[state.mat]||[];
-      window.aaCz.register('gridsw', { label: (matLabelWord()==='Colour'?'Leather colour':(matLabelWord()==='Fabric'?'Fabric':'Finish')), items: items, orderSwatch:true });
-      if(woodItems){ window.aaCz.register('gridwood', { label: {{ cfg.wood.label | default: 'Wood Finish' | json }}, items: woodItems, orderSwatch: woodOrderSwatch }); }
+      var lab=(matLabelWord()==='Colour'?'Leather colour':(matLabelWord()==='Fabric'?'Fabric':'Finish'));
+      window.aaCz.register('gridsw', { label: lab, items: items, orderSwatch:true });
+      if(woodItems){ window.aaCz.register('gridwood', { label: woodLabel, items: woodItems, orderSwatch: woodOrderSwatch }); }
     }
     function refreshSwatchRow(){
       var word=matLabelWord();
@@ -365,7 +354,6 @@
   {%- for o in product.options_with_values -%}{%- if o.name == priced_option -%}{%- assign priced_pos = o.position -%}{%- endif -%}{%- endfor -%}
 {%- endif -%}
 
-{%- comment -%} Static size display (non-variant): product-level cm dims, inches derived {%- endcomment -%}
 {%- assign dw = product.metafields.aav.dim_w.value -%}
 {%- assign dd = product.metafields.aav.dim_d.value -%}
 {%- assign dh = product.metafields.aav.dim_h.value -%}
@@ -397,7 +385,6 @@
       <div class="aa-sofa__group" data-chair-axis="{{ axis.type }}" data-axis-key="{{ axis.key | escape }}">
         <div class="aa-sofa__label"><span>{{ axis.label | default: topt.name }}</span><span class="aa-sofa__hint" data-chair-tierhint>{%- unless axis.type == 'size' -%}{{ topt.selected_value }}{%- endunless -%}</span></div>
         {%- if opt_count == 1 -%}
-          {%- comment -%} Single value: static line, no picker. For size, render dual-unit. {%- endcomment -%}
           {%- assign only_v = topt.values | first -%}
           <button type="button" class="aa-sofa__btn is-active" data-chair-tier="{{ only_v | escape }}" hidden></button>
           {%- if axis.type == 'size' -%}
