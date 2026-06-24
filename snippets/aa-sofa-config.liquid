@@ -232,6 +232,10 @@
     document.querySelectorAll('[data-sticky-price]').forEach(function(el){ el.textContent = money(v.price); });
     document.querySelectorAll('[data-sticky-id]').forEach(function(el){ el.value = v.id; });
   }
+  function setRegistered(){
+    var set = sw[state.mat] || sw['Fabric'];
+    if(window.aaCz && window.aaCz.register && set){ window.aaCz.register('sofaopt', { label: set.label, items: set.items }); }
+  }
   function refreshSwatchRow(){
     var isLeather = state.mat==='Leather';
     var set = sw[state.mat] || sw['Fabric'];
@@ -239,7 +243,7 @@
     var sub=root.querySelector('[data-sofa-swsub]');
     if(lbl) lbl.textContent = isLeather ? 'Colour' : 'Fabric';
     if(sub) sub.textContent = (isLeather?'Choose your leather colour':'Choose your fabric')+', or order a swatch from \u20B92,000 to feel it first.';
-    if(window.aaCz && set){ window.aaCz.register('sofaopt', { label: set.label, items: set.items }); }
+    setRegistered();
     var chosen = state.swatch[state.mat];
     var first = set && set.items && set.items[0];
     var nm=root.querySelector('[data-cz-selname="sofaopt"]');
@@ -269,7 +273,8 @@
     }
   });
 
-  if(window.aaCz){
+  function bindChoose(){
+    if(!window.aaCz || !window.aaCz.onChoose) return false;
     window.aaCz.onChoose(function(group, item){
       if(group!=='sofaopt') return;
       state.swatch[state.mat]=item;
@@ -282,6 +287,7 @@
         inp.value=item.name;
       }
     });
+    return true;
   }
 
   var customBtn=root.querySelector('[data-cz-consult]');
@@ -291,6 +297,17 @@
   }); }
 
   updatePrice(); refreshSwatchRow(); broadcastMat(); updateDims();
+
+  {%- comment -%} aaCz (modal) script runs AFTER this snippet, so retry until it exists, then register the default set + bind choose. Fixes first-click-does-nothing on the swatch picker. {%- endcomment -%}
+  var tries=0;
+  (function waitForCz(){
+    if(window.aaCz && window.aaCz.register){
+      setRegistered();
+      bindChoose();
+      return;
+    }
+    if(tries++ < 50){ setTimeout(waitForCz, 50); }
+  })();
 })();
 </script>
 {%- endif -%}
