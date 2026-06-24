@@ -12,3 +12,27 @@
 .aa-sofa__btn--size.is-active .aa-sofa__btn-met{color:var(--surface-page,#f5f0e6);opacity:.72;}
 /* single-value non-size priced axis: static display line */
 .aa-sofa__fixedline{font-size:14px;color:var(--text-primary);padding:2px 0;}
+
+/* ===== TABLET: size buttons in an even 3-up grid so long dual-unit labels don't wrap raggedly ===== */
+@media (max-width:1024px) and (min-width:783px){
+  .aa-chair .aa-sofa__btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .aa-chair .aa-sofa__btn--size{min-width:0;padding:13px 10px;}
+  .aa-chair .aa-sofa__btn-imp{font-size:13px;}
+  .aa-chair .aa-sofa__btn-met{font-size:10.5px;}
+}
+
+/* ===== MOBILE: stack size buttons full-width so each dimension reads on one line ===== */
+@media (max-width:782px){
+  .aa-chair .aa-sofa__btns{display:grid;grid-template-columns:1fr;gap:8px;}
+  .aa-chair .aa-sofa__btn{min-width:0;width:100%;}
+  .aa-chair .aa-sofa__btn--size{flex-direction:row;justify-content:space-between;align-items:baseline;text-align:left;padding:14px 16px;gap:10px;}
+  .aa-chair .aa-sofa__btn-imp{font-size:14px;}
+  .aa-chair .aa-sofa__btn-met{font-size:12px;white-space:nowrap;}
+  .aa-chair .aa-sofa__dims{justify-content:flex-start;text-align:left;padding:12px 14px;}
+  .aa-chair .aa-sofa__dims-cm,.aa-chair .aa-sofa__dims-in{font-size:13px;}
+  /* touch-friendly swatch + fixed rows */
+  .aa-chair .aa-cz-row{padding:15px 16px;}
+  .aa-chair .aa-cz-row__v{font-size:14px;}
+  .aa-chair .aa-sofa__swsub,.aa-chair .aa-sofa__custom{font-size:13px;}
+  .aa-chair .aa-sofa__group{margin-bottom:20px;}
+}
