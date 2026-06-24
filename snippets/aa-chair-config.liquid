@@ -9,6 +9,9 @@
     tier_filters (for tier).
   order_swatch:false hides the “Order a swatch” action in the modal (e.g. wood finish).
   An axis with a single available item renders as a fixed line (no picker).
+
+  SIZE: shown as a static, non-variant display read from product metafields
+  aav.dim_w / aav.dim_d / aav.dim_h (whole cm). Inches auto-derived. Hidden if absent.
   params: product
 {%- endcomment -%}
 
@@ -23,7 +26,28 @@
 {%- assign mf_swatches = product.metafields.aav.swatches.value -%}
 {%- assign mf_wood = product.metafields.aav.wood_finishes.value -%}
 
+{%- comment -%} Static size display (non-variant): product-level cm dims, inches derived {%- endcomment -%}
+{%- assign dw = product.metafields.aav.dim_w.value -%}
+{%- assign dd = product.metafields.aav.dim_d.value -%}
+{%- assign dh = product.metafields.aav.dim_h.value -%}
+{%- assign has_dims = false -%}
+{%- if dw != blank and dd != blank and dh != blank -%}{%- assign has_dims = true -%}{%- endif -%}
+
 <div class="aa-chair" id="aaChair" data-pid="{{ product.id }}">
+
+  {%- if has_dims -%}
+  {%- assign dwi = dw | times: 100 | divided_by: 254.0 | round: 1 -%}
+  {%- assign ddi = dd | times: 100 | divided_by: 254.0 | round: 1 -%}
+  {%- assign dhi = dh | times: 100 | divided_by: 254.0 | round: 1 -%}
+  <div class="aa-sofa__group">
+    <div class="aa-sofa__label"><span>Dimensions</span></div>
+    <div class="aa-sofa__dims">
+      <i class="ph ph-ruler"></i>
+      <span class="aa-sofa__dims-cm">{{ dw }} cm W × {{ dd }} cm D × {{ dh }} cm H</span>
+      <span class="aa-sofa__dims-in">({{ dwi }} in W × {{ ddi }} in D × {{ dhi }} in H)</span>
+    </div>
+  </div>
+  {%- endif -%}
 
   {%- for axis in cfg.axes -%}
     {%- if axis.type == 'tier' -%}
