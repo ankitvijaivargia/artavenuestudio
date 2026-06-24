@@ -1,0 +1,14 @@
+/* Art Avenue — sofa size dimensions line + ottoman/bench size variant buttons. Loaded via theme.liquid after aa.css. */
+.aa-sofa__dims{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;margin-top:12px;padding:10px 13px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);}
+.aa-sofa__dims[hidden]{display:none;}
+.aa-sofa__dims .ph-ruler{color:var(--accent-deep);font-size:15px;align-self:center;}
+.aa-sofa__dims-cm{font-family:var(--font-sans);font-size:13.5px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;}
+.aa-sofa__dims-in{font-size:12px;color:var(--text-muted);font-feature-settings:"lnum" 1,"tnum" 1;}
+
+/* ottoman/bench size variant buttons: stacked imperial + metric */
+.aa-sofa__btn--size{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;line-height:1.2;text-align:center;}
+.aa-sofa__btn-imp{font-size:13.5px;font-weight:500;font-feature-settings:"lnum" 1,"tnum" 1;}
+.aa-sofa__btn-met{font-size:11px;color:var(--text-muted);font-feature-settings:"lnum" 1,"tnum" 1;}
+.aa-sofa__btn--size.is-active .aa-sofa__btn-met{color:var(--surface-page,#f5f0e6);opacity:.72;}
+/* single-value non-size priced axis: static display line */
+.aa-sofa__fixedline{font-size:14px;color:var(--text-primary);padding:2px 0;}
