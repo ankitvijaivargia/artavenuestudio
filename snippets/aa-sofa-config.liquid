@@ -144,7 +144,9 @@
           {%- if cat == 'Leather' -%}
             {%- unless first_l -%},{%- endunless -%}{%- assign first_l = false -%}
             {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- endif -%}
-            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+            {%- assign sp = s.swatch_price.value | divided_by: 100 -%}{%- if sp == 0 or sp == blank -%}{%- assign sp = 2000 -%}{%- endif -%}
+            {%- assign su = s.surcharge.value | divided_by: 100 -%}{%- if su == blank -%}{%- assign su = 0 -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ sp | json }},"surcharge":{{ su | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
           {%- endif -%}
         {%- endfor -%}
       {%- else -%}
@@ -159,7 +161,9 @@
           {%- unless cat == 'Leather' -%}
             {%- unless first_f -%},{%- endunless -%}{%- assign first_f = false -%}
             {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- endif -%}
-            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ s.swatch_price.value.amount | default: 2000 | json }},"surcharge":{{ s.surcharge.value.amount | default: 0 | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
+            {%- assign sp = s.swatch_price.value | divided_by: 100 -%}{%- if sp == 0 or sp == blank -%}{%- assign sp = 2000 -%}{%- endif -%}
+            {%- assign su = s.surcharge.value | divided_by: 100 -%}{%- if su == blank -%}{%- assign su = 0 -%}{%- endif -%}
+            {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ s.hex.value | default: '#cccccc' | json }},"swatch":{{ sp | json }},"surcharge":{{ su | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}}
           {%- endunless -%}
         {%- endfor -%}
       {%- else -%}
