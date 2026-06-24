@@ -4,6 +4,7 @@
   Swatch orders add the 'swatch' product to cart with the swatch name as a property.
   A registered group may set orderSwatch:false to hide the “Order a swatch” action
   (e.g. wood finish, where a physical sample isn't meaningful).
+  An item may carry meta (a short description) shown in the detail panel.
 {%- endcomment -%}
 {%- assign swatch_product = all_products['swatch'] -%}
 {%- if swatch_product and swatch_product.first_available_variant -%}{%- assign swatch_vid = swatch_product.first_available_variant.id -%}{%- else -%}{%- assign swatch_vid = '' -%}{%- endif -%}
@@ -22,6 +23,7 @@
         <div class="aa-czm__panel-sw" id="aaCzPanelSw"></div>
         <div class="aa-czm__panel-name serif" id="aaCzPanelName">Select a swatch</div>
         <div class="aa-czm__panel-cat" id="aaCzPanelCat"></div>
+        <div class="aa-czm__panel-desc" id="aaCzPanelDesc" hidden></div>
         <div class="aa-czm__panel-sur" id="aaCzPanelSur"></div>
         <div class="aa-czm__panel-craft" id="aaCzPanelCraft" hidden></div>
         <button type="button" class="aa-czm__order" id="aaCzOrder">Order a swatch &middot; &#8377;999</button>
@@ -52,6 +54,7 @@
   var panelSw = document.getElementById('aaCzPanelSw');
   var panelName = document.getElementById('aaCzPanelName');
   var panelCat = document.getElementById('aaCzPanelCat');
+  var panelDesc = document.getElementById('aaCzPanelDesc');
   var panelSur = document.getElementById('aaCzPanelSur');
   var panelCraft = document.getElementById('aaCzPanelCraft');
   var orderBtn = document.getElementById('aaCzOrder');
@@ -74,7 +77,6 @@
     groupEl.textContent = d.label;
     titleEl.textContent = 'Choose your ' + d.label.toLowerCase();
     chooseBtn.textContent = 'Choose this ' + d.label.toLowerCase();
-    {%- comment -%} hide swatch-ordering UI when the group opts out (e.g. wood finish) {%- endcomment -%}
     var allowOrder = (d.orderSwatch !== false);
     if(orderBtn){ orderBtn.style.display = allowOrder ? '' : 'none'; }
     if(noteEl){ noteEl.style.display = allowOrder ? '' : 'none'; }
@@ -125,6 +127,10 @@
     panelSw.style.background = swBg(it);
     panelName.textContent = it.name;
     panelCat.textContent = it.cat || '';
+    if(panelDesc){
+      if(it.meta){ panelDesc.textContent = it.meta; panelDesc.hidden = false; }
+      else { panelDesc.hidden = true; panelDesc.textContent = ''; }
+    }
     panelSur.innerHTML = Number(it.surcharge)>0 ? 'Adds <strong>'+money(it.surcharge)+'</strong> to the piece' : 'Included &mdash; no upcharge';
     orderBtn.innerHTML = 'Order a swatch &middot; '+money(it.swatch);
     if(panelCraft){
