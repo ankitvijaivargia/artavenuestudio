@@ -155,8 +155,8 @@
                   {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
                   {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
                   {%- assign hexv = s.hex.value | default: '#cccccc' -%}
-                  {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
-                  {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
+                  {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value | divided_by: 100 -%}{%- endif -%}
+                  {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value | divided_by: 100 -%}{%- endif -%}
                   {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
                   {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
                 {%- endif -%}
@@ -171,8 +171,8 @@
             {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
             {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
             {%- assign hexv = s.hex.value | default: '#cccccc' -%}
-            {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value.amount | times: 1 -%}{%- endif -%}
-            {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value.amount | times: 1 -%}{%- endif -%}
+            {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value | divided_by: 100 -%}{%- endif -%}
+            {%- assign suv = 0 -%}{%- if s.surcharge.value != blank -%}{%- assign suv = s.surcharge.value | divided_by: 100 -%}{%- endif -%}
             {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
             {"name":{{ s.name.value | json }},"cat":{{ s.category.value | default: '' | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }},"surcharge":{{ suv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
           {%- endfor -%}{%- endif -%}
