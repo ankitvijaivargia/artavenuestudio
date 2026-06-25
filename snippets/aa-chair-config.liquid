@@ -3,7 +3,8 @@
   TWO ENGINES IN ONE FILE, gated on cfg.engine:
    - cfg.engine == 'grid'  -> TWO-AXIS priced grid (Size x Material). Availability AND
      price both derive from variants. Per-size material availability greys out
-     impossible combinations. Used by sofas.
+     combinations with NO variant (existence-based, not stock-based: made-to-order).
+     Used by sofas.
    - otherwise              -> single-priced-axis path (tier | size) + property pickers.
      Used by armchairs (tier) and ottomans/benches (size). UNCHANGED.
   params: product
@@ -191,9 +192,10 @@
       for(var g in grid){ if(g.toLowerCase()===kk) return grid[g]; }
       return null;
     }
+    {%- comment -%} existence-based: a combo with a variant is orderable (made-to-order; stock ignored) {%- endcomment -%}
     function matsForSize(s){
       var out=[]; var btns=root.querySelectorAll('[data-grid-mat]');
-      btns.forEach(function(b){ var m=b.getAttribute('data-grid-mat'); var v=variantFor(s,m); if(v && v.available!==false) out.push(m); });
+      btns.forEach(function(b){ var m=b.getAttribute('data-grid-mat'); if(variantFor(s,m)) out.push(m); });
       return out;
     }
     function setHiddenId(id){
