@@ -1,10 +1,17 @@
 {%- comment -%}
   Art Avenue — Generic chair configurator (schema-driven, metafield-reference based).
   TWO ENGINES IN ONE FILE, gated on cfg.engine:
-   - cfg.engine == 'grid'  -> TWO-AXIS priced grid (Size x Material). Availability AND
-     price both derive from variants. Per-size material availability greys out
+   - cfg.engine == 'grid'  -> TWO-AXIS priced grid (Size x Material/Legs). Availability AND
+     price both derive from variants. Per-size second-axis availability greys out
      combinations with NO variant (existence-based, not stock-based: made-to-order).
-     Used by sofas.
+     Used by sofas (Size x Material) and coffee tables (Size x Legs).
+     OPTIONAL cfg.pickers[]: array of finish pickers (coffee tables). Each picker:
+       { key, label, property, category? , branch_by_axis? , order_swatch? }
+       branch_by_axis:true  -> options switch with the second priced axis (e.g. leg finish
+                               by Wood/Metal legs), filtered via cfg.tier_filters[axisValue].
+       branch_by_axis:false -> always-on picker filtered by the picker's own category
+                               (e.g. leather colour, fabric print).
+     When cfg.pickers is absent, the legacy single swatch picker (gridsw) is used (sofa).
    - otherwise              -> single-priced-axis path (tier | size) + property pickers.
      Used by armchairs (tier) and ottomans/benches (size). UNCHANGED.
   params: product
@@ -16,7 +23,7 @@
 {%- assign mf_wood = product.metafields.aav.wood_finishes.value -%}
 
 {%- if cfg.engine == 'grid' -%}
-{%- comment -%} ============================ GRID ENGINE (Size x Material) ============================ {%- endcomment -%}
+{%- comment -%} ============================ GRID ENGINE (Size x Material/Legs) ============================ {%- endcomment -%}
 {%- assign size_opt_name = cfg.size_option | default: 'Size' -%}
 {%- assign mat_opt_name = cfg.material_option | default: 'Material' -%}
 {%- assign size_o = '' -%}{%- assign mat_o = '' -%}
@@ -28,6 +35,7 @@
 {%- assign size_count = size_o.values | size -%}
 {%- assign mat_count = mat_o.values | size -%}
 {%- assign has_wood = false -%}{%- if cfg.wood != blank -%}{%- assign has_wood = true -%}{%- endif -%}
+{%- assign has_pickers = false -%}{%- if cfg.pickers != blank -%}{%- assign has_pickers = true -%}{%- endif -%}
 {%- assign dims_obj = product.metafields.aav.size_dimensions.value -%}
 
 <div class="aa-chair aa-chair--grid" id="aaChair" data-pid="{{ product.id }}">
@@ -36,7 +44,6 @@
   <div class="aa-sofa__group" data-grid-axis="size">
     <div class="aa-sofa__label"><span>{{ cfg.size_label | default: size_opt_name }}</span><span class="aa-sofa__hint" data-grid-sizehint></span></div>
 
-    {%- comment -%} dims box reflects selected size (cm headline + inch sub-line) {%- endcomment -%}
     <div class="aa-sofa__dims" data-grid-dims>
       <i class="ph ph-ruler"></i>
       <span class="aa-sofa__dims-cm" data-grid-dims-cm></span>
@@ -65,7 +72,7 @@
     </button>
   </div>
 
-  {%- comment -%} MATERIAL axis: buttons when >1, static line when ==1 {%- endcomment -%}
+  {%- comment -%} SECOND priced axis (Material / Legs): buttons when >1, static line when ==1 {%- endcomment -%}
   <div class="aa-sofa__group" data-grid-axis="material">
     <div class="aa-sofa__label"><span>{{ cfg.material_label | default: mat_opt_name }}</span><span class="aa-sofa__hint" data-grid-mathint></span></div>
     {%- if mat_count == 1 -%}
@@ -81,7 +88,23 @@
     {%- endif -%}
   </div>
 
-  {%- comment -%} SWATCH picker row (bound to active material) {%- endcomment -%}
+  {%- if has_pickers -%}
+  {%- comment -%} MULTI-PICKER mode (coffee tables): one row per cfg.pickers entry {%- endcomment -%}
+  {%- for p in cfg.pickers -%}
+  <div class="aa-sofa__group" data-grid-picker="{{ p.key | escape }}">
+    <div class="aa-sofa__label"><span>{{ p.label }}</span><span class="aa-sofa__hint" data-cz-selname="gridp-{{ p.key | escape }}-hint"></span></div>
+    <button type="button" class="aa-cz-row" data-cz-open="gridp-{{ p.key | escape }}">
+      <span class="aa-cz-row__k">{{ p.label }}</span>
+      <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-grid-pdot="{{ p.key | escape }}"></span><span data-cz-selname="gridp-{{ p.key | escape }}">Choose</span><i class="ph ph-caret-right"></i></span>
+    </button>
+    <div class="aa-chair__fixed" data-grid-pfixed="{{ p.key | escape }}" hidden>
+      <span class="aa-cz-row__sw" data-grid-pfixeddot="{{ p.key | escape }}"></span>
+      <span data-grid-pfixedname="{{ p.key | escape }}"></span>
+    </div>
+  </div>
+  {%- endfor -%}
+  {%- else -%}
+  {%- comment -%} LEGACY single swatch picker (sofa), bound to active material {%- endcomment -%}
   <div class="aa-sofa__group">
     <button type="button" class="aa-cz-row" data-cz-open="gridsw">
       <span class="aa-cz-row__k" data-grid-swlabel>Colour</span>
@@ -89,6 +112,7 @@
     </button>
     <div class="aa-sofa__swsub" data-grid-swsub>Choose your finish, or order a swatch from &#8377;2,000 to feel it first.</div>
   </div>
+  {%- endif -%}
 
   {%- if has_wood -%}
   <div class="aa-sofa__group" data-grid-wood hidden>
@@ -116,7 +140,6 @@
   };
   </script>
 
-  {%- comment -%} swatch sets keyed by material, filtered via tier_filters; plus optional wood items {%- endcomment -%}
   <script type="application/json" id="aa-grid-sets-{{ product.id }}">
   {
     "materials": {
@@ -145,6 +168,67 @@
         ]
       {%- endfor -%}
     }
+    {%- if has_pickers -%},
+    "pickers": {
+      {%- assign first_p = true -%}
+      {%- for p in cfg.pickers -%}
+        {%- unless first_p -%},{%- endunless -%}{%- assign first_p = false -%}
+        {%- assign p_order = true -%}{%- if p.order_swatch == false -%}{%- assign p_order = false -%}{%- endif -%}
+        {{ p.key | json }}: {
+          "label": {{ p.label | json }},
+          "property": {{ p.property | default: p.label | json }},
+          "orderSwatch": {{ p_order | json }},
+          "branch": {{ p.branch_by_axis | default: false | json }},
+          {%- if p.branch_by_axis -%}
+          "sets": {
+            {%- assign first_b = true -%}
+            {%- for mv in mat_o.values -%}
+              {%- assign bfilt = tf[mv] -%}
+              {%- unless first_b -%},{%- endunless -%}{%- assign first_b = false -%}
+              {{ mv | json }}: [
+                {%- assign first_bi = true -%}
+                {%- assign blist = mf_swatches -%}{%- if p.source == 'wood_finishes' -%}{%- assign blist = mf_wood -%}{%- endif -%}
+                {%- if blist != blank -%}{%- for s in blist -%}
+                  {%- assign cat = s.category.value | default: '' -%}
+                  {%- assign keep = true -%}
+                  {%- if bfilt.category != blank and cat != bfilt.category -%}{%- assign keep = false -%}{%- endif -%}
+                  {%- if bfilt.exclude_category != blank and cat == bfilt.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
+                  {%- if keep -%}
+                    {%- unless first_bi -%},{%- endunless -%}{%- assign first_bi = false -%}
+                    {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
+                    {%- assign hexv = s.hex.value | default: '#cccccc' -%}
+                    {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value | divided_by: 100 -%}{%- endif -%}
+                    {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
+                    {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
+                  {%- endif -%}
+                {%- endfor -%}{%- endif -%}
+              ]
+            {%- endfor -%}
+          }
+          {%- else -%}
+          "items": [
+            {%- assign first_pi = true -%}
+            {%- assign plist = mf_swatches -%}{%- if p.source == 'wood_finishes' -%}{%- assign plist = mf_wood -%}{%- endif -%}
+            {%- if plist != blank -%}{%- for s in plist -%}
+              {%- assign cat = s.category.value | default: '' -%}
+              {%- assign keep = true -%}
+              {%- if p.category != blank and cat != p.category -%}{%- assign keep = false -%}{%- endif -%}
+              {%- if p.exclude_category != blank and cat == p.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
+              {%- if keep -%}
+                {%- unless first_pi -%},{%- endunless -%}{%- assign first_pi = false -%}
+                {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
+                {%- assign hexv = s.hex.value | default: '#cccccc' -%}
+                {%- assign spv = 2000 -%}{%- if s.swatch_price.value != blank -%}{%- assign spv = s.swatch_price.value | divided_by: 100 -%}{%- endif -%}
+                {%- assign metav = '' -%}{%- if s.description.value != blank -%}{%- assign metav = s.description.value -%}{%- elsif s.composition.value != blank -%}{%- assign metav = s.composition.value -%}{%- endif -%}
+                {"name":{{ s.name.value | json }},"cat":{{ cat | json }},"hex":{{ hexv | json }},"swatch":{{ spv | json }}{%- if img != '' -%},"img":{{ img | json }}{%- endif -%}{%- if metav != '' -%},"meta":{{ metav | json }}{%- endif -%}}
+              {%- endif -%}
+            {%- endfor -%}{%- endif -%}
+          ]
+          {%- endif -%}
+        }
+      {%- endfor -%}
+    }
+    {%- endif -%}
     {%- if has_wood -%},
     "wood": [
       {%- assign first_w = true -%}
@@ -169,6 +253,7 @@
     var grid=(window.AA_GRID && window.AA_GRID[pid])||{};
     var sets={}; try{ sets=JSON.parse(document.getElementById('aa-grid-sets-'+pid).textContent); }catch(e){ sets={}; }
     var mats=sets.materials||{};
+    var pickers=sets.pickers||null;
     var woodItems=sets.wood||null;
     var swProp={{ cfg.swatch_property | default: 'Upholstery' | json }};
     var woodProp={% if has_wood %}{{ cfg.wood.property | default: 'Wood Finish' | json }}{% else %}'Wood Finish'{% endif %};
@@ -192,7 +277,6 @@
       for(var g in grid){ if(g.toLowerCase()===kk) return grid[g]; }
       return null;
     }
-    {%- comment -%} existence-based: a combo with a variant is orderable (made-to-order; stock ignored) {%- endcomment -%}
     function matsForSize(s){
       var out=[]; var btns=root.querySelectorAll('[data-grid-mat]');
       btns.forEach(function(b){ var m=b.getAttribute('data-grid-mat'); if(variantFor(s,m)) out.push(m); });
@@ -254,6 +338,51 @@
       }
     }
 
+    {%- comment -%} ---- MULTI-PICKER (coffee tables) ---- {%- endcomment -%}
+    function pickerItems(pk){
+      var p=pickers[pk]; if(!p) return [];
+      if(p.branch){ return (p.sets && p.sets[state.mat]) || []; }
+      return p.items || [];
+    }
+    function applyPickerItem(pk, item){
+      if(!item) return;
+      var p=pickers[pk]; if(!p) return;
+      state.picks['p_'+pk]=item;
+      var nm=root.querySelector('[data-cz-selname="gridp-'+pk+'"]'); if(nm) nm.textContent=item.name;
+      var hint=root.querySelector('[data-cz-selname="gridp-'+pk+'-hint"]'); if(hint) hint.textContent=item.name;
+      var dot=root.querySelector('[data-grid-pdot="'+pk+'"]'); if(dot){ dot.style.background= item.img?("center/cover no-repeat url('"+item.img+"')"):(item.hex||'#cccccc'); }
+      var fdot=root.querySelector('[data-grid-pfixeddot="'+pk+'"]'); if(fdot){ fdot.style.background= item.img?("center/cover no-repeat url('"+item.img+"')"):(item.hex||'#cccccc'); }
+      var fname=root.querySelector('[data-grid-pfixedname="'+pk+'"]'); if(fname) fname.textContent=item.name;
+      if(p.property) setProp(p.property, item.name);
+    }
+    function layoutPicker(pk){
+      var p=pickers[pk]; if(!p) return;
+      var grp=root.querySelector('[data-grid-picker="'+pk+'"]'); if(!grp) return;
+      var items=pickerItems(pk);
+      var pickRow=grp.querySelector('[data-cz-open="gridp-'+pk+'"]');
+      var fixed=grp.querySelector('[data-grid-pfixed="'+pk+'"]');
+      if(items.length===0){ grp.hidden=true; return; }
+      grp.hidden=false;
+      if(items.length===1){ if(pickRow) pickRow.hidden=true; if(fixed) fixed.hidden=false; }
+      else { if(pickRow) pickRow.hidden=false; if(fixed) fixed.hidden=true; }
+    }
+    function registerPicker(pk){
+      if(!window.aaCz || !window.aaCz.register) return;
+      var p=pickers[pk]; if(!p) return;
+      var items=pickerItems(pk);
+      if(items.length){ window.aaCz.register('gridp-'+pk, { label: p.label, items: items, orderSwatch: p.orderSwatch !== false }); }
+    }
+    function refreshPicker(pk){
+      layoutPicker(pk);
+      registerPicker(pk);
+      var items=pickerItems(pk);
+      var chosen=state.picks['p_'+pk];
+      if(!chosen || (pickers[pk].branch)){ chosen=items[0]; }
+      if(chosen) applyPickerItem(pk, chosen);
+    }
+    function refreshAllPickers(){ if(!pickers) return; for(var pk in pickers){ refreshPicker(pk); } }
+
+    {%- comment -%} ---- LEGACY single picker (sofa) ---- {%- endcomment -%}
     function registerSwatch(){
       if(!window.aaCz || !window.aaCz.register) return;
       var items=mats[state.mat]||[];
@@ -262,6 +391,7 @@
       if(woodItems){ window.aaCz.register('gridwood', { label: woodLabel, items: woodItems, orderSwatch: woodOrderSwatch }); }
     }
     function refreshSwatchRow(){
+      if(pickers){ refreshAllPickers(); if(woodItems && window.aaCz && window.aaCz.register){ window.aaCz.register('gridwood', { label: woodLabel, items: woodItems, orderSwatch: woodOrderSwatch }); } return; }
       var word=matLabelWord();
       var lbl=root.querySelector('[data-grid-swlabel]'); if(lbl) lbl.textContent=word;
       var sub=root.querySelector('[data-grid-swsub]');
@@ -317,7 +447,10 @@
     function bindChoose(){
       if(!window.aaCz || !window.aaCz.onChoose) return;
       window.aaCz.onChoose(function(group, item){
-        if(group==='gridsw'){
+        if(pickers && group.indexOf('gridp-')===0){
+          var pk=group.slice(6);
+          applyPickerItem(pk, item);
+        } else if(group==='gridsw'){
           state.picks['sw_'+state.mat]=item;
           var nm=root.querySelector('[data-cz-selname="gridsw"]'); if(nm) nm.textContent=item.name;
           var dot=root.querySelector('[data-grid-swdot]'); if(dot){ dot.style.background= item.img?("center/cover no-repeat url('"+item.img+"')"):(item.hex||'#cccccc'); }
