@@ -1,0 +1,88 @@
+{%- comment -%}
+ART AVENUE — MATERIAL TRUST-NOTES LIBRARY
+
+WHAT THIS IS
+------------
+A standing set of pre-approved, on-brand notes that appear under the
+Construction / Material buttons on a PDP when a given option is selected.
+They set buyer expectations BEFORE purchase and frame natural variation as
+artisanal value rather than a defect — protecting against "it didn't match
+the photo" complaints while reinforcing the handmade story.
+
+HOW IT WORKS (engine: snippets/aa-chair-config.liquid, GRID path)
+-----------------------------------------------------------------
+The configurator JSON carries an OPTIONAL map:
+
+  "material_notes": {
+    "<exact option value>": "<note text>",
+    ...
+  }
+
+- Key MUST exactly match the Construction/Material option value (case-sensitive),
+  e.g. "Kilim", "Leather", "Genuine Leather", "Solid Wood".
+- The engine renders one hidden note per entry and shows only the one whose key
+  matches the active material; it updates live as the buyer toggles options and
+  on page load. Products without a material_notes key are unaffected.
+- Styling reuses the existing helper-text look (aa-sofa__swsub) — no CSS needed.
+- Notes are display-only; they are NOT pickers, variants, or line-item properties.
+
+WRITING RULES
+-------------
+1. Frame variation as the value, not a disclaimer. Lead with the craft, then the
+   consequence ("no two alike"), then reassurance.
+2. Be specific about WHAT varies (pattern, colour, grain, tone, texture) and WHY
+   (hand-cut from assorted rugs; natural hide; solid timber).
+3. 1–2 sentences. Calm, confident, luxury register. No exclamation marks.
+4. State plainly that the piece will differ from the photographs when true.
+5. One note per material value. Don't stack multiple concerns into a wall of text.
+6. Never promise uniformity you can't guarantee; never apologise.
+
+APPROVED LIBRARY (copy these; adapt product noun only)
+------------------------------------------------------
+Kilim:
+  "Each kilim panel is hand-cut from an assorted vintage rug, so no two pieces
+   are alike. The exact pattern, colours and weave will differ from the
+   photographs — that one-of-a-kind character is the essence of the piece."
+
+Leather / Genuine Leather:
+  "Made from full-grain natural leather. Subtle variation in grain, tone and
+   markings is inherent to genuine hide and will develop a richer patina with
+   use — each piece is unique."
+
+Solid Wood (exposed timber):
+  "Crafted from solid timber, so grain, knots and tone vary from piece to piece.
+   Your item will have its own natural character and won't match the photographs
+   exactly."
+
+Marble / Stone / Travertine top:
+  "Natural stone is unique — veining, colour and surface markings differ on every
+   top, so your piece will not be identical to the one shown."
+
+Handwoven / Cane / Rattan:
+  "Handwoven by artisans, so minor irregularities in the weave are natural and
+   expected — they are the signature of genuine handwork, not a flaw."
+
+WHEN TO APPLY
+-------------
+- Kilim: ALWAYS (highest variance; assorted rug sourcing).
+- Genuine leather, solid wood, natural stone, handweave: apply whenever that
+  material is a selectable construction/material option, or when the material is
+  fixed but variation is significant.
+- Do NOT add a note for engineered/uniform materials (e.g. printed fabric,
+  veneer, powder-coated metal) unless there is a real variation to disclose.
+
+EXAMPLE (Jaisalmer Campaign Trunk — storage pilot)
+--------------------------------------------------
+  "material_notes": {
+    "Kilim": "Each kilim panel is hand-cut from an assorted vintage rug, so no
+     two pieces are alike. The exact pattern, colours and weave will differ from
+     the photographs — that one-of-a-kind character is the essence of the piece."
+  }
+
+TO SET / UPDATE
+---------------
+Update the product's aav.configurator JSON via metafieldsSet (type: json),
+preserving all existing keys and adding/merging material_notes. Companion docs:
+  - snippets/aa-chair-schema-templates.txt.liquid  (configurator schemas)
+  - snippets/aa-alt-text-convention.txt.liquid     (image alt-text standard)
+{%- endcomment -%}
