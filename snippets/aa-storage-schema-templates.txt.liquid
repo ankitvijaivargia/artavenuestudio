@@ -22,6 +22,26 @@ one fixed Kilim + leather trim (limited) + metal finish. Leather-only pieces
 show the full leather colour range + metal finish.
 
 =========================================================================
+LEATHER IS TWO SEPARATE LIBRARIES, SPLIT BY USE (category value)
+=========================================================================
+There are TWO leather swatch libraries, distinguished only by the swatch
+'category' field. The engine filters by category, so a product simply points at
+whichever library fits — no code change, ever.
+
+  UPHOLSTERY LEATHER  — category 'Leather'           (soft seating hides)
+      Used by: sofas, lounge chairs, bed headboards, ottomans, benches.
+  FURNITURE LEATHER   — category 'Furniture Leather'  (hard-furniture leather)
+      Used by: trunks, coffee tables, chests of drawers, wardrobes, consoles.
+
+They are DIFFERENT colour ranges (10 each), same ₹2,000 swatch price. A product
+points its leather picker/tier_filter at ONE category and lists that library's
+IDs in aav.swatches. Never mix the two on one product.
+  - Upholstery product  -> category 'Leather'
+  - Non-upholstery piece -> category 'Furniture Leather'
+(Coffee tables may instead use the table-specific 'Table Leather' set — that is a
+per-category choice; the point is the engine keys entirely off 'category'.)
+
+=========================================================================
 ENGINE MAPPING (why the JSON looks like a 'grid')
 =========================================================================
 Both patterns run on the GRID engine. The CONSTRUCTION axis (Leather | Kilim)
@@ -77,18 +97,20 @@ WHENEVER YOU ADD A SWATCH TO A SHARED LIBRARY:
   3. Re-check any tier_filters.include_names — a name listed there must also be
      present in aav.swatches or it won't resolve.
 
-The canonical Leather library is 10 IDs (see SHARED LEATHER LIBRARY below). Any
-leather product that should show the full range must list all 10. Intentionally
-limited sets (e.g. kilim trim = Ebony + Chestnut only) are the deliberate
-exception — short by design, not a gap.
+Each leather library is 10 IDs (see the two LIBRARY sections below). Any leather
+product that should show its full range must list all 10 of the RIGHT library.
+Intentionally limited sets (e.g. kilim trim = Ebony + Chestnut only) are the
+deliberate exception — short by design, not a gap.
 
 AUDIT QUERY (run after any library change): fetch products with
 `metafield:aav.swatches`, expand each swatches reference's name+category, and
-compare each product's leather count against the canonical 10. Anything short
-(other than the kilim-trim products) needs the missing IDs appended.
+compare each product's leather count against the canonical 10 for ITS library
+('Leather' for upholstery pieces, 'Furniture Leather' for hard furniture).
+Anything short (other than the kilim-trim products) needs the missing IDs appended.
 
 =========================================================================
-SHARED LEATHER LIBRARY (swatch metaobjects, category 'Leather', all ₹2,000)
+UPHOLSTERY LEATHER LIBRARY (category 'Leather', all ₹2,000)
+Use for: sofas, lounge chairs, bed headboards, ottomans, benches.
 =========================================================================
   Ebony 239701065775   Chestnut 239700967471  Cognac 239701000239
   Whiskey 241433542703 Sand 239701033007      Berry Red 239701131311
@@ -100,11 +122,36 @@ Each product lists which leather IDs it exposes via aav.swatches (3, 5, or all;
 or none). Hardware IDs are always all three. Swatches in include_names MUST also
 be present in aav.swatches or they won't resolve.
 
-CANONICAL FULL-RANGE LEATHER ORDER (use when a product should show all 10):
+CANONICAL FULL-RANGE ORDER (use when a product should show all 10):
   Ebony, Chestnut, Cognac, Whiskey, Sand, Berry Red, Deep Forest, Olive,
   Indigo, Grey
   = [239701065775, 239700967471, 239701000239, 241433542703, 239701033007,
      239701131311, 239701098543, 241433509935, 241433477167, 241433444399]
+
+=========================================================================
+FURNITURE LEATHER LIBRARY (category 'Furniture Leather', all ₹2,000)
+Use for: trunks, coffee tables, chests of drawers, wardrobes, consoles.
+(A SEPARATE colour range from upholstery leather — never mix the two.)
+=========================================================================
+  Tan 241510973487       Saddle 241511006255    Mahogany 241511071791
+  Espresso 241511104559  Oxblood 241511137327   Hazel 241511497775
+  Slate 241511530543     Onyx 241511563311      Bottle Green 241511596079
+  Navy 241511628847
+Metal finish: same shared 'Storage Hardware' set as above (Antique Brass,
+Silver, Gold).
+
+CANONICAL FULL-RANGE ORDER (use when a product should show all 10):
+  Tan, Saddle, Mahogany, Espresso, Oxblood, Hazel, Slate, Onyx, Bottle Green, Navy
+  = [241510973487, 241511006255, 241511071791, 241511104559, 241511137327,
+     241511497775, 241511530543, 241511563311, 241511596079, 241511628847]
+
+To point a hard-furniture product at this library:
+  - branching picker:  "tier_filters":{"Leather":{"category":"Furniture Leather"}}
+  - always-on picker:   {"key":"leather","label":"Leather Colour","category":"Furniture Leather","property":"Leather Colour"}
+  - aav.swatches: the 10 Furniture Leather IDs above (+ hardware IDs if fitted).
+NOTE: these are currently HEX-ONLY (flat colour chips). When real hide
+photography exists, add it to each swatch's 'photo' field and the picker shows
+the texture automatically.
 
 =========================================================================
 TEMPLATE A — LEATHER PRODUCT, SINGLE SIZE (full colour range)
@@ -128,6 +175,8 @@ aav.configurator =
 Notes: tier_filters with no include_names = ALL leather swatches in aav.swatches
 show. To expose only 3/5 colours, list only those IDs in aav.swatches. To show
 the full range, list all 10 canonical IDs (see propagation rule above).
+For a HARD-FURNITURE leather piece, set tier_filters category to
+'Furniture Leather' and list the 10 Furniture Leather IDs instead.
 
 =========================================================================
 TEMPLATE B — KILIM PRODUCT, SINGLE SIZE (fixed kilim + limited trim)
@@ -190,7 +239,9 @@ BUILD CHECKLIST (new leather or kilim piece)
 2. metafieldsSet: aav.configurator (Template A/B/C), aav.swatches (leather IDs to
    expose + 3 hardware IDs), aav.size_dimensions (ONE KEY PER SIZE VALUE).
    Confirm unit_map keys == size_dimensions keys == size option values.
-   For full-range leather, list all 10 canonical IDs (propagation rule, #2 gotcha).
+   For full-range leather, list all 10 canonical IDs of the RIGHT library —
+   'Leather' for upholstery pieces, 'Furniture Leather' for hard furniture
+   (propagation rule, #2 gotcha).
 3. Upload photos; set alt text per aa-alt-text-convention; publish (ACTIVE) + add
    to relevant collection (tag-based smart collection).
 4. AFTER any later change to a shared swatch library, re-run the audit query and
