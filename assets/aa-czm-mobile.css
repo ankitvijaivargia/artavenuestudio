@@ -1,0 +1,30 @@
+/* Art Avenue — Customization modal mobile bottom-sheet detail.
+   Loaded after aa.css so these rules win where they overlap the base mobile block.
+   Desktop is unaffected (all rules are display:none default + inside the mobile media query). */
+.aa-czm__back{display:none;}
+@media (max-width:782px){
+  /* Make the body a bounded flex scroller so the swatch grid scrolls within the
+     fixed-height dialog. Without min-height:0 a flex child won't shrink below its
+     content, so the grid overflowed the dialog (clipped, no scroll) — which is why
+     Leather (10 swatches) showed only the first rows while Fabric (4) fit. */
+  .aa-czm__dialog{display:flex;flex-direction:column;}
+  .aa-czm__head{flex:0 0 auto;}
+  .aa-czm__body{position:relative;flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .aa-czm__grid{overflow-y:visible;padding-bottom:24px;}
+  .aa-czm__panel{
+    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    border-left:none;border-top:1px solid var(--border-hairline);
+    background:var(--surface-page,#f5f0e6);
+    box-shadow:0 -18px 48px -24px rgba(43,40,36,.5);
+    max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    transform:translateY(100%);transition:transform var(--dur-base) var(--ease-luxe);
+    padding:18px 20px calc(18px + env(safe-area-inset-bottom));
+  }
+  .aa-czm.is-detail .aa-czm__panel{transform:translateY(0);}
+  .aa-czm__back{
+    display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+    background:none;border:none;padding:4px 0 12px;cursor:pointer;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text-accent);
+  }
+}
