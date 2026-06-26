@@ -573,7 +573,7 @@
           <span class="aa-cz-row__k">{{ axis.label }}</span>
           <span class="aa-cz-row__v"><span class="aa-cz-row__sw" data-chair-swdot="{{ axis.key | escape }}"></span><span data-cz-selname="chair-{{ axis.key | escape }}">Choose</span><i class="ph ph-caret-right"></i></span>
         </button>
-        <div class="aa-chair__fixed" data-chair-fixedrow="{{ axis.key | escape }}" style="align-items:center;gap:10px;padding:14px 16px;border:1px solid rgba(0,0,0,.12);border-radius:8px" hidden>
+        <div class="aa-chair__fixed" data-chair-fixedrow="{{ axis.key | escape }}" style="display:none;align-items:center;gap:10px;padding:14px 16px;border:1px solid rgba(0,0,0,.12);border-radius:8px">
           <span class="aa-cz-row__sw" data-chair-fixeddot="{{ axis.key | escape }}"></span>
           <span data-chair-fixedname="{{ axis.key | escape }}"></span>
         </div>
@@ -753,8 +753,8 @@
     var fixed=group.querySelector('[data-chair-fixedrow="'+axisKey+'"]');
     if(items.length===0){ group.hidden=true; return; }
     group.hidden=false;
-    if(items.length===1){ if(pick) pick.hidden=true; if(fixed){ fixed.hidden=false; fixed.style.display='flex'; } }
-    else { if(pick) pick.hidden=false; if(fixed){ fixed.hidden=true; fixed.style.display='none'; } }
+    if(items.length===1){ if(pick){ pick.hidden=true; pick.style.display='none'; } if(fixed){ fixed.hidden=false; fixed.style.display='flex'; } }
+    else { if(pick){ pick.hidden=false; pick.style.display=''; } if(fixed){ fixed.hidden=true; fixed.style.display='none'; } }
   }
 
   function tierLabelWord(){
