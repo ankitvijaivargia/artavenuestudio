@@ -68,7 +68,7 @@
     {%- endif -%}
 
     <button type="button" class="aa-sofa__custom" data-cz-consult>
-      <i class="ph ph-ruler"></i> Need an L-shape or a custom size? <span>Speak with a design consultant ›</span>
+      <i class="ph ph-ruler"></i> {{ cfg.custom_size_text | default: 'Need an L-shape or a custom size?' }} <span>Speak with a design consultant ›</span>
     </button>
   </div>
 
@@ -573,7 +573,7 @@
   {%- endfor -%}
 
   <button type="button" class="aa-sofa__custom" data-cz-consult>
-    <i class="ph ph-ruler"></i> Want a bespoke finish or your own fabric? <span>Speak with a design consultant ›</span>
+    <i class="ph ph-ruler"></i> {{ cfg.custom_size_text | default: 'Want a bespoke finish or your own fabric?' }} <span>Speak with a design consultant ›</span>
   </button>
 
   <script>
@@ -617,7 +617,6 @@
                 {%- assign keep = true -%}
                 {%- if filt.category != blank and cat != filt.category -%}{%- assign keep = false -%}{%- endif -%}
                 {%- if filt.exclude_category != blank and cat == filt.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
-                {%- if filt.include_names != blank -%}{%- assign _nm = s.name.value -%}{%- unless filt.include_names contains _nm -%}{%- assign keep = false -%}{%- endunless -%}{%- endif -%}
                 {%- if keep -%}
                   {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
                   {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
