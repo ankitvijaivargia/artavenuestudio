@@ -1,0 +1,52 @@
+{%- comment -%}
+ART AVENUE — PRODUCT IMAGE ALT-TEXT CONVENTION
+Apply to every product image at creation time. Alt text is set on the MediaImage
+via the `fileUpdate` mutation (input: { id, alt }). IDs come from
+product.media -> ... on MediaImage { id }.
+
+WHY: empty alt = SEO + accessibility miss. Consistent alt = repeatable, scalable,
+and safe (no per-image guessing about what the photo shows).
+
+PATTERN
+-------
+  {Product name} — {material/construction} {piece type} by Art Avenue{, shot suffix}
+
+  - Base (everything before the suffix) is IDENTICAL on every image of the product.
+    It carries the SEO weight: product name + key material terms + brand.
+  - First/primary image: NO suffix (cleanest for the main listing image).
+  - Every other image: add a short, SHOT-NEUTRAL suffix for accessibility distinctness.
+
+SHOT SUFFIXES (use only what is verifiable without seeing the photo)
+-------------------------------------------------------------------
+  Generic, always safe:   view 2, view 3, view 4, ...
+  Safe descriptors:       hardware detail, corner detail, texture detail,
+                          closure detail, in a styled setting, made to order
+  AVOID claiming specifics you cannot verify from the filename alone
+  (e.g. "open interior", "brass corners", "leather vs kilim") unless you have
+  confirmed which image is which. Shot-neutral beats wrong.
+
+RULES
+-----
+  - Keep under ~125 characters.
+  - Do NOT keyword-stuff: the base already repeats the key terms across images;
+    that is sufficient. Do not pile synonyms into the suffix.
+  - One language (storefront English).
+  - Never start with "image of" / "photo of" (screen readers already announce it).
+
+EXAMPLE — Jaisalmer Campaign Trunk (storage pilot)
+--------------------------------------------------
+  img 1: Jaisalmer Campaign Trunk — handcrafted leather and kilim trunk by Art Avenue
+  img 2: Jaisalmer Campaign Trunk — handcrafted leather and kilim trunk by Art Avenue, view 2
+  img n: Jaisalmer Campaign Trunk — handcrafted leather and kilim trunk by Art Avenue, hardware detail
+
+MUTATION SHAPE
+--------------
+  mutation Alt($files: [FileUpdateInput!]!) {
+    fileUpdate(files: $files) {
+      files { ... on MediaImage { id alt } }
+      userErrors { field message code }
+    }
+  }
+  variables.files = [ { id: "gid://shopify/MediaImage/...", alt: "..." }, ... ]
+  (fileUpdate accepts the full batch in one call.)
+{%- endcomment -%}
