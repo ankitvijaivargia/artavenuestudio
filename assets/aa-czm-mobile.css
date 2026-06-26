@@ -2,30 +2,28 @@
    Loaded after aa.css so these rules win where they overlap the base mobile block. */
 .aa-czm__back{display:none;}
 @media (max-width:782px){
-  /* Dialog: fixed-height flex COLUMN with hidden overflow.
-     head (auto) sits above body (flex-fills + scrolls). Keeping the column intact is
-     essential — the body needs flex:1 to get a bounded height to scroll within. */
+  /* Dialog fills the screen; we do NOT rely on flex to bound the scroll area. */
   .aa-czm.is-open .aa-czm__dialog{
-    display:flex;flex-direction:column;
-    height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
-    overflow:hidden;
+    display:block;position:fixed;left:0;top:0;right:0;
+    width:100vw;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+    overflow:hidden;transform:none;border-radius:0;
   }
-  .aa-czm.is-open .aa-czm__head{flex:0 0 auto;}
-  /* Body is THE single scroll area. display:block (not grid) so it resolves a height
-     and scrolls reliably on iOS/Android; flex:1 + min-height:0 bound it to the dialog. */
-  .aa-czm.is-open .aa-czm__body{
-    display:block !important;flex:1 1 auto;min-height:0;
-    overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
-  }
-  /* Grid lays out inside the scrolling body; it must never scroll or cap its own height. */
+  /* Head sits at the top, fixed size. */
+  .aa-czm.is-open .aa-czm__head{position:relative;z-index:1;}
+  /* Body is irrelevant for sizing now; let it be a plain block. */
+  .aa-czm.is-open .aa-czm__body{display:block !important;overflow:visible !important;min-height:0;}
+  /* THE SCROLLER: the grid gets an explicit height cap (viewport minus the header)
+     and scrolls on its own. This does not depend on any flex height resolution,
+     which is what kept failing. ~150px reserves space for the eyebrow + title + tabs. */
   .aa-czm.is-open .aa-czm__grid{
-    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
-    overflow:visible !important;max-height:none !important;height:auto;
-    padding:18px 18px 32px;
+    display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:12px !important;
+    max-height:calc(100dvh - 150px) !important;
+    overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    padding:18px 18px 40px !important;
   }
-  /* Detail panel: fixed bottom sheet that slides up over the scrolling grid. */
+  /* Detail panel: fixed bottom sheet that slides up over the grid. */
   .aa-czm__panel{
-    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    position:fixed;left:0;right:0;bottom:0;z-index:5;
     border-left:none;border-top:1px solid var(--border-hairline);
     background:var(--surface-page,#f5f0e6);
     box-shadow:0 -18px 48px -24px rgba(43,40,36,.5);
