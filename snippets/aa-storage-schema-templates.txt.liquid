@@ -1,0 +1,117 @@
+{%- comment -%}
+ART AVENUE — STORAGE / LEATHER & KILIM PRODUCT SCHEMA TEMPLATES
+
+Companion to:
+  - snippets/aa-chair-schema-templates.txt.liquid   (chair/sofa configurator schemas)
+  - snippets/aa-alt-text-convention.txt.liquid      (image alt-text standard)
+  - snippets/aa-material-notes-library.txt.liquid    (material trust notes)
+
+=========================================================================
+GOVERNING RULE — LEATHER & KILIM ARE ALWAYS SEPARATE PRODUCTS
+=========================================================================
+Leather and kilim are NEVER a construction toggle on one product. Each is its
+own product / PDP. Both are FIXED PRICE, SINGLE VARIANT, with free line-item
+property pickers (no priced second axis).
+
+  LEATHER product: full Leather Colour picker + Metal Finish.
+  KILIM product:  Kilim shown as a FIXED LABEL (with trust note) + a LIMITED
+                  Leather Trim picker + Metal Finish.
+
+Wherever kilim is the main top fabric on ANY furniture category, the PDP shows:
+one fixed Kilim + leather trim (limited) + metal finish. Leather-only pieces
+show the full leather colour range + metal finish.
+
+=========================================================================
+ENGINE MAPPING (why the JSON looks like a 'grid')
+=========================================================================
+Both patterns run on the GRID engine as a DEGENERATE SINGLE-CELL GRID:
+  - Option 'Size'        = single value 'One Size'
+  - Option 'Construction'= single value ('Leather' OR 'Kilim')
+  - ONE variant, inventoryPolicy CONTINUE (made to order), fixed price.
+Because the material axis has one value, the engine renders it as a static
+fixed label (mat_count==1 path) — no toggle. Pickers ride on top via cfg.pickers[].
+Dimensions come from aav.size_dimensions (keyed by 'One Size'), NOT dim_w/d/h.
+
+The leather picker uses branch_by_axis:true so it filters via tier_filters keyed
+by the single Construction value. include_names limits which swatches show (kilim).
+
+=========================================================================
+SHARED LEATHER LIBRARY (swatch metaobjects, category 'Leather', all ₹2,000)
+=========================================================================
+  Ebony 239701065775   Chestnut 239700967471  Cognac 239701000239
+  Whiskey 241433542703 Sand 239701033007      Berry Red 239701131311
+  Deep Forest 239701098543  Olive 241433509935  Indigo 241433477167
+  Grey 241433444399
+Metal finish (swatch category 'Storage Hardware'):
+  Antique Brass 241428234287  Silver 241428267055  Gold 241428299823
+Each product lists which leather IDs it exposes via aav.swatches (3, 5, or all;
+or none). Hardware IDs are always all three.
+
+=========================================================================
+TEMPLATE A — LEATHER PRODUCT (full colour range)
+=========================================================================
+Product: Size=[One Size], Construction=[Leather]; 1 variant; CONTINUE; fixed price.
+aav.swatches = [ ...leather IDs to expose..., 3 hardware IDs ]
+aav.size_dimensions = {"One Size":{"cm":"45 × 45 × 45 cm","in":"17.7 × 17.7 × 17.7 in"}}
+aav.configurator =
+{
+  "engine":"grid",
+  "size_option":"Size","material_option":"Construction",
+  "size_label":"Dimensions","material_label":"Construction",
+  "custom_size_text":"Need a custom size?",
+  "unit_map":{"One Size":"45 × 45 × 45 cm"},
+  "tier_filters":{"Leather":{"category":"Leather"}},
+  "pickers":[
+    {"key":"leather","label":"Leather Colour","branch_by_axis":true,"property":"Leather Colour","order_swatch":true},
+    {"key":"hardware","label":"Metal Finish","category":"Storage Hardware","property":"Metal Finish","order_swatch":false}
+  ]
+}
+Notes: no material_notes (unless you want a generic leather-patina note from the
+material-notes library). tier_filters has no include_names = ALL leather swatches
+in aav.swatches show. To expose only 3/5 colours, simply list only those IDs in
+aav.swatches.
+
+=========================================================================
+TEMPLATE B — KILIM PRODUCT (fixed kilim + limited trim)
+=========================================================================
+Product: Size=[One Size], Construction=[Kilim]; 1 variant; CONTINUE; fixed price.
+aav.swatches = [ Ebony 239701065775, Chestnut 239700967471, 3 hardware IDs ]
+aav.size_dimensions = {"One Size":{...}}
+aav.configurator =
+{
+  "engine":"grid",
+  "size_option":"Size","material_option":"Construction",
+  "size_label":"Dimensions","material_label":"Construction",
+  "custom_size_text":"Need a custom size?",
+  "unit_map":{"One Size":"45 × 45 × 45 cm"},
+  "material_notes":{"Kilim":"Each kilim panel is hand-cut from an assorted vintage rug, so no two pieces are alike. The exact pattern, colours and weave will differ from the photographs — that one-of-a-kind character is the essence of the piece."},
+  "tier_filters":{"Kilim":{"category":"Leather","include_names":["Ebony","Chestnut"]}},
+  "pickers":[
+    {"key":"leather","label":"Leather Trim","branch_by_axis":true,"property":"Leather Trim","order_swatch":true},
+    {"key":"hardware","label":"Metal Finish","category":"Storage Hardware","property":"Metal Finish","order_swatch":false}
+  ]
+}
+Notes:
+- Kilim is the single Construction value -> renders as a fixed label, NOT a picker.
+- material_notes['Kilim'] shows the trust note under the construction label.
+- tier_filters.Kilim.include_names limits trim to [Ebony, Chestnut]. The two IDs
+  MUST also be present in aav.swatches or they won't resolve.
+- Picker label is 'Leather Trim' (vs 'Leather Colour' on leather products).
+
+=========================================================================
+WORKED EXAMPLES (storage pilot)
+=========================================================================
+Kilim Trunk:  Product 8322548826159 (Jaisalmer Campaign Trunk), ACTIVE.
+Leather Trunk: Product 8322565931055 (Jaisalmer Campaign Trunk — Leather), DRAFT.
+Both: ₹68,000, One Size, 45×45×45 cm.
+
+=========================================================================
+BUILD CHECKLIST (new leather or kilim piece)
+=========================================================================
+1. productSet (synchronous:true): Size=[One Size], Construction=[Leather|Kilim],
+   1 variant, CONTINUE, price. Tags include category + material + 'Made to Order'.
+2. metafieldsSet: aav.configurator (Template A or B), aav.swatches (leather IDs to
+   expose + 3 hardware IDs), aav.size_dimensions.
+3. Upload photos; set alt text per aa-alt-text-convention; publish (ACTIVE) + add
+   to relevant collection (tag-based smart collection).
+{%- endcomment -%}
