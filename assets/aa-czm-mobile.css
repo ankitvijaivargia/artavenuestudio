@@ -1,16 +1,20 @@
 /* Art Avenue — Customization modal mobile bottom-sheet detail.
    Loaded after aa.css so these rules win where they overlap the base mobile block.
-   Desktop is unaffected (all rules are display:none default + inside the mobile media query). */
+   Desktop is unaffected (rules are display:none default + inside the mobile media query). */
 .aa-czm__back{display:none;}
 @media (max-width:782px){
-  /* Dialog is a fixed-height flex column: head (auto) + body (fills, scrolls). */
-  .aa-czm.is-open .aa-czm__dialog{display:flex;flex-direction:column;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden;}
-  .aa-czm.is-open .aa-czm__head{flex:0 0 auto;}
-  /* The body becomes the bounded scroll area. Force block layout (was display:grid
-     in the base CSS, which let the swatch grid expand past the dialog and clip). */
-  .aa-czm.is-open .aa-czm__body{display:block;flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  /* Grid scrolls within the body; never establishes its own clipped height. */
-  .aa-czm.is-open .aa-czm__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;overflow:visible;max-height:none;padding:18px 18px 28px;}
+  /* Single scroll container model: the DIALOG itself scrolls as one piece.
+     This avoids nested flex/grid height traps that froze scrolling entirely. */
+  .aa-czm.is-open .aa-czm__dialog{
+    display:block;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  }
+  .aa-czm.is-open .aa-czm__body{display:block;overflow:visible;min-height:0;}
+  .aa-czm.is-open .aa-czm__grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+    overflow:visible;max-height:none;height:auto;padding:18px 18px 32px;
+  }
+  /* Detail panel: fixed bottom sheet that slides up over the scrolling grid. */
   .aa-czm__panel{
     position:fixed;left:0;right:0;bottom:0;z-index:3;
     border-left:none;border-top:1px solid var(--border-hairline);
