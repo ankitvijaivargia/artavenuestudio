@@ -5,6 +5,9 @@
   A registered group may set orderSwatch:false to hide the “Order a swatch” action
   (e.g. wood finish, where a physical sample isn't meaningful).
   An item may carry meta (a short description) shown in the detail panel.
+  MOBILE: the detail panel is a bottom sheet (class is-detail) that opens only when a
+  swatch is tapped; the “← All options” button (data-cz-back) collapses it back to the
+  grid without closing the picker. Desktop keeps the always-visible side panel.
 {%- endcomment -%}
 {%- assign swatch_product = all_products['swatch'] -%}
 {%- if swatch_product and swatch_product.first_available_variant -%}{%- assign swatch_vid = swatch_product.first_available_variant.id -%}{%- else -%}{%- assign swatch_vid = '' -%}{%- endif -%}
@@ -20,6 +23,7 @@
     <div class="aa-czm__body">
       <div class="aa-czm__grid" id="aaCzGrid"></div>
       <aside class="aa-czm__panel" id="aaCzPanel">
+        <button type="button" class="aa-czm__back" id="aaCzBack" data-cz-back>&larr; All options</button>
         <div class="aa-czm__panel-sw" id="aaCzPanelSw"></div>
         <div class="aa-czm__panel-name serif" id="aaCzPanelName">Select a swatch</div>
         <div class="aa-czm__panel-cat" id="aaCzPanelCat"></div>
@@ -64,6 +68,10 @@
   var groupEl = document.getElementById('aaCzGroup');
 
   var state = { group:'fabric', items:[], filter:'All', preview:null, selected:{} };
+  var mqMobile = window.matchMedia('(max-width:782px)');
+  function isMobile(){ return mqMobile.matches; }
+  function openDetail(){ if(isMobile()) modal.classList.add('is-detail'); }
+  function closeDetail(){ modal.classList.remove('is-detail'); }
 
   function money(v){ return '\u20B9 ' + Number(v||0).toLocaleString('en-IN'); }
   function swBg(it){
@@ -82,13 +90,22 @@
     if(noteEl){ noteEl.style.display = allowOrder ? '' : 'none'; }
     buildCats(); renderGrid();
     var cur = state.selected[group];
-    setPreview(cur ? findByName(cur.name) : state.items[0]);
+    closeDetail();
+    if(isMobile()){
+      // Mobile: show the grid first; the detail sheet opens only when a swatch is tapped.
+      state.preview = cur ? findByName(cur.name) : null;
+      renderGrid();
+    } else {
+      // Desktop: side panel is always visible, so preview the current/first item.
+      setPreview(cur ? findByName(cur.name) : state.items[0]);
+    }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden','false');
     document.body.style.overflow = 'hidden';
   }
   function closeModal(){
     modal.classList.remove('is-open');
+    modal.classList.remove('is-detail');
     modal.setAttribute('aria-hidden','true');
     document.body.style.overflow = '';
   }
@@ -116,7 +133,7 @@
       cell.innerHTML = '<span class="aa-czm__cell-sw" style="background:'+swBg(it)+'"></span>'+
         '<span class="aa-czm__cell-nm">'+it.name+'</span>'+
         '<span class="aa-czm__cell-pr">'+ (Number(it.surcharge)>0 ? '+'+money(it.surcharge) : 'No upcharge') +'</span>';
-      cell.addEventListener('click', function(){ setPreview(it); });
+      cell.addEventListener('click', function(){ setPreview(it); openDetail(); });
       grid.appendChild(cell);
     });
   }
@@ -208,8 +225,11 @@
   document.addEventListener('click', function(e){
     var open = e.target.closest('[data-cz-open]');
     if(open){ e.preventDefault(); openModal(open.getAttribute('data-cz-open')); return; }
+    if(e.target.closest('[data-cz-back]')){ closeDetail(); return; }
     if(e.target.closest('[data-cz-close]')){ closeModal(); }
   });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){ if(modal.classList.contains('is-detail')){ closeDetail(); } else { closeModal(); } }
+  });
 })();
 </script>
