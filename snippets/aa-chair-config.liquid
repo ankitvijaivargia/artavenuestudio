@@ -155,6 +155,7 @@
             {%- assign keep = true -%}
             {%- if filt.category != blank and cat != filt.category -%}{%- assign keep = false -%}{%- endif -%}
             {%- if filt.exclude_category != blank and cat == filt.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
+            {%- if filt.include_names != blank -%}{%- assign _nm = s.name.value -%}{%- unless filt.include_names contains _nm -%}{%- assign keep = false -%}{%- endunless -%}{%- endif -%}
             {%- if keep -%}
               {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
               {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
@@ -193,6 +194,7 @@
                   {%- assign keep = true -%}
                   {%- if bfilt.category != blank and cat != bfilt.category -%}{%- assign keep = false -%}{%- endif -%}
                   {%- if bfilt.exclude_category != blank and cat == bfilt.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
+                  {%- if bfilt.include_names != blank -%}{%- assign _nm = s.name.value -%}{%- unless bfilt.include_names contains _nm -%}{%- assign keep = false -%}{%- endunless -%}{%- endif -%}
                   {%- if keep -%}
                     {%- unless first_bi -%},{%- endunless -%}{%- assign first_bi = false -%}
                     {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
@@ -615,6 +617,7 @@
                 {%- assign keep = true -%}
                 {%- if filt.category != blank and cat != filt.category -%}{%- assign keep = false -%}{%- endif -%}
                 {%- if filt.exclude_category != blank and cat == filt.exclude_category -%}{%- assign keep = false -%}{%- endif -%}
+                {%- if filt.include_names != blank -%}{%- assign _nm = s.name.value -%}{%- unless filt.include_names contains _nm -%}{%- assign keep = false -%}{%- endunless -%}{%- endif -%}
                 {%- if keep -%}
                   {%- unless first_it -%},{%- endunless -%}{%- assign first_it = false -%}
                   {%- assign img = '' -%}{%- if s.photo.value != blank -%}{%- assign img = s.photo.value.image | image_url: width: 600 -%}{%- elsif s.swatch.value != blank -%}{%- assign img = s.swatch.value.image | image_url: width: 600 -%}{%- endif -%}
