@@ -1,18 +1,27 @@
 /* Art Avenue — Customization modal mobile bottom-sheet detail.
-   Loaded after aa.css so these rules win where they overlap the base mobile block.
-   Desktop is unaffected (rules are display:none default + inside the mobile media query). */
+   Loaded after aa.css so these rules win where they overlap the base mobile block. */
 .aa-czm__back{display:none;}
 @media (max-width:782px){
-  /* Single scroll container model: the DIALOG itself scrolls as one piece.
-     This avoids nested flex/grid height traps that froze scrolling entirely. */
+  /* Dialog: fixed-height flex COLUMN with hidden overflow.
+     head (auto) sits above body (flex-fills + scrolls). Keeping the column intact is
+     essential — the body needs flex:1 to get a bounded height to scroll within. */
   .aa-czm.is-open .aa-czm__dialog{
-    display:block;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    display:flex;flex-direction:column;
+    height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+    overflow:hidden;
   }
-  .aa-czm.is-open .aa-czm__body{display:block;overflow:visible;min-height:0;}
+  .aa-czm.is-open .aa-czm__head{flex:0 0 auto;}
+  /* Body is THE single scroll area. display:block (not grid) so it resolves a height
+     and scrolls reliably on iOS/Android; flex:1 + min-height:0 bound it to the dialog. */
+  .aa-czm.is-open .aa-czm__body{
+    display:block !important;flex:1 1 auto;min-height:0;
+    overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  }
+  /* Grid lays out inside the scrolling body; it must never scroll or cap its own height. */
   .aa-czm.is-open .aa-czm__grid{
     display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
-    overflow:visible;max-height:none;height:auto;padding:18px 18px 32px;
+    overflow:visible !important;max-height:none !important;height:auto;
+    padding:18px 18px 32px;
   }
   /* Detail panel: fixed bottom sheet that slides up over the scrolling grid. */
   .aa-czm__panel{
