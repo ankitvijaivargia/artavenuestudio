@@ -3,14 +3,14 @@
    Desktop is unaffected (all rules are display:none default + inside the mobile media query). */
 .aa-czm__back{display:none;}
 @media (max-width:782px){
-  /* Make the body a bounded flex scroller so the swatch grid scrolls within the
-     fixed-height dialog. Without min-height:0 a flex child won't shrink below its
-     content, so the grid overflowed the dialog (clipped, no scroll) — which is why
-     Leather (10 swatches) showed only the first rows while Fabric (4) fit. */
-  .aa-czm__dialog{display:flex;flex-direction:column;}
-  .aa-czm__head{flex:0 0 auto;}
-  .aa-czm__body{position:relative;flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .aa-czm__grid{overflow-y:visible;padding-bottom:24px;}
+  /* Dialog is a fixed-height flex column: head (auto) + body (fills, scrolls). */
+  .aa-czm.is-open .aa-czm__dialog{display:flex;flex-direction:column;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden;}
+  .aa-czm.is-open .aa-czm__head{flex:0 0 auto;}
+  /* The body becomes the bounded scroll area. Force block layout (was display:grid
+     in the base CSS, which let the swatch grid expand past the dialog and clip). */
+  .aa-czm.is-open .aa-czm__body{display:block;flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  /* Grid scrolls within the body; never establishes its own clipped height. */
+  .aa-czm.is-open .aa-czm__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;overflow:visible;max-height:none;padding:18px 18px 28px;}
   .aa-czm__panel{
     position:fixed;left:0;right:0;bottom:0;z-index:3;
     border-left:none;border-top:1px solid var(--border-hairline);
