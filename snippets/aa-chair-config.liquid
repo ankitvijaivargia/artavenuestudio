@@ -753,8 +753,7 @@
     var fixed=group.querySelector('[data-chair-fixedrow="'+axisKey+'"]');
     if(items.length===0){ group.hidden=true; return; }
     group.hidden=false;
-    if(items.length===1){ if(pick) pick.hidden=true; if(fixed) fixed.hidden=false; }
-    else { if(pick) pick.hidden=false; if(fixed) fixed.hidden=true; }
+    if(pick) pick.hidden=false; if(fixed) fixed.hidden=true;
   }
 
   function tierLabelWord(){
