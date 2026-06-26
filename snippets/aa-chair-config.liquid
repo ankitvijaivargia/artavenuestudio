@@ -86,6 +86,11 @@
         {%- endfor -%}
       </div>
     {%- endif -%}
+    {%- if cfg.material_notes != blank -%}
+      {%- for note in cfg.material_notes -%}
+        <div class="aa-sofa__swsub aa-sofa__matnote" data-grid-matnote="{{ note[0] | escape }}" hidden><i class="ph ph-info"></i> {{ note[1] }}</div>
+      {%- endfor -%}
+    {%- endif -%}
   </div>
 
   {%- if has_pickers -%}
@@ -317,6 +322,10 @@
       if(inch) inch.textContent=din?('('+din+')'):'';
       box.hidden = !(dcm||din);
     }
+    function updateMatNote(){
+      var notes=root.querySelectorAll('[data-grid-matnote]'); if(!notes.length) return;
+      notes.forEach(function(n){ n.hidden = (n.getAttribute('data-grid-matnote')!==state.mat); });
+    }
     function matLabelWord(){
       var t=(state.mat||'').toLowerCase();
       if(t.indexOf('leather')>-1) return 'Colour';
@@ -436,13 +445,13 @@
         root.querySelectorAll('[data-grid-size]').forEach(function(b){ b.classList.toggle('is-active', b===s); });
         var h=root.querySelector('[data-grid-sizehint]'); if(h) h.textContent=state.size;
         refreshMaterialAvailability();
-        updatePrice(); updateDims(); refreshSwatchRow();
+        updatePrice(); updateDims(); refreshSwatchRow(); updateMatNote();
       }
       if(m && !m.disabled){
         state.mat=m.getAttribute('data-grid-mat');
         root.querySelectorAll('[data-grid-mat]').forEach(function(b){ b.classList.toggle('is-active', b===m); });
         var h2=root.querySelector('[data-grid-mathint]'); if(h2) h2.textContent=state.mat;
-        updatePrice(); refreshSwatchRow();
+        updatePrice(); refreshSwatchRow(); updateMatNote();
       }
     });
 
@@ -476,7 +485,7 @@
     var sh=root.querySelector('[data-grid-sizehint]'); if(sh) sh.textContent=state.size;
     var mh=root.querySelector('[data-grid-mathint]'); if(mh) mh.textContent=state.mat;
     refreshMaterialAvailability();
-    updatePrice(); updateDims(); layoutWood();
+    updatePrice(); updateDims(); layoutWood(); updateMatNote();
 
     var tries=0;
     (function waitForCz(){
