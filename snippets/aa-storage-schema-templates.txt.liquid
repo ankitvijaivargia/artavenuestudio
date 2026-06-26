@@ -10,8 +10,8 @@ Companion to:
 GOVERNING RULE — LEATHER & KILIM ARE ALWAYS SEPARATE PRODUCTS
 =========================================================================
 Leather and kilim are NEVER a construction toggle on one product. Each is its
-own product / PDP. Both are FIXED PRICE, SINGLE VARIANT, with free line-item
-property pickers (no priced second axis).
+own product / PDP. Both are FIXED PRICE per size, with free line-item property
+pickers (no priced finish axis).
 
   LEATHER product: full Leather Colour picker + Metal Finish.
   KILIM product:  Kilim shown as a FIXED LABEL (with trust note) + a LIMITED
@@ -24,16 +24,38 @@ show the full leather colour range + metal finish.
 =========================================================================
 ENGINE MAPPING (why the JSON looks like a 'grid')
 =========================================================================
-Both patterns run on the GRID engine as a DEGENERATE SINGLE-CELL GRID:
-  - Option 'Size'        = single value 'One Size'
-  - Option 'Construction'= single value ('Leather' OR 'Kilim')
-  - ONE variant, inventoryPolicy CONTINUE (made to order), fixed price.
-Because the material axis has one value, the engine renders it as a static
-fixed label (mat_count==1 path) — no toggle. Pickers ride on top via cfg.pickers[].
-Dimensions come from aav.size_dimensions (keyed by 'One Size'), NOT dim_w/d/h.
+Both patterns run on the GRID engine. The CONSTRUCTION axis (Leather | Kilim)
+has exactly ONE value per product, so the engine renders it as a static fixed
+label (mat_count==1 path) — no toggle. Pickers ride on top via cfg.pickers[].
+
+The SIZE axis may be single OR multiple:
+  - Single size  -> one variant, size button hidden, dims shown from the one key.
+  - Multiple sizes (e.g. Square / Rectangular) -> one variant PER size, size
+    buttons shown, price + dims switch per size automatically.
+All variants: inventoryPolicy CONTINUE (made to order).
 
 The leather picker uses branch_by_axis:true so it filters via tier_filters keyed
 by the single Construction value. include_names limits which swatches show (kilim).
+
+=========================================================================
+*** DIMENSIONS RULE — READ THIS, IT IS THE #1 GOTCHA ***
+=========================================================================
+The grid engine reads dimensions from the aav.size_dimensions metafield, KEYED
+BY THE EXACT SIZE-BUTTON VALUE (case + spelling must match the option value).
+cfg.unit_map is the fallback and must carry the SAME keys.
+The dim_w / dim_d / dim_h number fields are NOT read by the grid engine.
+
+Whenever you ADD, RENAME, or REMOVE a size value you MUST update BOTH
+aav.size_dimensions and cfg.unit_map to have one matching key per size value.
+If a size button has no matching key, the dimensions box renders EMPTY.
+
+Example — a product with sizes [Square, Rectangular]:
+  aav.size_dimensions =
+    {"Square":{"cm":"45 × 45 × 45 cm","in":"17.7 × 17.7 × 17.7 in"},
+     "Rectangular":{"cm":"90 × 45 × 45 cm","in":"35.4 × 17.7 × 17.7 in"}}
+  cfg.unit_map =
+    {"Square":"45 × 45 × 45 cm","Rectangular":"90 × 45 × 45 cm"}
+  (cm->in: 45->17.7, 90->35.4, 60->23.6, 120->47.2, 75->29.5)
 
 =========================================================================
 SHARED LEATHER LIBRARY (swatch metaobjects, category 'Leather', all ₹2,000)
@@ -45,10 +67,11 @@ SHARED LEATHER LIBRARY (swatch metaobjects, category 'Leather', all ₹2,000)
 Metal finish (swatch category 'Storage Hardware'):
   Antique Brass 241428234287  Silver 241428267055  Gold 241428299823
 Each product lists which leather IDs it exposes via aav.swatches (3, 5, or all;
-or none). Hardware IDs are always all three.
+or none). Hardware IDs are always all three. Swatches in include_names MUST also
+be present in aav.swatches or they won't resolve.
 
 =========================================================================
-TEMPLATE A — LEATHER PRODUCT (full colour range)
+TEMPLATE A — LEATHER PRODUCT, SINGLE SIZE (full colour range)
 =========================================================================
 Product: Size=[One Size], Construction=[Leather]; 1 variant; CONTINUE; fixed price.
 aav.swatches = [ ...leather IDs to expose..., 3 hardware IDs ]
@@ -66,13 +89,11 @@ aav.configurator =
     {"key":"hardware","label":"Metal Finish","category":"Storage Hardware","property":"Metal Finish","order_swatch":false}
   ]
 }
-Notes: no material_notes (unless you want a generic leather-patina note from the
-material-notes library). tier_filters has no include_names = ALL leather swatches
-in aav.swatches show. To expose only 3/5 colours, simply list only those IDs in
-aav.swatches.
+Notes: tier_filters with no include_names = ALL leather swatches in aav.swatches
+show. To expose only 3/5 colours, list only those IDs in aav.swatches.
 
 =========================================================================
-TEMPLATE B — KILIM PRODUCT (fixed kilim + limited trim)
+TEMPLATE B — KILIM PRODUCT, SINGLE SIZE (fixed kilim + limited trim)
 =========================================================================
 Product: Size=[One Size], Construction=[Kilim]; 1 variant; CONTINUE; fixed price.
 aav.swatches = [ Ebony 239701065775, Chestnut 239700967471, 3 hardware IDs ]
@@ -94,24 +115,43 @@ aav.configurator =
 Notes:
 - Kilim is the single Construction value -> renders as a fixed label, NOT a picker.
 - material_notes['Kilim'] shows the trust note under the construction label.
-- tier_filters.Kilim.include_names limits trim to [Ebony, Chestnut]. The two IDs
-  MUST also be present in aav.swatches or they won't resolve.
+- tier_filters.Kilim.include_names limits trim to [Ebony, Chestnut].
 - Picker label is 'Leather Trim' (vs 'Leather Colour' on leather products).
+
+=========================================================================
+TEMPLATE C — MULTIPLE SIZES (Square / Rectangular) — kilim shown; same for leather
+=========================================================================
+Product: Size=[Square, Rectangular], Construction=[Kilim]; ONE VARIANT PER SIZE
+(2 variants: 'Square / Kilim', 'Rectangular / Kilim'); all CONTINUE.
+Prices may be equal or per-size — the engine reads price per variant.
+aav.swatches = [ Ebony, Chestnut, 3 hardware IDs ]   (same as Template B)
+aav.size_dimensions =
+  {"Square":{"cm":"45 × 45 × 45 cm","in":"17.7 × 17.7 × 17.7 in"},
+   "Rectangular":{"cm":"90 × 45 × 45 cm","in":"35.4 × 17.7 × 17.7 in"}}
+aav.configurator = (as Template B) but unit_map carries BOTH size keys:
+  "unit_map":{"Square":"45 × 45 × 45 cm","Rectangular":"90 × 45 × 45 cm"}
+For a LEATHER multi-size product: identical, but Construction=[Leather], full
+Leather Colour picker, no material_notes, tier_filters.Leather has no include_names.
+REMINDER: every size value needs a matching key in BOTH size_dimensions and
+unit_map, or its dimensions box is blank (see DIMENSIONS RULE above).
 
 =========================================================================
 WORKED EXAMPLES (storage pilot)
 =========================================================================
 Kilim Trunk:  Product 8322548826159 (Jaisalmer Campaign Trunk), ACTIVE.
+              Sizes Square (45×45×45) + Rectangular (90×45×45), Template C.
 Leather Trunk: Product 8322565931055 (Jaisalmer Campaign Trunk — Leather), DRAFT.
-Both: ₹68,000, One Size, 45×45×45 cm.
+Both: ₹68,000.
 
 =========================================================================
 BUILD CHECKLIST (new leather or kilim piece)
 =========================================================================
-1. productSet (synchronous:true): Size=[One Size], Construction=[Leather|Kilim],
-   1 variant, CONTINUE, price. Tags include category + material + 'Made to Order'.
-2. metafieldsSet: aav.configurator (Template A or B), aav.swatches (leather IDs to
-   expose + 3 hardware IDs), aav.size_dimensions.
+1. productSet (synchronous:true): Size=[...one or more...],
+   Construction=[Leather|Kilim], one variant PER size, CONTINUE, price(s).
+   Tags include category + material + 'Made to Order'.
+2. metafieldsSet: aav.configurator (Template A/B/C), aav.swatches (leather IDs to
+   expose + 3 hardware IDs), aav.size_dimensions (ONE KEY PER SIZE VALUE).
+   Confirm unit_map keys == size_dimensions keys == size option values.
 3. Upload photos; set alt text per aa-alt-text-convention; publish (ACTIVE) + add
    to relevant collection (tag-based smart collection).
 {%- endcomment -%}
