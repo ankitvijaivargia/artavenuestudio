@@ -75,7 +75,7 @@ Example — a product with sizes [Square, Rectangular]:
      "Rectangular":{"cm":"90 × 45 × 45 cm","in":"35.4 × 17.7 × 17.7 in"}}
   cfg.unit_map =
     {"Square":"45 × 45 × 45 cm","Rectangular":"90 × 45 × 45 cm"}
-  (cm->in: 45->17.7, 90->35.4, 60->23.6, 120->47.2, 75->29.5)
+  (cm->in: 45->17.7, 90->35.4, 60->23.6, 120->47.2, 75->29.5, 80->31.5)
 
 =========================================================================
 *** SWATCH-LIBRARY PROPAGATION RULE — #2 GOTCHA ***
@@ -154,6 +154,43 @@ photography exists, add it to each swatch's 'photo' field and the picker shows
 the texture automatically.
 
 =========================================================================
+LEGS & HANDLE LIBRARIES (small option sets, free pickers, ₹0)
+Use for: chests of drawers, wardrobes, consoles — any cased piece on a base
+with pull hardware. These are SWATCH metaobjects too (same type), just tiny
+categories. They carry no swatch_price/surcharge and are set order_swatch:false
+(you don't post a physical sample of a leg or a handle). Hex is a stand-in chip
+until real photos exist.
+=========================================================================
+LEGS (category 'Legs') — the base/stand choice:
+  Wooden Legs 241522343983   Metal Legs 241522376751
+HANDLE (category 'Handle') — the drawer pull choice:
+  Leather Handles 241522409519  Metal Knobs 241522442287  Metal Handles 241522475055
+
+These are ALWAYS-ON pickers filtered by their own category (branch_by_axis:false
+is the default — just give the picker a "category"). They do not change price.
+Picker shape:
+  {"key":"legs","label":"Legs","category":"Legs","property":"Legs","order_swatch":false}
+  {"key":"handle","label":"Handles","category":"Handle","property":"Handles","order_swatch":false}
+List both Legs IDs + all three Handle IDs in aav.swatches alongside the piece's
+leather/hardware IDs.
+
+=========================================================================
+WOOD FINISH LIBRARY (metaobject TYPE 'finish', via aav.wood_finishes)
+Use for: solid-wood pieces. NOTE this is a DIFFERENT metaobject type than
+'swatch' — it lives in its own aav.wood_finishes metafield, NOT aav.swatches.
+A picker reads it with "source":"wood_finishes" (no category needed).
+=========================================================================
+  Natural Teak 240137306159  Walnut 240137338927       Ebony 240137371695
+  Woodland 240141795375      English Chestnut 240141828143  Midnight 240141860911
+  Vanilla 240141893679       Sage 240141926447
+Full set (8) = [240137306159, 240137338927, 240137371695, 240141795375,
+  240141828143, 240141860911, 240141893679, 240141926447]
+Picker shape:
+  {"key":"wood","label":"Wood Finish","source":"wood_finishes","property":"Wood Finish","order_swatch":true}
+This is the SAME shared library the chairs use — product-agnostic, reused, never
+duplicated per product.
+
+=========================================================================
 TEMPLATE A — LEATHER PRODUCT, SINGLE SIZE (full colour range)
 =========================================================================
 Product: Size=[One Size], Construction=[Leather]; 1 variant; CONTINUE; fixed price.
@@ -223,21 +260,87 @@ REMINDER: every size value needs a matching key in BOTH size_dimensions and
 unit_map, or its dimensions box is blank (see DIMENSIONS RULE above).
 
 =========================================================================
+TEMPLATE D — CHEST OF DRAWERS (THREE SEPARATE CONSTRUCTION-FAMILY PRODUCTS)
+=========================================================================
+A chest of drawers is built as up to THREE separate products (same as the trunk
+model), one per construction family. Each is a grid-engine product with a stack
+of free pickers. Legs + Handles are ALWAYS-ON free pickers (no price change).
+Size (drawer count) may be single OR multi; price is per-size variant.
+
+  FAMILY 1 — SOLID WOOD: Construction=[Wood] (fixed label). Pickers:
+      Wood Finish (source wood_finishes) + Legs + Handles. NO leather, NO kilim,
+      NO metal-finish-of-hardware. aav.swatches = [2 Legs, 3 Handle].
+      aav.wood_finishes = full 8-finish set.
+  FAMILY 2 — KILIM: Construction=[Kilim] (fixed label + material_notes trust note).
+      Pickers: Leather Trim (branch, Leather category, include_names Ebony+Chestnut)
+      + Metal Finish + Legs + Handles.
+      aav.swatches = [Ebony, Chestnut, 3 hardware, 2 Legs, 3 Handle].
+  FAMILY 3 — FULL LEATHER: Construction=[Leather] (fixed label). Pickers:
+      Leather Colour (branch, category 'Furniture Leather') + Metal Finish +
+      Legs + Handles.
+      aav.swatches = [10 Furniture Leather, 3 hardware, 2 Legs, 3 Handle].
+
+FAMILY 3 configurator (the richest; trim 1-2 pickers for the others):
+{
+  "engine":"grid",
+  "size_option":"Size","material_option":"Construction",
+  "size_label":"Size","material_label":"Construction",
+  "custom_size_text":"Need a custom size or drawer count?",
+  "unit_map":{"3-Drawer":"90 × 45 × 80 cm","5-Drawer":"90 × 45 × 120 cm"},
+  "tier_filters":{"Leather":{"category":"Furniture Leather"}},
+  "pickers":[
+    {"key":"leather","label":"Leather Colour","branch_by_axis":true,"property":"Leather Colour","order_swatch":true},
+    {"key":"hardware","label":"Metal Finish","category":"Storage Hardware","property":"Metal Finish","order_swatch":false},
+    {"key":"legs","label":"Legs","category":"Legs","property":"Legs","order_swatch":false},
+    {"key":"handle","label":"Handles","category":"Handle","property":"Handles","order_swatch":false}
+  ]
+}
+FAMILY 1 (Wood) configurator — no leather/hardware, wood finish is the main pick:
+{
+  "engine":"grid",
+  "size_option":"Size","material_option":"Construction",
+  "size_label":"Size","material_label":"Construction",
+  "custom_size_text":"Need a custom size or drawer count?",
+  "unit_map":{"3-Drawer":"90 × 45 × 80 cm","5-Drawer":"90 × 45 × 120 cm"},
+  "pickers":[
+    {"key":"wood","label":"Wood Finish","source":"wood_finishes","property":"Wood Finish","order_swatch":true},
+    {"key":"legs","label":"Legs","category":"Legs","property":"Legs","order_swatch":false},
+    {"key":"handle","label":"Handles","category":"Handle","property":"Handles","order_swatch":false}
+  ]
+}
+Notes:
+- No engine change was needed for Legs/Handles — they are just two more swatch
+  categories the existing picker filters on. order_swatch:false hides 'Order a
+  swatch' (you don't sample a leg or handle).
+- The Wood family uses NO tier_filters (no branching leather); Wood Finish is an
+  always-on picker via source:wood_finishes.
+- A possible FAMILY 4 (wood body + leather drawer fronts) = Family 1 + an extra
+  always-on 'Drawer Front' picker with category 'Furniture Leather'. Not built yet.
+
+=========================================================================
 WORKED EXAMPLES (storage pilot)
 =========================================================================
 Kilim Trunk:  Product 8322548826159 (Jaisalmer Campaign Trunk), ACTIVE.
               Sizes Square (45×45×45) + Rectangular (90×45×45), Template C.
 Leather Trunk: Product 8322565931055 (Jaisalmer Campaign Trunk — Leather), DRAFT.
 Both: ₹68,000.
+Chest of Drawers — Wood:    Product 8322681536559, DRAFT. Template D Family 1.
+  Sizes 3-Drawer / 5-Drawer, placeholder ₹84,000 / ₹98,000.
+Chest of Drawers — Leather: Product 8322681634863, DRAFT. Template D Family 3.
+  Sizes 3-Drawer / 5-Drawer, placeholder ₹1,12,000 / ₹1,34,000.
+Chest of Drawers — Kilim:   Product 8322681700399, DRAFT. Template D Family 2.
+  One Size, placeholder ₹1,04,000.
+(All chest prices + dimensions are PLACEHOLDERS pending real figures.)
 
 =========================================================================
-BUILD CHECKLIST (new leather or kilim piece)
+BUILD CHECKLIST (new leather, kilim, or wood piece)
 =========================================================================
 1. productSet (synchronous:true): Size=[...one or more...],
-   Construction=[Leather|Kilim], one variant PER size, CONTINUE, price(s).
+   Construction=[Leather|Kilim|Wood], one variant PER size, CONTINUE, price(s).
    Tags include category + material + 'Made to Order'.
-2. metafieldsSet: aav.configurator (Template A/B/C), aav.swatches (leather IDs to
-   expose + 3 hardware IDs), aav.size_dimensions (ONE KEY PER SIZE VALUE).
+2. metafieldsSet: aav.configurator (Template A/B/C/D), aav.swatches (leather/
+   hardware/legs/handle IDs as the family needs), aav.size_dimensions (ONE KEY
+   PER SIZE VALUE), and aav.wood_finishes if the piece has a Wood Finish picker.
    Confirm unit_map keys == size_dimensions keys == size option values.
    For full-range leather, list all 10 canonical IDs of the RIGHT library —
    'Leather' for upholstery pieces, 'Furniture Leather' for hard furniture
