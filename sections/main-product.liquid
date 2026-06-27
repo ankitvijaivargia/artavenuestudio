@@ -118,11 +118,13 @@
         {%- endif -%}
       </div>
       {%- if p.images.size > 1 -%}
-      <div class="aa-gallery__thumbs" id="aaGalThumbs">
-        {%- for img in p.images -%}
-          <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
-        {%- endfor -%}
-        <span class="aa-gallery__more" aria-hidden="true"><i class="ph ph-caret-down"></i></span>
+      <div class="aa-gallery__thumbwrap">
+        <div class="aa-gallery__thumbs" id="aaGalThumbs">
+          {%- for img in p.images -%}
+            <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
+          {%- endfor -%}
+        </div>
+        <span class="aa-gallery__more" id="aaGalMore" aria-hidden="true"><i class="ph ph-caret-down"></i></span>
       </div>
       {%- endif -%}
     {%- else -%}
@@ -199,19 +201,25 @@
       entries.forEach(function(en){ if(en.isIntersecting){ setActive(+en.target.getAttribute('data-idx')); } });
     },{root:main,threshold:0.6});
     slides.forEach(function(s){ obs.observe(s); });
+    var moreCue=document.getElementById('aaGalMore');
+    function setOverflow(on){
+      if(thumbs) thumbs.classList.toggle('has-overflow', on);
+      if(moreCue) moreCue.classList.toggle('is-shown', on);
+    }
     function checkThumbOverflow(){
       if(!thumbs) return;
       var horiz=window.matchMedia('(max-width:782px)').matches;
       var over= horiz ? (thumbs.scrollWidth - thumbs.clientWidth > 2) : (thumbs.scrollHeight - thumbs.clientHeight > 2);
-      thumbs.classList.toggle('has-overflow', over);
+      setOverflow(over);
     }
     checkThumbOverflow();
     window.addEventListener('resize', checkThumbOverflow);
     if(thumbs){ thumbs.addEventListener('scroll', function(){
       var horiz=window.matchMedia('(max-width:782px)').matches;
+      var hasOver = horiz ? thumbs.scrollWidth>thumbs.clientWidth+2 : thumbs.scrollHeight>thumbs.clientHeight+2;
       var atEnd= horiz ? (thumbs.scrollLeft + thumbs.clientWidth >= thumbs.scrollWidth-2)
                        : (thumbs.scrollTop + thumbs.clientHeight >= thumbs.scrollHeight-2);
-      thumbs.classList.toggle('has-overflow', !atEnd && (horiz ? thumbs.scrollWidth>thumbs.clientWidth+2 : thumbs.scrollHeight>thumbs.clientHeight+2));
+      setOverflow(hasOver && !atEnd);
     }); }
     updateArrows();
   })();
