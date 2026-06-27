@@ -112,10 +112,15 @@
         {%- endfor -%}
       </div>
       {%- if p.images.size > 1 -%}
+      <button type="button" class="aa-gallery__nav aa-gallery__nav--prev is-hidden" id="aaGalPrev" aria-label="Previous image"><i class="ph ph-caret-left"></i></button>
+      <button type="button" class="aa-gallery__nav aa-gallery__nav--next" id="aaGalNext" aria-label="Next image"><i class="ph ph-caret-right"></i></button>
+      {%- endif -%}
+      {%- if p.images.size > 1 -%}
       <div class="aa-gallery__thumbs" id="aaGalThumbs">
         {%- for img in p.images -%}
           <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
         {%- endfor -%}
+        <span class="aa-gallery__more" aria-hidden="true"><i class="ph ph-caret-down"></i></span>
       </div>
       {%- endif -%}
     {%- else -%}
@@ -157,20 +162,56 @@
 
 <script>
   (function(){
-    var main=document.getElementById('aaGalMain'), thumbs=document.getElementById('aaGalThumbs');
-    if(!main||!thumbs) return;
+    var main=document.getElementById('aaGalMain');
+    if(!main) return;
+    var thumbs=document.getElementById('aaGalThumbs');
     var slides=main.querySelectorAll('.aa-gallery__slide');
-    var tbs=thumbs.querySelectorAll('.aa-gallery__thumb');
-    function setActive(i){ tbs.forEach(function(t,n){ t.classList.toggle('is-active', n===i); }); }
-    thumbs.addEventListener('click', function(e){
-      var b=e.target.closest('.aa-gallery__thumb'); if(!b) return;
-      var i=+b.getAttribute('data-idx');
+    if(slides.length<2) return;
+    var prev=document.getElementById('aaGalPrev'), next=document.getElementById('aaGalNext');
+    var cur=0;
+    function tbs(){ return thumbs ? thumbs.querySelectorAll('.aa-gallery__thumb') : []; }
+    function setActive(i){
+      cur=i;
+      Array.prototype.forEach.call(tbs(), function(t,n){ t.classList.toggle('is-active', n===i); });
+      var active=tbs()[i];
+      if(active && thumbs){ active.scrollIntoView({behavior:'smooth',inline:'nearest',block:'nearest'}); }
+      updateArrows();
+    }
+    function updateArrows(){
+      if(prev) prev.classList.toggle('is-hidden', cur<=0);
+      if(next) next.classList.toggle('is-hidden', cur>=slides.length-1);
+    }
+    function goTo(i){
+      i=Math.max(0, Math.min(slides.length-1, i));
       if(slides[i]){ slides[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); setActive(i); }
-    });
+    }
+    if(thumbs){
+      thumbs.addEventListener('click', function(e){
+        var b=e.target.closest('.aa-gallery__thumb'); if(!b) return;
+        goTo(+b.getAttribute('data-idx'));
+      });
+    }
+    if(prev) prev.addEventListener('click', function(){ goTo(cur-1); });
+    if(next) next.addEventListener('click', function(){ goTo(cur+1); });
     var obs=new IntersectionObserver(function(entries){
       entries.forEach(function(en){ if(en.isIntersecting){ setActive(+en.target.getAttribute('data-idx')); } });
     },{root:main,threshold:0.6});
     slides.forEach(function(s){ obs.observe(s); });
+    function checkThumbOverflow(){
+      if(!thumbs) return;
+      var horiz=window.matchMedia('(max-width:782px)').matches;
+      var over= horiz ? (thumbs.scrollWidth - thumbs.clientWidth > 2) : (thumbs.scrollHeight - thumbs.clientHeight > 2);
+      thumbs.classList.toggle('has-overflow', over);
+    }
+    checkThumbOverflow();
+    window.addEventListener('resize', checkThumbOverflow);
+    if(thumbs){ thumbs.addEventListener('scroll', function(){
+      var horiz=window.matchMedia('(max-width:782px)').matches;
+      var atEnd= horiz ? (thumbs.scrollLeft + thumbs.clientWidth >= thumbs.scrollWidth-2)
+                       : (thumbs.scrollTop + thumbs.clientHeight >= thumbs.scrollHeight-2);
+      thumbs.classList.toggle('has-overflow', !atEnd && (horiz ? thumbs.scrollWidth>thumbs.clientWidth+2 : thumbs.scrollHeight>thumbs.clientHeight+2));
+    }); }
+    updateArrows();
   })();
 </script>
 
