@@ -349,4 +349,79 @@ BUILD CHECKLIST (new leather, kilim, or wood piece)
    to relevant collection (tag-based smart collection).
 4. AFTER any later change to a shared swatch library, re-run the audit query and
    append new IDs to every product that should carry them (propagation rule).
+
+=========================================================================
+HANDLE-FINISH INHERITANCE — picker options that mirror another picker
+=========================================================================
+OPT-IN, DORMANT BY DEFAULT. A picker may declare an "inherit" map so that
+chosen options take their colour/photo FROM ANOTHER PICKER's current selection
+instead of their own seeded swatch. Used on the chest Handles picker so the
+metal handles always match the chosen Metal Finish, and the leather handle
+always matches the body leather. Products without an "inherit" key are wholly
+unaffected — the engine no-ops when the key is absent.
+
+SCHEMA — add "inherit" to the inheriting picker only:
+  {"key":"handle","label":"Handles","category":"Handle","property":"Handles",
+   "order_swatch":false,
+   "inherit":{"Metal Knobs":"hardware","Metal Handles":"hardware",
+              "Leather Handles":"leather"}}
+  - KEY  = the option's swatch NAME, byte-for-byte (must match the metaobject
+           'name' exactly, including case + spacing).
+  - VALUE = the picker KEY it inherits from (e.g. "hardware", "leather").
+  An option NOT listed in the map keeps its own seeded swatch as normal.
+
+BEHAVIOUR:
+  - Selected row: when an inheriting option is chosen, its dot + name + cart
+    property mirror the source picker's current selection, e.g. the cart
+    property reads  Handles: Metal Handles (Silver).
+  - Open-picker OPTIONS: when you open the Handles picker after choosing a
+    metal finish, the metal-handle OPTION CHIPS render IN that finish (Silver),
+    not their seeded brass. Change the finish and reopen — the chips update.
+  - Leather Handles chip mirrors the chosen body leather colour the same way.
+
+WHY IT'S WIRED THE WAY IT IS (two-part fix — keep BOTH):
+  1) resolveInheritedItems(pk, items) clones each inheriting option and
+     overwrites its hex/img from the source picker's current selection BEFORE
+     registerPicker() hands the items to the modal. The modal paints option
+     chips from the items array it is given at register() time (cell colour =
+     it.img || it.hex), so the items must be repainted BEFORE registration —
+     not after.
+  2) syncInheritors(changedKey) re-registers an inheriting picker whenever the
+     SOURCE changes. The trigger is driven by the inherit MAP (does ANY of this
+     picker's options inherit from changedKey — via inheritDependsOn), NOT by
+     which option is currently selected.
+
+  *** THE BUG THAT COST THREE DEPLOYS — READ THIS ***
+  The first attempts re-registered the Handles picker only when its CURRENTLY
+  SELECTED option inherited from the changed source. But the default handle
+  selection is "Leather Handles", which inherits from leather — so changing the
+  Metal Finish hit a guard that said "selected option doesn't depend on
+  hardware" and skipped the repaint entirely. The metal OPTION chips never
+  updated and kept showing seeded brass. FIX: gate on the inherit MAP's VALUES
+  (any option depends on the changed source), never on the current selection.
+  GENERAL LESSON: when the SAME code shows DIFFERENT behaviour, suspect a DATA
+  difference; and when stuck after two guesses, REPRODUCE the engine logic in a
+  tiny Node harness with the REAL swatch/configurator JSON rather than reasoning
+  from the rendered screen. The harness found it in seconds.
+
+  ALSO REMEMBER: the modal renders OPTIONS from the items array passed at
+  register() time. To change how options LOOK you must rewrite items before
+  register() AND re-register when the source changes — repainting only the
+  selected row is not enough.
+
+REQUIREMENTS / GOTCHAS:
+  - Option NAMES in the map must byte-match the swatch metaobject names. A typo
+    silently no-ops (looks like "inheritance isn't working").
+  - Source pickers must be listed in cfg.pickers (e.g. "hardware", "leather")
+    and their swatch IDs present in aav.swatches.
+  - Inheritance is colour/photo only — it does NOT add a price/surcharge and
+    does NOT create variants. Cart property records "Option (Source)".
+  - Metal finishes are currently HEX-ONLY chips; they read as plausible metal
+    tones. When real finish photos are added to the swatch 'photo' field, the
+    inherited chips use the photo automatically — no code change.
+
+LIVE ON: Chest of Drawers — Leather (8322681634863) and — Kilim (8322681700399).
+Both configs already carry the inherit map; the wood + cane chests do not (no
+handles inheriting a finish), and are unaffected.
+
 {%- endcomment -%}
