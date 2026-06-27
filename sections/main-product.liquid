@@ -106,15 +106,17 @@
 
   <div class="aa-gallery">
     {%- if p.images.size > 0 -%}
-      <div class="aa-gallery__main" id="aaGalMain">
-        {%- for img in p.images -%}
-          <div class="aa-fig aa-gallery__slide" data-idx="{{ forloop.index0 }}" style="aspect-ratio:3/4;position:relative"><img src="{{ img | image_url: width: 1400 }}" alt="{{ p.title | escape }}"{% unless forloop.first %} loading="lazy"{% endunless %}>{%- if forloop.first -%}<span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span>{%- endif -%}</div>
-        {%- endfor -%}
+      <div class="aa-gallery__stage">
+        <div class="aa-gallery__main" id="aaGalMain">
+          {%- for img in p.images -%}
+            <div class="aa-fig aa-gallery__slide" data-idx="{{ forloop.index0 }}" style="aspect-ratio:3/4;position:relative"><img src="{{ img | image_url: width: 1400 }}" alt="{{ p.title | escape }}"{% unless forloop.first %} loading="lazy"{% endunless %}>{%- if forloop.first -%}<span style="position:absolute;top:18px;left:18px"><span class="aa-badge aa-badge--on-image">Handcrafted in India</span></span>{%- endif -%}</div>
+          {%- endfor -%}
+        </div>
+        {%- if p.images.size > 1 -%}
+        <button type="button" class="aa-gallery__nav aa-gallery__nav--prev is-hidden" id="aaGalPrev" aria-label="Previous image"><i class="ph ph-caret-left"></i></button>
+        <button type="button" class="aa-gallery__nav aa-gallery__nav--next" id="aaGalNext" aria-label="Next image"><i class="ph ph-caret-right"></i></button>
+        {%- endif -%}
       </div>
-      {%- if p.images.size > 1 -%}
-      <button type="button" class="aa-gallery__nav aa-gallery__nav--prev is-hidden" id="aaGalPrev" aria-label="Previous image"><i class="ph ph-caret-left"></i></button>
-      <button type="button" class="aa-gallery__nav aa-gallery__nav--next" id="aaGalNext" aria-label="Next image"><i class="ph ph-caret-right"></i></button>
-      {%- endif -%}
       {%- if p.images.size > 1 -%}
       <div class="aa-gallery__thumbs" id="aaGalThumbs">
         {%- for img in p.images -%}
