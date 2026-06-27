@@ -386,6 +386,7 @@
         var hint=root.querySelector('[data-cz-selname="gridp-'+hk+'-hint"]'); if(hint) hint.textContent=chosen.name+' — '+src.name;
         var fname=root.querySelector('[data-grid-pfixedname="'+hk+'"]'); if(fname) fname.textContent=chosen.name+' — '+src.name;
         if(hp.property) setProp(hp.property, chosen.name+' ('+src.name+')');
+        registerPicker(hk);
       }
     }
     function layoutPicker(pk){
@@ -399,10 +400,20 @@
       if(items.length===1){ if(pickRow) pickRow.hidden=true; if(fixed) fixed.hidden=false; }
       else { if(pickRow) pickRow.hidden=false; if(fixed) fixed.hidden=true; }
     }
+    function resolveInheritedItems(pk, items){
+      var p=pickers[pk]; if(!p || !p.inherit) return items;
+      return items.map(function(it){
+        var srcKey=p.inherit[it.name]; if(!srcKey) return it;
+        var src=sourceSelectionFor(srcKey); if(!src) return it;
+        var clone={}; for(var kk in it){ clone[kk]=it[kk]; }
+        clone.hex=src.hex; if(src.img){ clone.img=src.img; } else { delete clone.img; }
+        return clone;
+      });
+    }
     function registerPicker(pk){
       if(!window.aaCz || !window.aaCz.register) return;
       var p=pickers[pk]; if(!p) return;
-      var items=pickerItems(pk);
+      var items=resolveInheritedItems(pk, pickerItems(pk));
       if(items.length){ window.aaCz.register('gridp-'+pk, { label: p.label, items: items, orderSwatch: p.orderSwatch !== false }); }
     }
     function refreshPicker(pk){
