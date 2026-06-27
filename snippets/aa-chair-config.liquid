@@ -185,6 +185,7 @@
           "property": {{ p.property | default: p.label | json }},
           "orderSwatch": {{ p_order | json }},
           "branch": {{ p.branch_by_axis | default: false | json }},
+          {%- if p.inherit != blank -%}"inherit": {{ p.inherit | json }},{%- endif -%}
           {%- if p.branch_by_axis -%}
           "sets": {
             {%- assign first_b = true -%}
@@ -365,6 +366,27 @@
       var fdot=root.querySelector('[data-grid-pfixeddot="'+pk+'"]'); if(fdot){ fdot.style.background= item.img?("center/cover no-repeat url('"+item.img+"')"):(item.hex||'#cccccc'); }
       var fname=root.querySelector('[data-grid-pfixedname="'+pk+'"]'); if(fname) fname.textContent=item.name;
       if(p.property) setProp(p.property, item.name);
+      syncInheritors(pk);
+    }
+    function sourceSelectionFor(srcKey){
+      var sp=pickers[srcKey]; if(!sp) return null;
+      return state.picks['p_'+srcKey] || pickerItems(srcKey)[0] || null;
+    }
+    function syncInheritors(changedKey){
+      if(!pickers) return;
+      for(var hk in pickers){
+        var hp=pickers[hk]; if(!hp || !hp.inherit) continue;
+        var chosen=state.picks['p_'+hk]; if(!chosen) continue;
+        var srcKey=hp.inherit[chosen.name]; if(!srcKey) continue;
+        if(changedKey!=null && changedKey!==srcKey && changedKey!==hk) continue;
+        var src=sourceSelectionFor(srcKey); if(!src) continue;
+        var dot=root.querySelector('[data-grid-pdot="'+hk+'"]'); if(dot){ dot.style.background= src.img?("center/cover no-repeat url('"+src.img+"')"):(src.hex||'#cccccc'); }
+        var fdot=root.querySelector('[data-grid-pfixeddot="'+hk+'"]'); if(fdot){ fdot.style.background= src.img?("center/cover no-repeat url('"+src.img+"')"):(src.hex||'#cccccc'); }
+        var nm=root.querySelector('[data-cz-selname="gridp-'+hk+'"]'); if(nm) nm.textContent=chosen.name+' — '+src.name;
+        var hint=root.querySelector('[data-cz-selname="gridp-'+hk+'-hint"]'); if(hint) hint.textContent=chosen.name+' — '+src.name;
+        var fname=root.querySelector('[data-grid-pfixedname="'+hk+'"]'); if(fname) fname.textContent=chosen.name+' — '+src.name;
+        if(hp.property) setProp(hp.property, chosen.name+' ('+src.name+')');
+      }
     }
     function layoutPicker(pk){
       var p=pickers[pk]; if(!p) return;
