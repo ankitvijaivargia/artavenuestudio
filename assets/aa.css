@@ -487,8 +487,8 @@ em.accent{color:var(--accent);font-style:italic;}
 .aa-gallery__nav--prev{left:14px;right:auto;}
 .aa-gallery__nav--next{right:14px;left:auto;}
 .aa-gallery__nav.is-hidden{opacity:0;pointer-events:none;}
-/* thumbnail column + pinned overflow cue (stays at the visible edge) */
-.aa-gallery__thumbcol{order:1;position:relative;flex:0 0 76px;width:76px;display:flex;}
+/* thumbnail column wraps strip; cue pinned to the column's bottom (desktop) */
+.aa-gallery__thumbcol{order:1;position:relative;flex:0 0 76px;width:76px;display:block;}
 .aa-gallery__thumbcol .aa-gallery__thumbs{width:100%;}
 .aa-gallery__more{display:none;position:absolute;left:0;right:0;bottom:0;height:34px;align-items:flex-end;justify-content:center;padding-bottom:2px;color:var(--aa-bronze-deep);font-size:16px;pointer-events:none;z-index:3;background:linear-gradient(to top,var(--surface-page,#FAF6EF) 30%,rgba(250,246,239,0));}
 .aa-gallery__more.is-shown{display:flex;}
@@ -497,8 +497,9 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-gallery__nav i{font-size:20px;}
   .aa-gallery__nav--prev{left:10px;}
   .aa-gallery__nav--next{right:10px;}
-  /* mobile: thumbcol is full-width; strip horizontal; cue pinned to RIGHT edge, points right */
-  .aa-gallery__thumbcol{order:1;width:100%;flex:none;}
-  .aa-gallery__more{left:auto;top:0;bottom:0;right:0;width:40px;height:auto;align-items:center;padding-bottom:0;padding-right:2px;background:linear-gradient(to right,rgba(250,246,239,0),var(--surface-page,#FAF6EF) 60%);}
+  /* mobile: thumbcol spans the full bleed width; strip scrolls inside; cue pinned to the viewport's right edge */
+  .aa-gallery__thumbcol{order:1;display:block;width:100vw;flex:none;overflow:hidden;}
+  .aa-gallery__thumbcol .aa-gallery__thumbs{width:100%;}
+  .aa-gallery__more{left:auto;top:auto;bottom:0;right:0;width:44px;height:54px;align-items:center;padding-bottom:0;padding-right:4px;background:linear-gradient(to right,rgba(250,246,239,0),var(--surface-page,#FAF6EF) 55%);}
   .aa-gallery__more i{transform:rotate(-90deg);}
 }
