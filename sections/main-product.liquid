@@ -118,10 +118,12 @@
         {%- endif -%}
       </div>
       {%- if p.images.size > 1 -%}
-      <div class="aa-gallery__thumbs" id="aaGalThumbs">
-        {%- for img in p.images -%}
-          <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
-        {%- endfor -%}
+      <div class="aa-gallery__thumbcol">
+        <div class="aa-gallery__thumbs" id="aaGalThumbs">
+          {%- for img in p.images -%}
+            <button type="button" class="aa-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-idx="{{ forloop.index0 }}" aria-label="View image {{ forloop.index }}"><img src="{{ img | image_url: width: 160 }}" alt="" loading="lazy"></button>
+          {%- endfor -%}
+        </div>
         <span class="aa-gallery__more" id="aaGalMore" aria-hidden="true"><i class="ph ph-caret-down"></i></span>
       </div>
       {%- endif -%}
