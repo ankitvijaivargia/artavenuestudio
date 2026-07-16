@@ -135,7 +135,7 @@
     {%- if p.type != blank -%}<div class="aa-buybox__eyebrow" style="font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent)">{{ p.type }}</div>{%- endif -%}
     <h1 class="serif aa-buybox__title" style="font-size:clamp(34px,3.4vw,46px);line-height:1.08;letter-spacing:var(--tracking-tight);margin:12px 0 0">{{ p.title }}</h1>
     <div class="aa-buybox__price">{% render 'aa-price', product: p, show_price: show_price, visibility: visibility, caption: price_cap %}</div>
-    {%- if p.description != blank -%}<div class="rte aa-buybox__desc" style="font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:18px;max-width:46ch">{{ p.description }}</div>{%- endif -%}
+    {%- if p.description != blank -%}<div class="rte aa-buybox__desc" style="font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:18px;max-width:46ch">{{ p.description | strip_html | truncatewords: 28 }}</div>{%- endif -%}
 
     {% render 'aa-fulfillment-bar', type: fulfillment, product: p %}
     {% render 'aa-lifecycle-banner', state: lifecycle %}
