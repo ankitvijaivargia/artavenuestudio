@@ -11,7 +11,15 @@
   "sections": {
     "hero": {
       "type": "aa-hero",
-      "settings": {}
+      "settings": {
+        "eyebrow": "The Spring Collection · 2026",
+        "heading": "Crafted spaces, collected stories.",
+        "subheading": "Handcrafted furniture, rugs and objects for homes that are made to be lived in — and remembered.",
+        "cta_label": "Explore the Collection",
+        "cta_link": "",
+        "image": "shopify://shop_images/luxurious-home-in-the-desert.jpg",
+        "tone": "clay"
+      }
     },
     "signature": {
       "type": "aa-signature",
@@ -69,15 +77,29 @@
         "s4",
         "s5"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow": "Signature Collections",
+        "heading": "Five disciplines, one point of view.",
+        "intro": "Each category is curated and commissioned in-house — a considered edit rather than an endless catalog."
+      }
     },
     "craft": {
       "type": "aa-craft",
-      "settings": {}
+      "settings": {
+        "eyebrow": "The Atelier",
+        "heading": "Made slowly, by hand, to last.",
+        "intro": "Every piece begins in the hands of an artisan — turned, joined and finished the way furniture was always meant to be made.",
+        "cta_link": ""
+      }
     },
     "arrivals": {
       "type": "aa-arrivals",
-      "settings": {}
+      "settings": {
+        "eyebrow": "Just Arrived",
+        "heading": "New this season",
+        "collection": "",
+        "link": ""
+      }
     },
     "rooms": {
       "type": "aa-rooms",
@@ -130,15 +152,29 @@
         "r4",
         "r5"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow": "Shop by Room",
+        "heading": "Begin with the space.",
+        "intro": "See how our pieces live together — then make the room your own."
+      }
     },
     "featured": {
       "type": "aa-featured",
-      "settings": {}
+      "settings": {
+        "eyebrow": "The Featured Collection",
+        "heading": "The Marwar Collection",
+        "intro": "An ode to the courtyards of Rajasthan — low silhouettes, hand-carved frames, and the deep warmth of aged teak and brass.",
+        "collection": "",
+        "link": ""
+      }
     },
     "trade": {
       "type": "aa-trade-band",
-      "settings": {}
+      "settings": {
+        "eyebrow": "Trade & Design Program",
+        "heading": "For designers & architects.",
+        "intro": "We partner with interior designers, architects and hospitality buyers to source with confidence — from a single statement piece to an entire property."
+      }
     },
     "homes": {
       "type": "aa-homes",
@@ -178,7 +214,11 @@
         "h3",
         "h4"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow": "Customer Homes",
+        "heading": "Lived in, beautifully.",
+        "intro": "Real spaces, shared by the homeowners and designers who made them. Tag #ArtAvenueAtHome."
+      }
     },
     "journal": {
       "type": "aa-journal",
@@ -189,6 +229,7 @@
             "category": "Styling",
             "title": "How to layer a living room like a designer",
             "read": "6 min",
+            "link": "",
             "tone": "stone"
           }
         },
@@ -198,6 +239,7 @@
             "category": "Materials",
             "title": "Why hand-knotted wool ages so beautifully",
             "read": "4 min",
+            "link": "",
             "tone": "olive"
           }
         },
@@ -207,6 +249,7 @@
             "category": "At Home",
             "title": "Inside a Bandra apartment, restored",
             "read": "8 min",
+            "link": "",
             "tone": "clay"
           }
         }
@@ -216,11 +259,18 @@
         "j2",
         "j3"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow": "The Journal",
+        "heading": "Design notes & stories",
+        "link": ""
+      }
     },
     "statement": {
       "type": "aa-statement",
-      "settings": {}
+      "settings": {
+        "eyebrow": "Art Avenue",
+        "text": "We are not a furniture store. We are a design house — curating the handcrafted, the considered, and the made-to-last, so your home can hold its stories for generations."
+      }
     }
   },
   "order": [
