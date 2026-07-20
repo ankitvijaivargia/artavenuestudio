@@ -91,6 +91,7 @@
 
 <script>
 (function(){
+  function init(){
   var root = document.querySelector('[data-aa-rug]');
   if(!root) return;
   var form = document.querySelector('form[action*="/cart/add"]');
@@ -220,5 +221,7 @@
     first.classList.add('is-active');
     if(first.dataset.custom){ selectCustom(first); } else { selectStandard(first); }
   }
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 </script>
