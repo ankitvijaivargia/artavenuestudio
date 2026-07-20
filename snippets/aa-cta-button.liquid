@@ -17,6 +17,8 @@
     {%- if _hs and _hm -%}{%- assign sofa_style = true -%}{%- endif -%}
     {%- comment -%} chair configurator also drives the variant id via a hidden input {%- endcomment -%}
     {%- if product.metafields.aav.configurator.value != blank -%}{%- assign sofa_style = true -%}{%- endif -%}
+    {%- comment -%} rug configurator drives variant id + quantity via hidden inputs {%- endcomment -%}
+    {%- if product.metafields.aav.rug_custom.value != blank -%}{%- assign sofa_style = true -%}{%- endif -%}
     {%- if sofa_style -%}
         <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
       {%- elsif product.variants.size > 1 -%}
