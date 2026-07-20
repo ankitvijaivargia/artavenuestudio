@@ -1,0 +1,224 @@
+{%- comment -%}
+  Art Avenue — rug configurator. Size is the only option.
+  Standard sizes are ordinary variants. A "Custom Size" variant is priced per 0.1 sq ft;
+  the customer enters width x length in cm and quantity is set to the area in 0.1 sq ft units.
+  params: product
+{%- endcomment -%}
+{%- assign cfg = product.metafields.aav.rug_custom.value -%}
+{%- assign custom_variant = nil -%}
+{%- for v in product.variants -%}
+  {%- if v.title contains 'Custom' -%}{%- assign custom_variant = v -%}{%- endif -%}
+{%- endfor -%}
+{%- assign first_std = nil -%}
+{%- for v in product.variants -%}
+  {%- unless v.title contains 'Custom' -%}{%- if first_std == nil -%}{%- assign first_std = v -%}{%- endif -%}{%- endunless -%}
+{%- endfor -%}
+
+<style>
+  .aa-rug{margin-top:26px;}
+  .aa-rug__label{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+  .aa-rug__val{letter-spacing:0;text-transform:none;color:var(--text-secondary);font-size:12.5px;}
+  .aa-rug__btns{display:flex;gap:10px;flex-wrap:wrap;}
+  .aa-rug__btn{flex:1 1 auto;min-width:92px;padding:13px 16px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-family:var(--font-sans);font-size:13.5px;cursor:pointer;transition:border-color var(--dur-base),background var(--dur-base);}
+  .aa-rug__btn:hover{border-color:var(--accent);}
+  .aa-rug__btn.is-active{background:var(--text-primary);color:var(--surface-page,#f5f0e6);border-color:var(--text-primary);}
+  .aa-rug__custom{margin-top:14px;padding:18px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);}
+  .aa-rug__custom[hidden]{display:none;}
+  .aa-rug__fields{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
+  .aa-rug__field{flex:1 1 120px;min-width:0;}
+  .aa-rug__field label{display:block;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+  .aa-rug__field input{width:100%;font-family:var(--font-sans);font-size:15px;color:var(--text-primary);background:var(--surface-page);border:1px solid var(--border-strong);border-radius:0;padding:11px 13px;-moz-appearance:textfield;}
+  .aa-rug__field input::-webkit-outer-spin-button,.aa-rug__field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .aa-rug__x{padding-bottom:12px;color:var(--text-muted);font-size:14px;}
+  .aa-rug__hint{font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.5;}
+  .aa-rug__calc{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-hairline);display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .aa-rug__area{font-size:12.5px;color:var(--text-secondary);}
+  .aa-rug__price{font-family:var(--font-sans);font-size:19px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;}
+  .aa-rug__err{margin-top:10px;font-size:12.5px;color:#8a2b2b;line-height:1.5;}
+  .aa-rug__err[hidden]{display:none;}
+</style>
+
+<div class="aa-rug" data-aa-rug
+     data-minw="{{ cfg.min_w_cm | default: 60 }}"
+     data-maxw="{{ cfg.max_w_cm | default: 450 }}"
+     data-minl="{{ cfg.min_l_cm | default: 60 }}"
+     data-maxl="{{ cfg.max_l_cm | default: 900 }}"
+     {%- if custom_variant %} data-custom-id="{{ custom_variant.id }}" data-custom-rate="{{ custom_variant.price }}"{% endif -%}>
+
+  <div class="aa-rug__label">
+    <span>Size</span>
+    <span class="aa-rug__val" data-rug-val>{% if first_std %}{{ first_std.title }}{% endif %}</span>
+  </div>
+
+  <div class="aa-rug__btns">
+    {%- for v in product.variants -%}
+      {%- assign is_custom = false -%}{%- if v.title contains 'Custom' -%}{%- assign is_custom = true -%}{%- endif -%}
+      <button type="button" class="aa-rug__btn{% if first_std and v.id == first_std.id %} is-active{% endif %}"
+              data-rug-size
+              data-vid="{{ v.id }}"
+              data-price="{{ v.price }}"
+              data-title="{{ v.title | escape }}"
+              {% if is_custom %}data-custom="1"{% endif %}>{{ v.title }}</button>
+    {%- endfor -%}
+  </div>
+
+  {%- if custom_variant -%}
+  <div class="aa-rug__custom" data-rug-custom hidden>
+    <div class="aa-rug__fields">
+      <div class="aa-rug__field">
+        <label for="aaRugW">Width (cm)</label>
+        <input type="number" id="aaRugW" data-rug-w inputmode="numeric" step="1"
+               min="{{ cfg.min_w_cm | default: 60 }}" max="{{ cfg.max_w_cm | default: 450 }}" placeholder="95">
+      </div>
+      <div class="aa-rug__x">&times;</div>
+      <div class="aa-rug__field">
+        <label for="aaRugL">Length (cm)</label>
+        <input type="number" id="aaRugL" data-rug-l inputmode="numeric" step="1"
+               min="{{ cfg.min_l_cm | default: 60 }}" max="{{ cfg.max_l_cm | default: 900 }}" placeholder="250">
+      </div>
+    </div>
+    <div class="aa-rug__hint">
+      Woven to your exact measurements, from {{ cfg.min_w_cm | default: 60 }}&ndash;{{ cfg.max_w_cm | default: 450 }} cm wide and {{ cfg.min_l_cm | default: 60 }}&ndash;{{ cfg.max_l_cm | default: 900 }} cm long.
+    </div>
+    <div class="aa-rug__err" data-rug-err hidden></div>
+    <div class="aa-rug__calc" data-rug-calc hidden>
+      <span class="aa-rug__area" data-rug-area></span>
+      <span class="aa-rug__price" data-rug-price></span>
+    </div>
+  </div>
+  {%- endif -%}
+</div>
+
+<script>
+(function(){
+  var root = document.querySelector('[data-aa-rug]');
+  if(!root) return;
+  var form = document.querySelector('form[action*="/cart/add"]');
+  if(!form) return;
+
+  var CM2_PER_SQFT = 929.0304;
+  var custom = root.querySelector('[data-rug-custom]');
+  var wEl = root.querySelector('[data-rug-w]');
+  var lEl = root.querySelector('[data-rug-l]');
+  var errEl = root.querySelector('[data-rug-err]');
+  var calcEl = root.querySelector('[data-rug-calc]');
+  var areaEl = root.querySelector('[data-rug-area]');
+  var priceEl = root.querySelector('[data-rug-price]');
+  var valEl = root.querySelector('[data-rug-val]');
+  var qtyBox = form.querySelector('.aa-qty');
+  var qtyInput = form.querySelector('input[name="quantity"]');
+  var submitBtn = form.querySelector('button[type="submit"]');
+
+  var minW = +root.dataset.minw, maxW = +root.dataset.maxw;
+  var minL = +root.dataset.minl, maxL = +root.dataset.maxl;
+  var customId = root.dataset.customId || null;
+  var customRate = +(root.dataset.customRate || 0);
+
+  var money = function(paise){
+    try{
+      return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(paise/100);
+    }catch(e){ return '₹' + Math.round(paise/100).toLocaleString('en-IN'); }
+  };
+
+  function field(name, value){
+    var el = form.querySelector('[name="'+name+'"][data-rug-injected]');
+    if(value === null){ if(el) el.remove(); return; }
+    if(!el){
+      el = document.createElement('input');
+      el.type = 'hidden'; el.name = name; el.setAttribute('data-rug-injected','');
+      form.appendChild(el);
+    }
+    el.value = value;
+  }
+
+  function setVariant(id){
+    var idEl = form.querySelector('input[name="id"], select[name="id"]');
+    if(idEl) idEl.value = id;
+  }
+
+  function setSubmit(label, enabled){
+    if(!submitBtn) return;
+    submitBtn.textContent = label;
+    submitBtn.disabled = !enabled;
+    submitBtn.style.opacity = enabled ? '' : '.55';
+    submitBtn.style.cursor = enabled ? '' : 'not-allowed';
+  }
+
+  var current = null;
+
+  function selectStandard(btn){
+    current = btn;
+    if(custom) custom.hidden = true;
+    if(qtyBox) qtyBox.style.display = '';
+    if(qtyInput) qtyInput.value = 1;
+    setVariant(btn.dataset.vid);
+    field('properties[Size]', null);
+    field('properties[Dimensions]', null);
+    field('properties[Area]', null);
+    if(valEl) valEl.textContent = btn.dataset.title;
+    setSubmit('Add to Cart · ' + money(+btn.dataset.price), true);
+  }
+
+  function selectCustom(btn){
+    current = btn;
+    if(custom) custom.hidden = false;
+    if(qtyBox) qtyBox.style.display = 'none';
+    setVariant(customId);
+    if(valEl) valEl.textContent = 'Custom Size';
+    recalc();
+  }
+
+  function recalc(){
+    if(!current || !current.dataset.custom) return;
+    var w = parseFloat(wEl && wEl.value), l = parseFloat(lEl && lEl.value);
+    var msg = '';
+    if(!w || !l){
+      msg = '';
+    } else if(w < minW || w > maxW){
+      msg = 'Width must be between ' + minW + ' and ' + maxW + ' cm. For anything outside this, speak with a design consultant.';
+    } else if(l < minL || l > maxL){
+      msg = 'Length must be between ' + minL + ' and ' + maxL + ' cm. For anything outside this, speak with a design consultant.';
+    }
+
+    if(errEl){ errEl.textContent = msg; errEl.hidden = !msg; }
+
+    if(!w || !l || msg){
+      if(calcEl) calcEl.hidden = true;
+      field('properties[Size]', null);
+      field('properties[Dimensions]', null);
+      field('properties[Area]', null);
+      setSubmit('Enter your dimensions', false);
+      return;
+    }
+
+    var sqft = (w * l) / CM2_PER_SQFT;
+    var units = Math.max(1, Math.round(sqft * 10));
+    var total = units * customRate;
+
+    if(qtyInput) qtyInput.value = units;
+    field('properties[Size]', 'Custom — ' + w + ' × ' + l + ' cm');
+    field('properties[Dimensions]', w + ' × ' + l + ' cm');
+    field('properties[Area]', sqft.toFixed(1) + ' sq ft');
+
+    if(calcEl) calcEl.hidden = false;
+    if(areaEl) areaEl.textContent = w + ' × ' + l + ' cm · ' + sqft.toFixed(1) + ' sq ft';
+    if(priceEl) priceEl.textContent = money(total);
+    setSubmit('Add to Cart · ' + money(total), true);
+  }
+
+  root.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-rug-size]');
+    if(!btn) return;
+    root.querySelectorAll('[data-rug-size]').forEach(function(b){ b.classList.toggle('is-active', b === btn); });
+    if(btn.dataset.custom){ selectCustom(btn); } else { selectStandard(btn); }
+  });
+
+  [wEl, lEl].forEach(function(el){ if(el){ el.addEventListener('input', recalc); el.addEventListener('change', recalc); } });
+
+  var first = root.querySelector('[data-rug-size].is-active') || root.querySelector('[data-rug-size]');
+  if(first){
+    first.classList.add('is-active');
+    if(first.dataset.custom){ selectCustom(first); } else { selectStandard(first); }
+  }
+})();
+</script>
