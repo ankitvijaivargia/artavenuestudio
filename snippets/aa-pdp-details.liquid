@@ -6,13 +6,44 @@
 {%- comment -%} rugs get their own care + no assembly section {%- endcomment -%}
 {%- assign is_rug = false -%}
 {%- if product.type == 'Rug' or product.metafields.aav.rug_custom.value != blank -%}{%- assign is_rug = true -%}{%- endif -%}
+{%- comment -%} construction drives materials, craft and care copy. metafield wins, else tag. {%- endcomment -%}
+{%- assign rc = product.metafields.aav.rug_construction | downcase -%}
+{%- unless rc != blank -%}
+  {%- if product.tags contains 'hand-knotted-rugs' -%}{%- assign rc = 'knotted' -%}
+  {%- elsif product.tags contains 'hand-tufted-rugs' -%}{%- assign rc = 'tufted' -%}
+  {%- elsif product.tags contains 'flat-weave-rugs' -%}{%- assign rc = 'flatweave' -%}
+  {%- elsif product.tags contains 'hand-loomed-rugs' -%}{%- assign rc = 'loomed' -%}
+  {%- endif -%}
+{%- endunless -%}
+{%- case rc -%}
+  {%- when 'knotted' -%}{%- assign rc_label = 'Hand-Knotted' -%}
+  {%- when 'tufted' -%}{%- assign rc_label = 'Hand-Tufted' -%}
+  {%- when 'flatweave' -%}{%- assign rc_label = 'Handwoven Flat-Weave' -%}
+  {%- when 'loomed' -%}{%- assign rc_label = 'Hand-Loomed' -%}
+  {%- else -%}{%- assign rc_label = '' -%}
+{%- endcase -%}
 <div class="aa-accordion" id="aaPdpDetails">
   {%- if product.description != blank -%}
   <details open><summary>Description <i class="ph ph-plus aa-acc-pm"></i></summary><div class="rte" style="padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary)">{{ product.description }}</div></details>
   {%- endif -%}
 
   {%- if is_rug -%}
-  <details><summary>Materials &amp; Construction <i class="ph ph-plus aa-acc-pm"></i></summary><p>Knotted, tufted or flat-woven by hand from natural fibres &mdash; wool, cotton, jute and silk blends &mdash; on traditional looms. Because each rug is made by hand from natural yarn, slight variation in colour, pile height and finished dimensions is intrinsic to the piece, not a defect.</p></details>
+  <details><summary>Materials &amp; Construction{% if rc_label != blank %} &mdash; {{ rc_label }}{% endif %} <i class="ph ph-plus aa-acc-pm"></i></summary>
+    {%- case rc -%}
+      {%- when 'knotted' -%}
+      <p>Every knot is tied individually by hand onto the warp &mdash; the most time-honoured and labour-intensive of all rug constructions, and a single piece can occupy several artisans for months. There is no adhesive and no backing: the structure is the knots themselves. That is why a hand-knotted rug can be washed, repaired and passed down across generations.</p>
+      {%- when 'tufted' -%}
+      <p>Wool is punched through a stretched canvas backing with a hand-held tufting tool, secured with a latex adhesive and finished with a cotton scrim. The result is a dense, deeply plush pile with the pattern carved in relief &mdash; the softest underfoot of our constructions.</p>
+      {%- when 'flatweave' -%}
+      <p>Woven by hand on a traditional loom with no knotted pile &mdash; the pattern is created by the weave itself, so it reads on both faces. Flat, light and fully reversible, it suits layering, high-traffic rooms and warmer months.</p>
+      {%- when 'loomed' -%}
+      <p>Woven on a hand-operated loom, drawing the yarn across the warp row by row and shearing the pile level. This gives an even, consistent surface with a softer and more uniform texture than tufting.</p>
+      {%- else -%}
+      <p>Knotted, tufted or flat-woven by hand from natural fibres &mdash; wool, cotton, jute and silk blends &mdash; on traditional looms. Because each rug is made by hand from natural yarn, slight variation in colour, pile height and finished dimensions is intrinsic to the piece, not a defect.</p>
+    {%- endcase -%}
+    <p style="padding-bottom:20px">Made by hand from natural yarn, so slight variation in colour, pile height and finished dimensions is intrinsic to the piece, not a defect.</p>
+  </details>
+
   <details><summary>Rug Care <i class="ph ph-plus aa-acc-pm"></i></summary>
     <ul style="padding:0 0 20px 18px;margin:0;font-size:15px;line-height:1.72;color:var(--text-secondary);max-width:62ch">
       <li>Vacuum periodically with the beater bar or brush roll switched off &mdash; suction only. Never brush or scrub the pile.</li>
@@ -20,14 +51,46 @@
       <li>Rotate the rug every few months so it wears and fades evenly.</li>
       <li>Use protectors under the legs of heavy furniture to prevent flattening and permanent indentation.</li>
       <li>If a thread lifts, never pull it &mdash; trim it level with the pile using sharp scissors.</li>
-      <li>Some shedding is normal in the first months on hand-knotted and hand-tufted wool. It settles with regular gentle vacuuming.</li>
       <li>Keep out of prolonged direct sunlight to preserve the depth of the dyes.</li>
-      <li>An underlay is recommended &mdash; it stops slipping, cushions the pile and extends the life of the rug.</li>
+      {%- case rc -%}
+        {%- when 'knotted' -%}
+        <li>Light shedding may appear at first and settles quickly. With no adhesive backing, this rug can be professionally wet-cleaned and, in time, repaired or restored.</li>
+        <li>An underlay is recommended &mdash; it stops slipping, cushions the pile and extends the life of the rug.</li>
+        {%- when 'tufted' -%}
+        <li><strong>Expect noticeable shedding for the first few months.</strong> This is normal for a tufted pile and reduces steadily with gentle, regular vacuuming.</li>
+        <li>Because the pile is set into an adhesive backing, never soak or steam clean this rug &mdash; excess moisture breaks down the backing. Have it dry-cleaned by a rug specialist.</li>
+        <li>An underlay is recommended &mdash; it stops slipping, cushions the pile and extends the life of the rug.</li>
+        {%- when 'flatweave' -%}
+        <li>Fully reversible &mdash; turn the rug over occasionally to distribute wear evenly across both faces.</li>
+        <li>An anti-slip underlay is strongly recommended: flat-weaves are light and will otherwise shift and ruck underfoot.</li>
+        {%- when 'loomed' -%}
+        <li>Light shedding is normal at first and settles with regular gentle vacuuming.</li>
+        <li>An underlay is recommended &mdash; it stops slipping, cushions the pile and extends the life of the rug.</li>
+        {%- else -%}
+        <li>Some shedding is normal in the first months on any hand-made pile. It settles with regular gentle vacuuming.</li>
+        <li>An underlay is recommended &mdash; it stops slipping, cushions the pile and extends the life of the rug.</li>
+      {%- endcase -%}
       <li>Have the rug professionally cleaned periodically. Avoid machine washing, bleach and harsh solvents.</li>
     </ul>
   </details>
+
   <details><summary>Sizing &amp; Placement <i class="ph ph-plus aa-acc-pm"></i></summary><p>As a guide: in a living room, the front legs of all seating should rest on the rug. In a dining room, allow at least 60 cm beyond the table edge so chairs stay on the rug when pulled out. In a bedroom, allow 45&ndash;60 cm of rug either side of the bed. Custom dimensions are available on most pieces &mdash; enter your measurements on this page, or speak with a design consultant.</p></details>
-  <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary><p>Woven by hand over weeks or months, passing through the hands of several artisans &mdash; dyeing, weaving, washing, clipping and finishing. Hand-knotted rugs are the most labour-intensive of all, with every single knot tied by hand.</p></details>
+
+  <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary>
+    {%- case rc -%}
+      {%- when 'knotted' -%}
+      <p>Wool is carded, hand-spun and dyed in small batches, then knotted row by row on an upright loom. Once cut from the loom the rug is washed, clipped and finished entirely by hand &mdash; the clipping alone defines the final texture and the crispness of the pattern.</p>
+      {%- when 'tufted' -%}
+      <p>The design is traced onto the backing and worked tuft by tuft with a hand tool, then sheared and carved so the pattern stands in relief. Finishing, binding and the final shear are all done by hand.</p>
+      {%- when 'flatweave' -%}
+      <p>The warp is dressed onto the loom and the weft beaten in by hand, row upon row, until the pattern emerges from the weave itself. Nothing is glued or backed &mdash; the rug is exactly what you see on both sides.</p>
+      {%- when 'loomed' -%}
+      <p>The weaver works a hand loom, drawing loops of yarn across the warp before the pile is sheared level and the rug washed and finished by hand.</p>
+      {%- else -%}
+      <p>Woven by hand over weeks or months, passing through the hands of several artisans &mdash; dyeing, weaving, washing, clipping and finishing.</p>
+    {%- endcase -%}
+  </details>
+
   <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>Made-to-order rugs ship in 3&ndash;4 weeks via safe, insured delivery, rolled and wrapped for transit. A rug may arrive with fold marks or a slight curl at the edges &mdash; lay it flat and allow a few days for it to settle. International freight is quoted at checkout.</p></details>
   {%- else -%}
   <details><summary>Materials <i class="ph ph-plus aa-acc-pm"></i></summary><p>Built from carefully selected, natural materials — kiln-dried hardwoods, hand-spun textiles, cast metal and quarried stone, chosen to last for decades. Naturally occurring grain and tone variation is intrinsic to each handmade piece.</p></details>
