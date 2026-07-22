@@ -7,10 +7,28 @@
     <form action="{{ routes.cart_url }}" method="post">
       <table style="width:100%;border-collapse:collapse;margin:24px 0">
         {%- for item in cart.items -%}
+          {%- assign is_custom = false -%}{%- if item.variant.title contains 'Custom' -%}{%- assign is_custom = true -%}{%- endif -%}
           <tr style="border-bottom:1px solid var(--border-hairline)">
             <td style="padding:18px 0;width:96px">{% if item.image %}<div class="aa-fig" style="width:80px;aspect-ratio:1/1"><img src="{{ item.image | image_url: width:200 }}" alt="{{ item.title }}"></div>{% endif %}</td>
-            <td style="padding:18px 16px"><div class="serif" style="font-size:19px">{{ item.product.title }}</div><div style="font-size:13px;color:var(--text-muted)">{{ item.variant.title }}</div></td>
-            <td style="padding:18px 16px"><input type="number" name="updates[]" value="{{ item.quantity }}" min="0" class="aa-control" style="width:72px"></td>
+            <td style="padding:18px 16px">
+              <div class="serif" style="font-size:19px">{{ item.product.title }}</div>
+              {%- unless is_custom or item.variant.title == 'Default Title' -%}<div style="font-size:13px;color:var(--text-muted)">{{ item.variant.title }}</div>{%- endunless -%}
+              {%- for pr in item.properties -%}
+                {%- assign pv = pr.last -%}
+                {%- unless pv == blank -%}{%- assign fc = pr.first | slice: 0 -%}{%- unless fc == '_' -%}
+                  <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px">{{ pr.first }}: {{ pv }}</div>
+                {%- endunless -%}{%- endunless -%}
+              {%- endfor -%}
+              <a href="{{ item.url_to_remove }}" style="display:inline-block;margin-top:8px;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted)">Remove</a>
+            </td>
+            <td style="padding:18px 16px;vertical-align:top">
+              {%- if is_custom -%}
+                <input type="hidden" name="updates[]" value="{{ item.quantity }}">
+                <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent)"><i class="ph ph-ruler" style="font-size:14px"></i> Made to order</div>
+              {%- else -%}
+                <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" class="aa-control" style="width:72px">
+              {%- endif -%}
+            </td>
             <td style="padding:18px 0;text-align:right;font-family:var(--font-serif);font-size:18px">{{ item.final_line_price | money }}</td>
           </tr>
         {%- endfor -%}
