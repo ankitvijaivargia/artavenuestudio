@@ -1,10 +1,12 @@
 {%- comment -%}
   Art Avenue — rug configurator. Size is the only option.
   Standard sizes are ordinary variants. A "Custom Size" variant is priced per 0.1 sq ft;
-  the customer enters width x length in cm and quantity is set to the area in 0.1 sq ft units.
+  the customer enters dimensions and quantity is set to the area in 0.1 sq ft units.
+  Rectangular / runner rugs: width x length in cm.  Round rugs: a single diameter in cm.
   params: product
 {%- endcomment -%}
 {%- assign cfg = product.metafields.aav.rug_custom.value -%}
+{%- assign shape = cfg.shape | default: 'rect' -%}
 {%- assign custom_variant = nil -%}
 {%- for v in product.variants -%}
   {%- if v.title contains 'Custom' -%}{%- assign custom_variant = v -%}{%- endif -%}
@@ -39,10 +41,13 @@
 </style>
 
 <div class="aa-rug" data-aa-rug
+     data-shape="{{ shape }}"
      data-minw="{{ cfg.min_w_cm | default: 60 }}"
      data-maxw="{{ cfg.max_w_cm | default: 450 }}"
      data-minl="{{ cfg.min_l_cm | default: 60 }}"
      data-maxl="{{ cfg.max_l_cm | default: 900 }}"
+     data-mind="{{ cfg.min_d_cm | default: 90 }}"
+     data-maxd="{{ cfg.max_d_cm | default: 300 }}"
      {%- if custom_variant %} data-custom-id="{{ custom_variant.id }}" data-custom-rate="{{ custom_variant.price }}"{% endif -%}>
 
   <div class="aa-rug__label">
@@ -64,6 +69,18 @@
 
   {%- if custom_variant -%}
   <div class="aa-rug__custom" data-rug-custom hidden>
+    {%- if shape == 'round' -%}
+    <div class="aa-rug__fields">
+      <div class="aa-rug__field">
+        <label for="aaRugD">Diameter (cm)</label>
+        <input type="number" id="aaRugD" data-rug-d inputmode="numeric" step="1"
+               min="{{ cfg.min_d_cm | default: 90 }}" max="{{ cfg.max_d_cm | default: 300 }}" placeholder="180">
+      </div>
+    </div>
+    <div class="aa-rug__hint">
+      A perfect circle, woven to your diameter from {{ cfg.min_d_cm | default: 90 }}&ndash;{{ cfg.max_d_cm | default: 300 }} cm.
+    </div>
+    {%- else -%}
     <div class="aa-rug__fields">
       <div class="aa-rug__field">
         <label for="aaRugW">Width (cm)</label>
@@ -80,6 +97,7 @@
     <div class="aa-rug__hint">
       Woven to your exact measurements, from {{ cfg.min_w_cm | default: 60 }}&ndash;{{ cfg.max_w_cm | default: 450 }} cm wide and {{ cfg.min_l_cm | default: 60 }}&ndash;{{ cfg.max_l_cm | default: 900 }} cm long.
     </div>
+    {%- endif -%}
     <div class="aa-rug__err" data-rug-err hidden></div>
     <div class="aa-rug__calc" data-rug-calc hidden>
       <span class="aa-rug__area" data-rug-area></span>
@@ -98,9 +116,12 @@
   if(!form) return;
 
   var CM2_PER_SQFT = 929.0304;
+  var shape = root.dataset.shape || 'rect';
+  var isRound = shape === 'round';
   var custom = root.querySelector('[data-rug-custom]');
   var wEl = root.querySelector('[data-rug-w]');
   var lEl = root.querySelector('[data-rug-l]');
+  var dEl = root.querySelector('[data-rug-d]');
   var errEl = root.querySelector('[data-rug-err]');
   var calcEl = root.querySelector('[data-rug-calc]');
   var areaEl = root.querySelector('[data-rug-area]');
@@ -112,8 +133,9 @@
 
   var minW = +root.dataset.minw, maxW = +root.dataset.maxw;
   var minL = +root.dataset.minl, maxL = +root.dataset.maxl;
+  var minD = +root.dataset.mind, maxD = +root.dataset.maxd;
   var customId = root.dataset.customId || null;
-  var customRate = +(root.dataset.customRate || 0);
+  var customRate = +(root.dataset.customRate || 0); // paise per 0.1 sq ft
 
   var money = function(paise){
     try{
@@ -130,6 +152,12 @@
       form.appendChild(el);
     }
     el.value = value;
+  }
+
+  function clearProps(){
+    field('properties[Size]', null);
+    field('properties[Dimensions]', null);
+    field('properties[Area]', null);
   }
 
   function setVariant(id){
@@ -153,9 +181,7 @@
     if(qtyBox) qtyBox.style.display = '';
     if(qtyInput) qtyInput.value = 1;
     setVariant(btn.dataset.vid);
-    field('properties[Size]', null);
-    field('properties[Dimensions]', null);
-    field('properties[Area]', null);
+    clearProps();
     if(valEl) valEl.textContent = btn.dataset.title;
     setSubmit('Add to Cart · ' + money(+btn.dataset.price), true);
   }
@@ -169,42 +195,58 @@
     recalc();
   }
 
-  function recalc(){
-    if(!current || !current.dataset.custom) return;
-    var w = parseFloat(wEl && wEl.value), l = parseFloat(lEl && lEl.value);
-    var msg = '';
-    if(!w || !l){
-      msg = '';
-    } else if(w < minW || w > maxW){
-      msg = 'Width must be between ' + minW + ' and ' + maxW + ' cm. For anything outside this, speak with a design consultant.';
-    } else if(l < minL || l > maxL){
-      msg = 'Length must be between ' + minL + ' and ' + maxL + ' cm. For anything outside this, speak with a design consultant.';
-    }
-
-    if(errEl){ errEl.textContent = msg; errEl.hidden = !msg; }
-
-    if(!w || !l || msg){
-      if(calcEl) calcEl.hidden = true;
-      field('properties[Size]', null);
-      field('properties[Dimensions]', null);
-      field('properties[Area]', null);
-      setSubmit('Enter your dimensions', false);
-      return;
-    }
-
-    var sqft = (w * l) / CM2_PER_SQFT;
+  function commit(sqft, sizeLabel, dimsLabel, areaLabel){
     var units = Math.max(1, Math.round(sqft * 10));
     var total = units * customRate;
-
     if(qtyInput) qtyInput.value = units;
-    field('properties[Size]', 'Custom — ' + w + ' × ' + l + ' cm');
-    field('properties[Dimensions]', w + ' × ' + l + ' cm');
+    field('properties[Size]', sizeLabel);
+    field('properties[Dimensions]', dimsLabel);
     field('properties[Area]', sqft.toFixed(1) + ' sq ft');
-
     if(calcEl) calcEl.hidden = false;
-    if(areaEl) areaEl.textContent = w + ' × ' + l + ' cm · ' + sqft.toFixed(1) + ' sq ft';
+    if(areaEl) areaEl.textContent = areaLabel;
     if(priceEl) priceEl.textContent = money(total);
     setSubmit('Add to Cart · ' + money(total), true);
+  }
+
+  function invalid(msg){
+    if(errEl){ errEl.textContent = msg || ''; errEl.hidden = !msg; }
+    if(calcEl) calcEl.hidden = true;
+    clearProps();
+    setSubmit(isRound ? 'Enter a diameter' : 'Enter your dimensions', false);
+  }
+
+  function recalc(){
+    if(!current || !current.dataset.custom) return;
+
+    if(isRound){
+      var d = parseFloat(dEl && dEl.value);
+      if(!d){ return invalid(''); }
+      if(d < minD || d > maxD){
+        return invalid('Diameter must be between ' + minD + ' and ' + maxD + ' cm. For anything outside this, speak with a design consultant.');
+      }
+      if(errEl){ errEl.hidden = true; }
+      var r = d / 2;
+      var sqft = (Math.PI * r * r) / CM2_PER_SQFT;
+      return commit(sqft,
+        'Custom — ⌀ ' + d + ' cm',
+        '⌀ ' + d + ' cm (round)',
+        '⌀ ' + d + ' cm · ' + sqft.toFixed(1) + ' sq ft');
+    }
+
+    var w = parseFloat(wEl && wEl.value), l = parseFloat(lEl && lEl.value);
+    if(!w || !l){ return invalid(''); }
+    if(w < minW || w > maxW){
+      return invalid('Width must be between ' + minW + ' and ' + maxW + ' cm. For anything outside this, speak with a design consultant.');
+    }
+    if(l < minL || l > maxL){
+      return invalid('Length must be between ' + minL + ' and ' + maxL + ' cm. For anything outside this, speak with a design consultant.');
+    }
+    if(errEl){ errEl.hidden = true; }
+    var sqft2 = (w * l) / CM2_PER_SQFT;
+    commit(sqft2,
+      'Custom — ' + w + ' × ' + l + ' cm',
+      w + ' × ' + l + ' cm',
+      w + ' × ' + l + ' cm · ' + sqft2.toFixed(1) + ' sq ft');
   }
 
   root.addEventListener('click', function(e){
@@ -214,7 +256,7 @@
     if(btn.dataset.custom){ selectCustom(btn); } else { selectStandard(btn); }
   });
 
-  [wEl, lEl].forEach(function(el){ if(el){ el.addEventListener('input', recalc); el.addEventListener('change', recalc); } });
+  [wEl, lEl, dEl].forEach(function(el){ if(el){ el.addEventListener('input', recalc); el.addEventListener('change', recalc); } });
 
   var first = root.querySelector('[data-rug-size].is-active') || root.querySelector('[data-rug-size]');
   if(first){
