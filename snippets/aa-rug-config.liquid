@@ -156,7 +156,7 @@
 
   function clearProps(){
     field('properties[Size]', null);
-    field('properties[Dimensions]', null);
+    field('properties[_Dimensions]', null);
     field('properties[Area]', null);
   }
 
@@ -200,7 +200,7 @@
     var total = units * customRate;
     if(qtyInput) qtyInput.value = units;
     field('properties[Size]', sizeLabel);
-    field('properties[Dimensions]', dimsLabel);
+    field('properties[_Dimensions]', dimsLabel);
     field('properties[Area]', sqft.toFixed(1) + ' sq ft');
     if(calcEl) calcEl.hidden = false;
     if(areaEl) areaEl.textContent = areaLabel;
