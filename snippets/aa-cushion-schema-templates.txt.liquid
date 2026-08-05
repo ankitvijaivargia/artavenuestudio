@@ -1,0 +1,48 @@
+{%- comment -%}
+Art Avenue — CUSHION schema templates (authoritative reference; never rendered).
+Category rules confirmed 2026-08:
+  - Square and rectangular versions of a design are SEPARATE products.
+  - Two priced Shopify axes: Size (position 1) × Fill (position 2). All variants inventoryPolicy CONTINUE.
+  - Fill values: "Cover Only", "With Insert" (Cover Only listed first = default selection).
+  - Size values are cm-led with multiplication sign: "45 × 45 cm", "30 × 50 cm".
+    Inch equivalents shown via aav.size_dimensions (dims box under the Size buttons).
+  - Shaped cushions: With Insert only, fixed size -> single variant, Size "One Size" + Fill "With Insert".
+  - Designs WITHOUT colourways: set "no_pickers": true in aav.configurator.
+    (An empty pickers array is BLANK in Liquid and falls into the legacy sofa gridsw row — never use pickers:[].)
+  - Designs WITH colourways: per-design swatch category to prevent cross-design bleed, e.g. "Cushion Tokyo".
+    Seed swatch metaobjects in that category, reference them from the product's aav.swatches list,
+    and use the always-on picker template below instead of no_pickers.
+
+STANDARD SIZE LIBRARY (extensible per product):
+  Square:      40 × 40 cm (16 × 16 in) | 45 × 45 cm (18 × 18 in) | 50 × 50 cm (20 × 20 in) | 60 × 60 cm (24 × 24 in)
+  Rectangular: 30 × 50 cm (12 × 20 in) | 40 × 60 cm (16 × 24 in) | 35 × 85 cm (14 × 33 in)
+
+============================================================
+TEMPLATE C1 — SQUARE or RECTANGULAR, no colourways (built: Tokyo Cushion Cover — Square, gid 8405170389039)
+============================================================
+aav.configurator (json):
+{"engine":"grid","size_option":"Size","material_option":"Fill","size_label":"Size","material_label":"Fill","no_pickers":true,"custom_size_text":"Want a custom size or a different fabric?","material_notes":{"Cover Only":"Cover only \u2014 insert not included. Pairs with a standard insert in the matching size.","With Insert":"Arrives ready to style, with a plush hypoallergenic fibre insert included."}}
+
+aav.size_dimensions (json) — one entry per Size value, e.g.:
+{"45 × 45 cm":{"cm":"45 × 45 cm","in":"18 × 18 in"},"50 × 50 cm":{"cm":"50 × 50 cm","in":"20 × 20 in"},"60 × 60 cm":{"cm":"60 × 60 cm","in":"24 × 24 in"}}
+
+============================================================
+TEMPLATE C2 — SQUARE or RECTANGULAR, WITH colourways
+============================================================
+Same axes/variants as C1. Replace "no_pickers":true with:
+"pickers":[{"key":"colourway","label":"Colourway","category":"Cushion <Design>","property":"Colourway","order_swatch":true}]
+Then: create swatch metaobjects with category "Cushion <Design>" (name, hex, optional photo),
+and set the product's aav.swatches list to reference exactly those metaobjects.
+
+============================================================
+TEMPLATE C3 — SHAPED cushion (With Insert only, fixed size)
+============================================================
+Options: Size ["One Size"] × Fill ["With Insert"] -> 1 variant, CONTINUE.
+aav.configurator (json):
+{"engine":"grid","size_option":"Size","material_option":"Fill","size_label":"Size","material_label":"Fill","no_pickers":true,"custom_size_text":"After a different shape or size? We can make it.","material_notes":{"With Insert":"Insert included \u2014 shaped cushions arrive ready to style."}}
+aav.size_dimensions (json): {"One Size":{"cm":"<W> × <H> cm","in":"<W> × <H> in"}}
+Colourway variant: swap no_pickers for the C2 pickers block.
+
+Adding a size later to any live cushion = productVariantsBulkCreate with the two new
+Size × Fill variants (Shopify auto-creates the option value) + extend aav.size_dimensions.
+{%- endcomment -%}
