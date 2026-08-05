@@ -12,6 +12,7 @@
        branch_by_axis:false -> always-on picker filtered by the picker's own category
                                (e.g. leather colour, fabric print).
      When cfg.pickers is absent, the legacy single swatch picker (gridsw) is used (sofa).
+     Set cfg.no_pickers:true to suppress the swatch row entirely (cushions: grid only).
    - otherwise              -> single-priced-axis path (tier | size) + property pickers.
      Used by armchairs (tier) and ottomans/benches (size). UNCHANGED.
   params: product
@@ -108,6 +109,8 @@
     </div>
   </div>
   {%- endfor -%}
+  {%- elsif cfg.no_pickers -%}
+  {%- comment -%} NO PICKERS: grid axes only (cushions) {%- endcomment -%}
   {%- else -%}
   {%- comment -%} LEGACY single swatch picker (sofa), bound to active material {%- endcomment -%}
   <div class="aa-sofa__group">
