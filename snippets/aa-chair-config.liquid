@@ -57,7 +57,8 @@
           {%- assign dcm = '' -%}{%- assign din = '' -%}
           {%- if dims_obj != blank and dims_obj[v] -%}{%- assign dcm = dims_obj[v].cm -%}{%- assign din = dims_obj[v].in -%}{%- endif -%}
           {%- if dcm == blank -%}{%- assign dcm = cfg.unit_map[v] -%}{%- endif -%}
-          <button type="button" class="aa-sofa__btn{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}" data-dim-cm="{{ dcm | escape }}" data-dim-in="{{ din | escape }}">{{ v }}</button>
+          {%- assign v_parts = v | split: ' / ' -%}
+          <button type="button" class="aa-sofa__btn{% if v_parts.size > 1 %} aa-sofa__btn--size{% endif %}{% if v == size_o.selected_value %} is-active{% endif %}" data-grid-size="{{ v | escape }}" data-dim-cm="{{ dcm | escape }}" data-dim-in="{{ din | escape }}">{%- if v_parts.size > 1 -%}<span class="aa-sofa__btn-imp">{{ v_parts[0] }}</span><span class="aa-sofa__btn-met">{{ v_parts[1] }}</span>{%- else -%}{{ v }}{%- endif -%}</button>
         {%- endfor -%}
       </div>
     {%- else -%}
