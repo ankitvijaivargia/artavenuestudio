@@ -272,7 +272,7 @@
     var woodOrderSwatch={% if has_wood and cfg.wood.order_swatch == false %}false{% else %}true{% endif %};
 
     function norm(s){ return (s==null?'':String(s)).trim(); }
-    function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
+    function money(v){ var n=(Number(v)||0)/100; return '₹ ' + Math.round(n).toLocaleString('en-IN'); }
     function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
     function key(s,m){ return norm(s)+'|||'+norm(m); }
 
@@ -448,7 +448,7 @@
       var word=matLabelWord();
       var lbl=root.querySelector('[data-grid-swlabel]'); if(lbl) lbl.textContent=word;
       var sub=root.querySelector('[data-grid-swsub]');
-      if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from \\u20B92,000 to feel it first.';
+      if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from ₹2,000 to feel it first.';
       registerSwatch();
       var items=mats[state.mat]||[];
       var chosen=state.picks['sw_'+state.mat]||items[0];
@@ -712,7 +712,7 @@
   try { sets = JSON.parse(document.getElementById('aa-chair-sets-'+pid).textContent); } catch(e){ sets = {}; }
 
   function norm(s){ return (s==null?'':String(s)).trim(); }
-  function money(v){ var n=(Number(v)||0)/100; return '\u20B9 ' + Math.round(n).toLocaleString('en-IN'); }
+  function money(v){ var n=(Number(v)||0)/100; return '₹ ' + Math.round(n).toLocaleString('en-IN'); }
   function form(){ return document.querySelector('.aa-buyrow form') || document.querySelector('form[action*="/cart/add"]'); }
 
   var tierKey=null, pricedType=null; for(var k in sets){ if(sets[k].type==='tier' || sets[k].type==='size'){ tierKey=k; pricedType=sets[k].type; break; } }
@@ -812,7 +812,7 @@
     var word=tierLabelWord();
     var lbl=root.querySelector('[data-chair-tierswlabel]'); if(lbl) lbl.textContent=word;
     var sub=root.querySelector('[data-chair-tiersub]');
-    if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from \\u20B92,000 to feel it first.';
+    if(sub) sub.textContent='Choose your '+word.toLowerCase()+', or order a swatch from ₹2,000 to feel it first.';
     defaultPick(tierKey);
   }
 
