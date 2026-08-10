@@ -2,12 +2,43 @@
 {%- capture consult -%}{% render 'aa-lead-url', type:'consultation', product: product %}{%- endcapture -%}
 <div class="aa-stickybar" data-aa-sticky>
   <div class="aa-stickybar__in">
-    <div class="aa-stickybar__name"><b>{{ product.title }}</b><span data-sticky-price>{{ price_text }}</span></div>
+    <div class="aa-stickybar__name"><b>{{ product.title }}</b><span data-sticky-price data-aa-price-display>{{ price_text }}</span></div>
     <a class="btn btn--secondary aa-stickybar__consult" href="{{ consult | strip }}" target="_blank" rel="noopener" aria-label="Consult"><i class="ph ph-chat-teardrop-dots"></i><span class="aa-stickybar__consult-tx"> Consult</span></a>
     {%- if show_cart -%}
-      {%- form 'product', product -%}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-sticky-id><button class="btn btn--primary" type="submit">Add to Cart</button>{%- endform -%}
+      {%- form 'product', product -%}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-sticky-id><button class="btn btn--primary" type="submit" data-sticky-submit>Add to Cart</button>{%- endform -%}
     {%- else -%}
       <a class="btn btn--primary" href="{{ consult | strip }}" target="_blank" rel="noopener">Enquire</a>
     {%- endif -%}
   </div>
 </div>
+
+<script>
+(function(){
+  if(window.aaStickySyncInit) return;
+  window.aaStickySyncInit = true;
+  function bind(){
+    var rug = document.querySelector('[data-aa-rug]');
+    if(!rug) return;
+    var idEl = document.querySelector('[data-sticky-id]');
+    var subEl = document.querySelector('[data-sticky-submit]');
+    var consultEl = document.querySelector('.aa-stickybar__consult');
+    function sync(btn){
+      if(!btn) return;
+      if(btn.dataset.custom){
+        if(subEl) subEl.style.display = 'none';
+        if(consultEl) consultEl.style.flex = '1';
+        return;
+      }
+      if(subEl) subEl.style.display = '';
+      if(consultEl) consultEl.style.flex = '';
+      if(idEl && btn.dataset.vid) idEl.value = btn.dataset.vid;
+    }
+    rug.addEventListener('click', function(e){
+      var b = e.target.closest('[data-rug-size]');
+      if(b) sync(b);
+    });
+    sync(rug.querySelector('[data-rug-size].is-active'));
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', bind); } else { bind(); }
+})();
+</script>
