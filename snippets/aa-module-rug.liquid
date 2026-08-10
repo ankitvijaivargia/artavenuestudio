@@ -1,0 +1,98 @@
+{%- comment -%}
+  Art Avenue — rug content modules (specs, construction, craft).
+  Driven by aav.rug_specs (json). Falls back to construction tags so
+  existing rugs render correctly before rug_specs is populated.
+  params: key, product
+{%- endcomment -%}
+{%- assign p = product -%}
+{%- assign rs = p.metafields.aav.rug_specs.value -%}
+
+{%- assign constr = rs.construction -%}
+{%- if constr == blank -%}
+  {%- if p.tags contains 'hand-tufted-rugs' -%}{%- assign constr = 'Hand-Tufted' -%}
+  {%- elsif p.tags contains 'flat-weave-rugs' -%}{%- assign constr = 'Flat-Weave' -%}
+  {%- elsif p.tags contains 'hand-loomed-rugs' -%}{%- assign constr = 'Hand-Loomed' -%}
+  {%- else -%}{%- assign constr = 'Hand-Knotted' -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign lead = rs.lead_time -%}
+{%- if lead == blank -%}{%- assign lead = p.metafields.aav.lead_time.value -%}{%- endif -%}
+{%- if lead == blank -%}{%- assign lead = 'Made to order' -%}{%- endif -%}
+
+{%- assign rug_shape = p.metafields.aav.rug_custom.value.shape | default: 'rect' -%}
+{%- if rug_shape == 'round' -%}{%- assign shape_label = 'Round' -%}
+{%- elsif rug_shape == 'runner' -%}{%- assign shape_label = 'Runner' -%}
+{%- else -%}{%- assign shape_label = 'Rectangular' -%}{%- endif -%}
+
+{%- case key -%}
+
+{%- when 'specs' -%}
+<section class='aa-section'><div class='aa-wrap'>
+  <span class='aa-eyebrow aa-eyebrow--rule'>Specifications</span>
+  <h2 class='aa-h1' style='margin:16px 0 0'>Every detail, on the record.</h2>
+  <div class='grid-3 aa-modrail' style='margin-top:44px'>
+
+    <div><div class='aa-eyebrow' style='padding-bottom:14px;border-bottom:1px solid var(--border-strong)'>Construction</div><dl style='margin:0'>
+      {%- capture c_rows -%}Construction|{{ constr }}{% if rs.knot_density != blank %}~Knot density|{{ rs.knot_density }}{% endif %}{% if rs.pile_height != blank %}~Pile height|{{ rs.pile_height }}{% endif %}~Shape|{{ shape_label }}{% if rs.shape_note != blank %} · {{ rs.shape_note }}{% endif %}{%- endcapture -%}
+      {%- assign c_list = c_rows | split: '~' -%}
+      {%- for r in c_list -%}{%- assign rp = r | split: '|' -%}
+        <div style='display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)'><dt style='font-size:13px;color:var(--text-muted)'>{{ rp[0] }}</dt><dd style='margin:0;font-size:13.5px'>{{ rp[1] }}</dd></div>
+      {%- endfor -%}
+    </dl></div>
+
+    <div><div class='aa-eyebrow' style='padding-bottom:14px;border-bottom:1px solid var(--border-strong)'>Material &amp; colour</div><dl style='margin:0'>
+      {%- capture m_rows -%}Pile|{{ rs.pile | default: 'Hand-spun highland wool' }}~Foundation|{{ rs.foundation | default: 'Mercerised cotton' }}~Colour|{{ rs.colour | default: 'Vegetable &amp; low-impact dyes' }}{% if rs.weight != blank %}~Weight|{{ rs.weight }}{% endif %}{%- endcapture -%}
+      {%- assign m_list = m_rows | split: '~' -%}
+      {%- for r in m_list -%}{%- assign rp = r | split: '|' -%}
+        <div style='display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)'><dt style='font-size:13px;color:var(--text-muted)'>{{ rp[0] }}</dt><dd style='margin:0;font-size:13.5px'>{{ rp[1] }}</dd></div>
+      {%- endfor -%}
+    </dl></div>
+
+    <div><div class='aa-eyebrow' style='padding-bottom:14px;border-bottom:1px solid var(--border-strong)'>Use &amp; care</div><dl style='margin:0'>
+      {%- capture u_rows -%}Suitability|{{ rs.suitability | default: 'Indoor · residential' }}~Origin|{{ rs.origin | default: 'Handmade in India' }}~Lead time|{{ lead }}~Care|{{ rs.care | default: 'Vacuum on low · rotate twice yearly' }}{%- endcapture -%}
+      {%- assign u_list = u_rows | split: '~' -%}
+      {%- for r in u_list -%}{%- assign rp = r | split: '|' -%}
+        <div style='display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-hairline)'><dt style='font-size:13px;color:var(--text-muted)'>{{ rp[0] }}</dt><dd style='margin:0;font-size:13.5px'>{{ rp[1] }}</dd></div>
+      {%- endfor -%}
+    </dl></div>
+
+  </div>
+</div></section>
+
+{%- when 'construction' -%}
+<section class='aa-section aa-alt'><div class='aa-wrap'>
+  <span class='aa-eyebrow aa-eyebrow--rule'>Understand the Craft</span>
+  <h2 class='aa-h1' style='margin:16px 0 0'>How a rug is made changes everything.</h2>
+  <div class='grid-4 aa-modrail' style='margin-top:40px'>
+    {%- assign cs = 'Hand-Knotted|Every knot tied by hand around the warp — the most enduring and collectible construction. Months on the loom; a rug made to be passed down.|Exceptional · decades|High-traffic living &amp; dining~Hand-Tufted|Wool punched through a backing and sheared to a plush, even pile. Quicker to make and gentler on price, soft underfoot.|Good · 8–12 years|Bedrooms &amp; low-traffic~Flat-Weave|Woven flat with no pile — reversible, light and crisp in pattern. Easy to lift, air and layer over a larger rug.|Hard-wearing · reversible|Layering, kitchens, entryways~Hand-Loomed|Woven on a loom with a subtle loop or cut pile — a quiet, contemporary texture between knotted and flat.|Very good|Living rooms &amp; studies' | split: '~' -%}
+    {%- for c in cs -%}{%- assign cp = c | split: '|' -%}
+      {%- assign is_this = false -%}{%- if cp[0] == constr -%}{%- assign is_this = true -%}{%- endif -%}
+      <div style='position:relative;background:{% if is_this %}var(--surface-sand, var(--surface-raised)){% else %}var(--surface-raised){% endif %};border:1px solid {% if is_this %}var(--accent){% else %}var(--border-hairline){% endif %};border-radius:var(--radius-sm);padding:24px 22px'>{% if is_this %}<span style='position:absolute;top:18px;right:20px;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-accent)'>This rug</span>{% endif %}<h3 class='serif' style='font-size:21px'>{{ cp[0] }}</h3><p style='font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin:12px 0 18px'>{{ cp[1] }}</p><div style='display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px'><span style='font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);align-self:center'>Durability</span><span>{{ cp[2] }}</span><span style='font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);align-self:center'>Best for</span><span>{{ cp[3] }}</span></div></div>
+    {%- endfor -%}
+  </div>
+</div></section>
+
+{%- when 'craft' -%}
+{%- assign craft_title = rs.craft_title -%}
+{%- assign craft_body = rs.craft_body -%}
+{%- if craft_title == blank -%}
+  {%- if constr == 'Hand-Tufted' -%}{%- assign craft_title = 'Tufted by hand, sheared by eye.' -%}
+  {%- elsif constr == 'Flat-Weave' -%}{%- assign craft_title = 'Woven flat on a pit loom.' -%}
+  {%- elsif constr == 'Hand-Loomed' -%}{%- assign craft_title = 'Loomed slowly, in small runs.' -%}
+  {%- else -%}{%- assign craft_title = 'Knotted entirely by hand, the old way.' -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if craft_body == blank -%}
+  {%- if constr == 'Hand-Tufted' -%}{%- assign craft_body = 'Wool is punched through a stretched backing strand by strand, then sheared level by hand until the pile sits true. The finish is plush and even; the making is quicker than knotting, and the price follows.' -%}
+  {%- elsif constr == 'Flat-Weave' -%}{%- assign craft_body = 'Warp and weft interlace with no pile at all, so the pattern reads the same on both faces. Light enough to lift and air, crisp enough to layer over something larger.' -%}
+  {%- elsif constr == 'Hand-Loomed' -%}{%- assign craft_body = 'Woven on a hand loom in short runs, with a loop or cut pile that sits quietly between knotted density and flat-weave crispness.' -%}
+  {%- else -%}{%- assign craft_body = 'A single piece passes through the hands of spinners, dyers and weavers, and can take months to finish. The gentle variation you see is the signature of that human hand, never a flaw.' -%}
+  {%- endif -%}
+{%- endif -%}
+<section class='aa-section aa-alt'><div class='aa-wrap aa-modwrap' style='display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,90px);align-items:center'>
+  {% render 'aa-figure', tone:'espresso', ratio:'4/5', label:'On the loom' %}
+  <div><span class='aa-eyebrow aa-eyebrow--rule'>Craftsmanship</span><h2 class='aa-h1' style='margin-top:16px'>{{ craft_title }}</h2><p style='font-size:var(--text-body);line-height:1.72;color:var(--text-secondary);margin-top:16px;max-width:56ch'>{{ craft_body }}</p></div>
+</div></section>
+
+{%- endcase -%}
