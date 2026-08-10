@@ -1,21 +1,24 @@
 {%- comment -%}
-  Display price. Shows a From price on load for multi-size rugs, then tracks the
-  selected size. Any rug custom-size variant is excluded from the From figure.
+  Display price.
+  Multi-variant products open on a From price computed across real variants;
+  once the customer picks a size the exact price replaces it.
+  Any variant whose title contains "Custom" is excluded from the From figure —
+  rug custom sizes are priced per 0.1 sq ft and would otherwise dominate.
+  Tracking is done by watching the cart form's variant input, so this works with
+  the grid engine and the rug engine alike without knowing either one's markup.
 {%- endcomment -%}
 {%- assign disp_price = product.price -%}
 {%- assign price_prefix = '' -%}
-{%- if product.metafields.aav.rug_custom.value != blank -%}
-  {%- assign lowest = 0 -%}{%- assign std_count = 0 -%}
-  {%- for v in product.variants -%}
-    {%- unless v.title contains 'Custom' -%}
-      {%- assign std_count = std_count | plus: 1 -%}
-      {%- if lowest == 0 or v.price < lowest -%}{%- assign lowest = v.price -%}{%- endif -%}
-    {%- endunless -%}
-  {%- endfor -%}
-  {%- if lowest > 0 -%}
-    {%- assign disp_price = lowest -%}
-    {%- if std_count > 1 -%}{%- assign price_prefix = 'From ' -%}{%- endif -%}
-  {%- endif -%}
+{%- assign lowest = 0 -%}{%- assign std_count = 0 -%}
+{%- for v in product.variants -%}
+  {%- unless v.title contains 'Custom' -%}
+    {%- assign std_count = std_count | plus: 1 -%}
+    {%- if lowest == 0 or v.price < lowest -%}{%- assign lowest = v.price -%}{%- endif -%}
+  {%- endunless -%}
+{%- endfor -%}
+{%- if lowest > 0 -%}
+  {%- assign disp_price = lowest -%}
+  {%- if std_count > 1 -%}{%- assign price_prefix = 'From ' -%}{%- endif -%}
 {%- endif -%}
 {%- if show_price -%}
   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:16px">
@@ -32,6 +35,11 @@
 (function(){
   if(window.aaPriceSyncInit) return;
   window.aaPriceSyncInit = true;
+
+  var PRICES = {
+    {%- for v in product.variants -%}"{{ v.id }}": {{ v.price }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
+  };
+
   function money(rupees){
     try{ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(rupees); }
     catch(e){ return '\\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
@@ -39,21 +47,43 @@
   function paint(txt){
     document.querySelectorAll('[data-aa-price-display]').forEach(function(el){ el.textContent = txt; });
   }
-  function sync(btn){
-    if(!btn) return;
-    if(btn.dataset.custom){ paint('Priced on enquiry'); return; }
-    var p = parseFloat(btn.dataset.price);
-    if(!isNaN(p)) paint(money(p/100));
+
+  function start(){
+    var form = document.querySelector('form[action*="/cart/add"]');
+    if(!form) return;
+    var idEl = form.querySelector('input[name="id"], select[name="id"]');
+    if(!idEl) return;
+
+    var initial = String(idEl.value || '');
+    var last = initial;
+    var touched = false;
+
+    function apply(id){
+      var p = PRICES[id];
+      if(typeof p === 'number') paint(money(p/100));
+    }
+
+    // Rug custom size has no variant of its own — flag it explicitly.
+    var rug = document.querySelector('[data-aa-rug]');
+    if(rug){
+      rug.addEventListener('click', function(e){
+        var b = e.target.closest('[data-rug-size]');
+        if(!b) return;
+        touched = true;
+        if(b.dataset.custom){ paint('Priced on enquiry'); }
+        else if(b.dataset.vid){ last = String(b.dataset.vid); apply(last); }
+      });
+    }
+
+    setInterval(function(){
+      var now = String(idEl.value || '');
+      if(now === last) return;
+      last = now;
+      touched = true;
+      apply(now);
+    }, 250);
   }
-  function bind(){
-    var wrap = document.querySelector('[data-aa-rug]');
-    if(!wrap) return;
-    wrap.addEventListener('click', function(e){
-      var b = e.target.closest('[data-rug-size]');
-      if(b) sync(b);
-    });
-    sync(wrap.querySelector('[data-rug-size].is-active'));
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', bind); } else { bind(); }
+
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
 })();
 </script>
