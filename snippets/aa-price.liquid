@@ -1,6 +1,6 @@
 {%- comment -%}
-  Display price. For rugs, the Custom Size variant is priced per 0.1 sq ft
-  and must never drive the headline price — exclude it and show a From price.
+  Display price. Shows a From price on load for multi-size rugs, then tracks the
+  selected size. Any rug custom-size variant is excluded from the From figure.
 {%- endcomment -%}
 {%- assign disp_price = product.price -%}
 {%- assign price_prefix = '' -%}
@@ -19,7 +19,7 @@
 {%- endif -%}
 {%- if show_price -%}
   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:16px">
-    <span class="aa-price" style="margin-top:0">{{ price_prefix }}{% render 'aa-money', cents: disp_price %}</span>
+    <span class="aa-price" style="margin-top:0" data-aa-price-display>{{ price_prefix }}{% render 'aa-money', cents: disp_price %}</span>
     {%- if caption != blank -%}<span class="aa-price-cap" style="margin-top:0">{{ caption }}</span>{%- endif -%}
   </div>
 {%- elsif visibility == 'project-only' -%}
@@ -27,3 +27,33 @@
 {%- else -%}
   <div class="aa-price aa-price--enquire">Price on request <span>Shared on enquiry</span></div>
 {%- endif -%}
+
+<script>
+(function(){
+  if(window.aaPriceSyncInit) return;
+  window.aaPriceSyncInit = true;
+  function money(rupees){
+    try{ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(rupees); }
+    catch(e){ return '\\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
+  }
+  function paint(txt){
+    document.querySelectorAll('[data-aa-price-display]').forEach(function(el){ el.textContent = txt; });
+  }
+  function sync(btn){
+    if(!btn) return;
+    if(btn.dataset.custom){ paint('Priced on enquiry'); return; }
+    var p = parseFloat(btn.dataset.price);
+    if(!isNaN(p)) paint(money(p/100));
+  }
+  function bind(){
+    var wrap = document.querySelector('[data-aa-rug]');
+    if(!wrap) return;
+    wrap.addEventListener('click', function(e){
+      var b = e.target.closest('[data-rug-size]');
+      if(b) sync(b);
+    });
+    sync(wrap.querySelector('[data-rug-size].is-active'));
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', bind); } else { bind(); }
+})();
+</script>
