@@ -17,11 +17,24 @@
     {%- when 'custom' -%}{%- assign ful_label = 'Custom Order' -%}
     {%- when 'project' -%}{%- assign ful_label = 'Project Enquiry' -%}
   {%- endcase -%}
+  {%- comment -%} From price across real variants; custom-size variants never lead {%- endcomment -%}
+  {%- assign card_price = product.price -%}{%- assign card_prefix = '' -%}
+  {%- assign card_low = 0 -%}{%- assign card_n = 0 -%}
+  {%- for cv in product.variants -%}
+    {%- unless cv.title contains 'Custom' -%}
+      {%- assign card_n = card_n | plus: 1 -%}
+      {%- if card_low == 0 or cv.price < card_low -%}{%- assign card_low = cv.price -%}{%- endif -%}
+    {%- endunless -%}
+  {%- endfor -%}
+  {%- if card_low > 0 -%}
+    {%- assign card_price = card_low -%}
+    {%- if card_n > 1 -%}{%- assign card_prefix = 'From ' -%}{%- endif -%}
+  {%- endif -%}
   <div class="aa-pcard-wrap">
     <a class="aa-pcard" href="{{ product.url }}">
       <div class="aa-pcard__media">
         {%- if product.featured_image -%}
-          <div class="aa-fig"><img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}" loading="lazy"></div>
+          <div class="aa-fig aa-full-bg"><img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" loading="lazy"></div>
         {%- else -%}{% render 'aa-figure', tone: 'clay', class: 'aa-full-bg' %}{%- endif -%}
         {%- if badge -%}<span class="aa-pcard__badge"><span class="aa-badge aa-badge--on-image">{{ badge }}</span></span>{%- endif -%}
         <button type="button" class="aa-pcard__fav" aria-label="Save to wishlist" onclick="event.preventDefault();event.stopPropagation();this.classList.toggle('is-saved');"><i class="ph ph-heart"></i></button>
@@ -29,7 +42,7 @@
       <div class="aa-pcard__body">
         {%- if product.type != blank -%}<div class="aa-pcard__cat">{{ product.type }}</div>{%- endif -%}
         <div class="aa-pcard__name">{{ product.title }}</div>
-        <div class="aa-pcard__price">{% if product.price > 0 %}{% render 'aa-money', cents: product.price %}{% else %}Price on request{% endif %}</div>
+        <div class="aa-pcard__price">{% if card_price > 0 %}{{ card_prefix }}{% render 'aa-money', cents: card_price %}{% else %}Price on request{% endif %}</div>
         {%- if ful_label != blank -%}<div class="aa-pcard__ful">{{ ful_label }}</div>{%- endif -%}
       </div>
     </a>
