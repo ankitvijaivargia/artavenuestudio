@@ -6,6 +6,7 @@
   No priced custom variant is used, so the Custom Size price can never pollute
   product.price, collection tiles, structured data or product feeds.
   Enable per rug with cfg.custom_size (default true; set false for fixed-size rugs).
+  cfg.size_sublabels gives cm equivalents, format: "5×8 ft|152 × 244 cm~6×9 ft|183 × 274 cm"
   Rectangular / runner: width x length in cm.  Round: a single diameter in cm.
   params: product
 {%- endcomment -%}
@@ -15,6 +16,7 @@
 {%- if cfg.custom_size == false -%}{%- assign allow_custom = false -%}{%- endif -%}
 {%- assign rate = cfg.rate_per_sqft | default: 0 -%}
 {%- if rate == 0 -%}{%- assign allow_custom = false -%}{%- endif -%}
+{%- assign sub_pairs = cfg.size_sublabels | default: '' | split: '~' -%}
 {%- assign first_std = nil -%}
 {%- for v in product.variants -%}
   {%- unless v.title contains 'Custom' -%}{%- if first_std == nil -%}{%- assign first_std = v -%}{%- endif -%}{%- endunless -%}
@@ -26,11 +28,11 @@
   .aa-rug__label{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
   .aa-rug__val{letter-spacing:0;text-transform:none;color:var(--text-secondary);font-size:12.5px;}
   .aa-rug__btns{display:flex;gap:10px;flex-wrap:wrap;}
-  .aa-rug__btn{flex:1 1 auto;min-width:92px;padding:13px 16px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-family:var(--font-sans);font-size:13.5px;cursor:pointer;transition:border-color var(--dur-base),background var(--dur-base);}
+  .aa-rug__btn{flex:1 1 auto;min-width:92px;padding:12px 16px;border:1px solid var(--border-strong);border-radius:0;background:transparent;color:var(--text-primary);font-family:var(--font-sans);font-size:13.5px;line-height:1.3;cursor:pointer;transition:border-color var(--dur-base),background var(--dur-base);}
   .aa-rug__btn:hover{border-color:var(--accent);}
   .aa-rug__btn.is-active{background:var(--text-primary);color:var(--surface-page,#f5f0e6);border-color:var(--text-primary);}
-  .aa-rug__sub{display:block;font-size:11px;color:var(--text-muted);margin-top:3px;letter-spacing:0;}
-  .aa-rug__btn.is-active .aa-rug__sub{color:var(--surface-page,#f5f0e6);opacity:.72;}
+  .aa-rug__sub{display:block;font-size:10.5px;color:var(--text-muted);margin-top:3px;letter-spacing:.02em;}
+  .aa-rug__btn.is-active .aa-rug__sub{color:var(--surface-page,#f5f0e6);opacity:.7;}
   .aa-rug__custom{margin-top:14px;padding:18px;border:1px solid var(--border-hairline);border-radius:var(--radius-xs);background:var(--surface-raised);}
   .aa-rug__custom[hidden]{display:none;}
   .aa-rug__fields{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
@@ -42,8 +44,8 @@
   .aa-rug__hint{font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.5;}
   .aa-rug__calc{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-hairline);display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;}
   .aa-rug__area{font-size:12.5px;color:var(--text-secondary);}
-  .aa-rug__price{font-family:var(--font-sans);font-size:19px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;}
-  .aa-rug__est{display:block;font-size:11px;font-weight:400;color:var(--text-muted);letter-spacing:0;text-align:right;margin-top:2px;}
+  .aa-rug__price{font-family:var(--font-sans);font-size:19px;font-weight:500;color:var(--text-primary);font-feature-settings:"lnum" 1,"tnum" 1;text-align:right;}
+  .aa-rug__est{display:block;font-size:11px;font-weight:400;color:var(--text-muted);letter-spacing:0;margin-top:2px;}
   .aa-rug__err{margin-top:10px;font-size:12.5px;color:#8a2b2b;line-height:1.5;}
   .aa-rug__err[hidden]{display:none;}
   .aa-rug__quote{display:block;margin-top:14px;text-align:center;}
@@ -70,15 +72,21 @@
   <div class="aa-rug__btns">
     {%- for v in product.variants -%}
       {%- unless v.title contains 'Custom' -%}
+      {%- assign sub = '' -%}
+      {%- for pr in sub_pairs -%}
+        {%- assign kv = pr | split: '|' -%}
+        {%- if kv[0] == v.title -%}{%- assign sub = kv[1] -%}{%- endif -%}
+      {%- endfor -%}
       <button type="button" class="aa-rug__btn{% if first_std and v.id == first_std.id %} is-active{% endif %}"
               data-rug-size
               data-vid="{{ v.id }}"
               data-price="{{ v.price }}"
-              data-title="{{ v.title | escape }}">{{ v.title }}</button>
+              data-title="{{ v.title | escape }}"
+              data-sub="{{ sub | escape }}">{{ v.title }}{%- if sub != '' -%}<span class="aa-rug__sub">{{ sub }}</span>{%- endif -%}</button>
       {%- endunless -%}
     {%- endfor -%}
     {%- if allow_custom -%}
-      <button type="button" class="aa-rug__btn" data-rug-size data-custom="1" data-title="Custom Size" style="flex-basis:100%">Custom Size</button>
+      <button type="button" class="aa-rug__btn" data-rug-size data-custom="1" data-title="Custom Size" style="flex-basis:100%">Custom Size<span class="aa-rug__sub">Woven to your measurements</span></button>
     {%- endif -%}
   </div>
 
@@ -116,7 +124,7 @@
     <div class="aa-rug__err" data-rug-err hidden></div>
     <div class="aa-rug__calc" data-rug-calc hidden>
       <span class="aa-rug__area" data-rug-area></span>
-      <span class="aa-rug__price" data-rug-price><span data-rug-total></span><span class="aa-rug__est">Indicative &middot; confirmed on enquiry</span></span>
+      <span class="aa-rug__price"><span data-rug-total></span><span class="aa-rug__est">Indicative &middot; confirmed on enquiry</span></span>
     </div>
     <a class="btn btn--primary aa-rug__quote" data-rug-quote href="#" target="_blank" rel="noopener" hidden><i class="ph ph-whatsapp-logo"></i> Request a Quote</a>
   </div>
@@ -151,14 +159,14 @@
   var minW = +root.dataset.minw, maxW = +root.dataset.maxw;
   var minL = +root.dataset.minl, maxL = +root.dataset.maxl;
   var minD = +root.dataset.mind, maxD = +root.dataset.maxd;
-  var rate = +(root.dataset.rate || 0); // rupees per sq ft
+  var rate = +(root.dataset.rate || 0);
   var quoteBase = root.dataset.quoteHref || '';
   var title = root.dataset.title || '';
 
   var money = function(rupees){
     try{
       return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(rupees);
-    }catch(e){ return '₹' + Math.round(rupees).toLocaleString('en-IN'); }
+    }catch(e){ return '\\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
   };
 
   function setVariant(id){
@@ -186,9 +194,7 @@
       var t = u.searchParams.get('text') || '';
       u.searchParams.set('text', (t ? t + ' ' : '') + detail);
       return u.toString();
-    }catch(e){
-      return quoteBase;
-    }
+    }catch(e){ return quoteBase; }
   }
 
   var current = null;
@@ -199,7 +205,9 @@
     showCart(true);
     if(qtyInput) qtyInput.value = 1;
     setVariant(btn.dataset.vid);
-    if(valEl) valEl.textContent = btn.dataset.title;
+    if(valEl){
+      valEl.textContent = btn.dataset.sub ? (btn.dataset.title + ' · ' + btn.dataset.sub) : btn.dataset.title;
+    }
     setSubmit('Add to Cart · ' + money((+btn.dataset.price)/100), true);
   }
 
