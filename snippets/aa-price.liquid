@@ -1,6 +1,25 @@
+{%- comment -%}
+  Display price. For rugs, the Custom Size variant is priced per 0.1 sq ft
+  and must never drive the headline price — exclude it and show a From price.
+{%- endcomment -%}
+{%- assign disp_price = product.price -%}
+{%- assign price_prefix = '' -%}
+{%- if product.metafields.aav.rug_custom.value != blank -%}
+  {%- assign lowest = 0 -%}{%- assign std_count = 0 -%}
+  {%- for v in product.variants -%}
+    {%- unless v.title contains 'Custom' -%}
+      {%- assign std_count = std_count | plus: 1 -%}
+      {%- if lowest == 0 or v.price < lowest -%}{%- assign lowest = v.price -%}{%- endif -%}
+    {%- endunless -%}
+  {%- endfor -%}
+  {%- if lowest > 0 -%}
+    {%- assign disp_price = lowest -%}
+    {%- if std_count > 1 -%}{%- assign price_prefix = 'From ' -%}{%- endif -%}
+  {%- endif -%}
+{%- endif -%}
 {%- if show_price -%}
   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:16px">
-    <span class="aa-price" style="margin-top:0">{% render 'aa-money', cents: product.price %}</span>
+    <span class="aa-price" style="margin-top:0">{{ price_prefix }}{% render 'aa-money', cents: disp_price %}</span>
     {%- if caption != blank -%}<span class="aa-price-cap" style="margin-top:0">{{ caption }}</span>{%- endif -%}
   </div>
 {%- elsif visibility == 'project-only' -%}
