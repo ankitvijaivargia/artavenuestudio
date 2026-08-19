@@ -31,6 +31,8 @@
   <div class="aa-price aa-price--enquire">Price on request <span>Shared on enquiry</span></div>
 {%- endif -%}
 
+{% render 'aa-onesize' %}
+
 <script>
 (function(){
   if(window.aaPriceSyncInit) return;
@@ -54,22 +56,18 @@
     var idEl = form.querySelector('input[name="id"], select[name="id"]');
     if(!idEl) return;
 
-    var initial = String(idEl.value || '');
-    var last = initial;
-    var touched = false;
+    var last = String(idEl.value || '');
 
     function apply(id){
       var p = PRICES[id];
       if(typeof p === 'number') paint(money(p/100));
     }
 
-    // Rug custom size has no variant of its own — flag it explicitly.
     var rug = document.querySelector('[data-aa-rug]');
     if(rug){
       rug.addEventListener('click', function(e){
         var b = e.target.closest('[data-rug-size]');
         if(!b) return;
-        touched = true;
         if(b.dataset.custom){ paint('Priced on enquiry'); }
         else if(b.dataset.vid){ last = String(b.dataset.vid); apply(last); }
       });
@@ -79,7 +77,6 @@
       var now = String(idEl.value || '');
       if(now === last) return;
       last = now;
-      touched = true;
       apply(now);
     }, 250);
   }
