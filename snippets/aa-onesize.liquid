@@ -1,0 +1,30 @@
+{%- comment -%}
+  Single-size products: the size axis offers no choice, so the engine renders a hidden
+  button — but its hint still reads the option value ("One Size"), which draws attention
+  to an absent choice. Blank the hint when there is nothing to pick. The dimensions box
+  above it still carries the real information.
+{%- endcomment -%}
+<script>
+(function(){
+  if(window.aaOneSizeInit) return;
+  window.aaOneSizeInit = true;
+  function tidy(){
+    var wrap=document.querySelector('[data-grid-axis="size"]');
+    if(!wrap) return false;
+    var btns=wrap.querySelectorAll('[data-grid-size]');
+    var visible=0;
+    Array.prototype.forEach.call(btns, function(b){ if(!b.hidden) visible++; });
+    if(visible===0){
+      var h=wrap.querySelector('[data-grid-sizehint]');
+      if(h){ h.textContent=''; h.style.display='none'; }
+    }
+    return true;
+  }
+  function start(){
+    tidy();
+    var n=0;
+    var t=setInterval(function(){ tidy(); if(++n>20) clearInterval(t); }, 100);
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>
