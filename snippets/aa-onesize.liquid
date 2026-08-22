@@ -1,30 +1,16 @@
 {%- comment -%}
-  Single-size products: the size axis offers no choice, so the engine renders a hidden
-  button — but its hint still reads the option value ("One Size"), which draws attention
-  to an absent choice. Blank the hint when there is nothing to pick. The dimensions box
-  above it still carries the real information.
+  Art Avenue - single-size products.
+
+  This snippet used to blank the size hint on products offering only one size,
+  on the reasoning that a hint pointing at an absent choice was noise.
+
+  Reversed 2026-08-22. On a single-size product the hint is the ONLY place the
+  size name appears, and an empty slot reads as a rendering fault when sitting
+  beside multi-size PDPs that show "Compact", "Grand", "Queen" and so on.
+  Leaving the hint untouched lets the engine's own value ("One Size") display
+  in the same position, so every PDP is visually consistent.
+
+  Kept as a no-op rather than removed: existing render call sites stay valid,
+  and file deletion is unavailable through the Admin API. Delete this file and
+  its render call sites together via git when convenient.
 {%- endcomment -%}
-<script>
-(function(){
-  if(window.aaOneSizeInit) return;
-  window.aaOneSizeInit = true;
-  function tidy(){
-    var wrap=document.querySelector('[data-grid-axis="size"]');
-    if(!wrap) return false;
-    var btns=wrap.querySelectorAll('[data-grid-size]');
-    var visible=0;
-    Array.prototype.forEach.call(btns, function(b){ if(!b.hidden) visible++; });
-    if(visible===0){
-      var h=wrap.querySelector('[data-grid-sizehint]');
-      if(h){ h.textContent=''; h.style.display='none'; }
-    }
-    return true;
-  }
-  function start(){
-    tidy();
-    var n=0;
-    var t=setInterval(function(){ tidy(); if(++n>20) clearInterval(t); }, 100);
-  }
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
-})();
-</script>
