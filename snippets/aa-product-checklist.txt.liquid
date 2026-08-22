@@ -1,0 +1,125 @@
+{%- comment -%}
+ART AVENUE - PRODUCT BUILD CHECKLIST
+Reference only. Never rendered. Sits alongside aa-chair-schema-templates and
+aa-storage-schema-templates.
+
+WHY THIS EXISTS
+A configurator product depends on THREE metafields working together. Miss any
+one and the PDP degrades SILENTLY - no error, no warning, no console message.
+The option simply does not appear, and it looks like a theme bug rather than
+missing data. Every gap listed below was shipped live at least once.
+
+================================================================
+1. THE THREE METAFIELDS - all required, all fail silently
+================================================================
+
+aav.configurator        json
+  The schema: engine, size_option, material_option, unit_map, tier_filters,
+  pickers. WITHOUT IT: no configurator renders at all (loudest failure - you
+  will notice this one).
+
+aav.swatches            list.metaobject_reference
+  The POOL that tier_filters and pickers draw from. Filters only FILTER this
+  list - they do NOT query the global swatch library.
+  WITHOUT IT: every picker vanishes. No error.
+  MISMATCHED: a filter naming a category absent from the list yields zero
+  swatches and the picker vanishes just the same. Changing a tier_filter
+  category ALWAYS means changing this list too. Never one without the other.
+
+aav.size_dimensions     json
+  Per-size dual units: { "One Size": { "cm": "...", "in": "..." } }
+  Keys MUST match the Size option values exactly.
+  WITHOUT IT: falls back to configurator unit_map - cm only, no inches.
+
+Also set, where the family uses them:
+  aav.wood_finishes     list.metaobject_reference  (any picker with
+                        source: "wood_finishes" - offer the full set, not one)
+  aav.short_description multi_line_text_field      (see section 3)
+  aav.dim_w / dim_d / dim_h   number_integer
+
+================================================================
+2. SWATCH LIBRARIES - pick the right one
+================================================================
+
+"Leather"            upholstery - sofas, chairs, bed headboards
+"Furniture Leather"  trunks, chests, wardrobes, cabinets, tables
+"Table Leather"      table tops
+"Storage Hardware"   Antique Brass / Silver / Gold
+"Legs"               Wooden Legs / Metal Legs
+"Handle"             Leather Handles / Metal Knobs / Metal Handles
+"Leg Wood"           Natural Oak / Walnut / Blackwood
+"Leg Metal"          Antique Brass / Matte Black / Brushed Nickel
+
+Beds sit on "Leather" DELIBERATELY - the headboard is upholstery, not a
+wrapped carcass. This is not drift. Do not "fix" it.
+
+Kilim trim uses "Furniture Leather" restricted to Saddle and Onyx.
+(Formerly Chestnut and Ebony on "Leather" - remapped 2026-08-22.)
+
+Ebony = leather colour. Blackwood = wood finish. Keep them distinct.
+
+================================================================
+3. COPY
+================================================================
+
+short_description  Complete sentences. This is the blurb under the price.
+                   Without it the theme truncates the description at 28 words,
+                   which cuts mid-sentence on any long description.
+description        Required. Five products shipped live with this EMPTY.
+
+NEVER claim "full-grain leather" anywhere. This has resurfaced twice after
+being swept. Grep before every launch.
+
+Size nomenclature by category:
+  sofas - seater count | rectangular coffee tables - Compact / Grand
+  round tables - diameter in cm | rugs - ft with cm sublabels
+
+================================================================
+4. VARIANTS
+================================================================
+
+inventoryPolicy: CONTINUE on every variant (made-to-order: a variant
+existing means it is orderable).
+inventoryPolicy DENY is INERT on untracked variants - Shopify treats
+untracked as infinitely available. Set inventoryItem.tracked = true too,
+if you ever actually need DENY.
+
+Prices are GST-INCLUSIVE (shop.taxesIncluded = true). A quoted ex-GST cost
+MUST be grossed up before entry. Check the number against sibling products -
+an odd figure beside round ones is usually an un-grossed cost price.
+
+Check for cannibalisation: a product must not undercut a sibling that offers
+less. Compare against the whole family before publishing.
+
+================================================================
+5. MERCHANDISING
+================================================================
+
+Smart collections match on EXACT tag strings. "Chest of Drawers" does NOT
+match a collection ruled on "chests-of-drawers" - that shipped as an empty
+live collection linked from the main menu. Add the hyphenated tag AND
+verify productsCount afterwards.
+
+publishablePublish is a SEPARATE call after productSet and collectionCreate.
+Neither publishes automatically.
+
+Photos: hero first (clean 3/4 of the object), then front, then detail, then
+lifestyle. Never lead a made-to-order configurator with a lifestyle shot.
+
+================================================================
+6. VERIFY BEFORE CALLING IT DONE
+================================================================
+
+[ ] Load the PDP. Every picker renders with more than one option.
+[ ] Dimensions box shows BOTH cm and inches.
+[ ] Size hint (top right) shows a value - "One Size" included.
+[ ] Blurb under the price is a complete sentence, no ellipsis.
+[ ] Description body is not empty.
+[ ] Price is GST-inclusive and consistent with its family.
+[ ] Product appears in every intended collection (check counts, not rules).
+[ ] Product and collections are published to Online Store.
+
+Theme edits: themeFilesUpsert replaces the WHOLE file. Always re-query
+size + checksumMd5 afterwards to confirm no truncation. themeFilesDelete
+is blocked via the API - removal goes through git rm.
+{%- endcomment -%}
