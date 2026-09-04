@@ -22,9 +22,62 @@
   {%- when 'loomed' -%}{%- assign rc_label = 'Hand-Loomed' -%}
   {%- else -%}{%- assign rc_label = '' -%}
 {%- endcase -%}
+{%- assign dims = product.metafields.aav.size_dimensions.value -%}
+{%- if dims != blank -%}
+<style>
+  .aa-dims__bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+  .aa-dims__cap{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent)}
+  .aa-dims__units{display:inline-flex;border:1px solid var(--accent-soft);border-radius:999px;overflow:hidden}
+  .aa-dims__unit{appearance:none;background:transparent;border:0;cursor:pointer;padding:5px 14px;font:inherit;font-size:12px;letter-spacing:.04em;color:var(--text-secondary)}
+  .aa-dims__unit.is-active{background:var(--surface-accent-tint);color:var(--text-accent)}
+  .aa-dims__table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.6;margin:0}
+  .aa-dims__table th,.aa-dims__table td{text-align:left;padding:10px 0;border-bottom:1px solid var(--accent-soft);vertical-align:top}
+  .aa-dims__table th{font-weight:500;color:var(--text-primary);padding-right:18px}
+  .aa-dims__table td{color:var(--text-secondary)}
+  .aa-dims__table tr:last-child th,.aa-dims__table tr:last-child td{border-bottom:0}
+  .aa-dims__note{margin:16px 0 0;font-size:14px;line-height:1.72;color:var(--text-secondary);max-width:60ch}
+  .aa-dims__check{margin:16px 0 0;padding:14px 16px;border-radius:var(--radius-sm);background:var(--surface-accent-tint);border:1px solid var(--accent-soft)}
+  .aa-dims__check ul{margin:8px 0 0;padding:0 0 0 18px;font-size:14px;line-height:1.72;color:var(--text-secondary)}
+  .aa-dims__wrap{padding-bottom:20px}
+</style>
+{%- endif -%}
 <div class="aa-accordion" id="aaPdpDetails">
   {%- if product.description != blank -%}
   <details open><summary>Description <i class="ph ph-plus aa-acc-pm"></i></summary><div class="rte" style="padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary)">{{ product.description }}</div></details>
+  {%- endif -%}
+
+  {%- if dims != blank -%}
+  <details><summary>Dimensions &amp; Fit <i class="ph ph-plus aa-acc-pm"></i></summary>
+    <div class="aa-dims__wrap" data-aa-dims>
+      <div class="aa-dims__bar">
+        <span class="aa-dims__cap">Finished measurements</span>
+        <div class="aa-dims__units" role="group" aria-label="Switch measurement units">
+          <button type="button" class="aa-dims__unit is-active" data-aa-unit="cm" aria-pressed="true">cm</button>
+          <button type="button" class="aa-dims__unit" data-aa-unit="in" aria-pressed="false">inches</button>
+        </div>
+      </div>
+      <table class="aa-dims__table">
+        <tbody>
+          {%- for row in dims -%}
+          <tr>
+            <th scope="row">{{ row[0] }}</th>
+            <td><span data-aa-dim="cm">{{ row[1]["cm"] }}</span><span data-aa-dim="in" style="display:none">{{ row[1]["in"] }}</span></td>
+          </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+      <div class="aa-dims__check">
+        <strong style="font-size:14px;color:var(--text-primary)">Worth measuring before you order</strong>
+        <ul>
+          <li>The space the piece will stand in, leaving room to walk around it</li>
+          <li>Doorways, corridors and any corner the piece has to turn</li>
+          <li>The stairwell or lift, if it isn&rsquo;t a ground-floor delivery</li>
+        </ul>
+      </div>
+      <p class="aa-dims__note">Your piece is built after you order it rather than taken off a shelf, so we&rsquo;d rather you check these measurements against your room first &mdash; made-to-order pieces can&rsquo;t be returned or exchanged. Being handmade, finished dimensions may vary by a centimetre or two.</p>
+      <p class="aa-dims__note">If these proportions aren&rsquo;t quite right for your space, we can change them. Speak to a design consultant before you order and we&rsquo;ll build the piece to your measurements.</p>
+    </div>
+  </details>
   {%- endif -%}
 
   {%- if is_rug -%}
@@ -102,7 +155,9 @@
   <details data-mat-section="Fabric"><summary>Fabric care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Vacuum gently and regularly with an upholstery attachment to lift dust before it settles. Blot spills immediately with a clean, dry cloth — press, don&rsquo;t rub — and avoid soaking the fabric. Plump and rotate loose cushions so they wear evenly. Keep out of prolonged direct sunlight to preserve colour, and have delicate weaves cleaned professionally rather than machine-washed.</p></details>
   {%- endif -%}
   <details><summary>Craftsmanship <i class="ph ph-plus aa-acc-pm"></i></summary><p>Carved, joined and finished by hand in our workshops, passing through the hands of several craftspeople. Joinery is mortise-and-tenon — never glued shortcuts — so the piece is made to be kept and passed down.</p></details>
-  <details><summary>Dimensions &amp; Specifications <i class="ph ph-plus aa-acc-pm"></i></summary><p>Generous, considered proportions drawn for real homes. Custom dimensions are available on most pieces through our design consultants. Share your space and we will confirm exact measurements before you order.</p></details>
+  {%- if dims == blank -%}
+  <details><summary>Dimensions &amp; Fit <i class="ph ph-plus aa-acc-pm"></i></summary><p>Generous, considered proportions drawn for real homes. Every piece is made to order, so if these aren&rsquo;t quite right for your space we can build to your measurements &mdash; speak to a design consultant before ordering and we&rsquo;ll confirm everything with you first.</p></details>
+  {%- endif -%}
   <details><summary>Assembly &amp; Installation <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most pieces arrive securely packed and ready to use. Some larger items may require simple assembly; installation assistance may be available depending on the product and your location — speak with a consultant to confirm before ordering.</p></details>
   <details><summary>Care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust timber with a soft dry cloth and treat with wax balm twice yearly. Vacuum upholstery gently and treat marks promptly. Keep out of prolonged direct sun to preserve the finish.</p></details>
   <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>Made-to-order pieces ship in 3&ndash;4 weeks via safe, insured delivery, securely packed for transit. Assembly assistance is available on selected pieces. International freight is quoted at checkout.</p></details>
@@ -110,6 +165,29 @@
 
   <details><summary>Designer Notes <i class="ph ph-plus aa-acc-pm"></i></summary><p>&ldquo;We design for the way you actually live &mdash; pieces generous enough to sink into, detailed enough to reward a second look, and made to age beautifully.&rdquo; &mdash; Art Avenue Design Studio</p></details>
 </div>
+
+{%- if dims != blank -%}
+<script>
+(function(){
+  var boxes = document.querySelectorAll('[data-aa-dims]');
+  Array.prototype.forEach.call(boxes, function(box){
+    box.addEventListener('click', function(e){
+      var b = e.target.closest('.aa-dims__unit');
+      if(!b) return;
+      var u = b.getAttribute('data-aa-unit');
+      Array.prototype.forEach.call(box.querySelectorAll('.aa-dims__unit'), function(x){
+        var on = (x === b);
+        x.classList.toggle('is-active', on);
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('[data-aa-dim]'), function(s){
+        s.style.display = (s.getAttribute('data-aa-dim') === u) ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
+{%- endif -%}
 
 {%- if has_leather or has_fabric -%}
 <script>
