@@ -25,6 +25,11 @@ aav.swatches            list.metaobject_reference
   MISMATCHED: a filter naming a category absent from the list yields zero
   swatches and the picker vanishes just the same. Changing a tier_filter
   category ALWAYS means changing this list too. Never one without the other.
+  DEFINITION-LOCKED: this list accepts the "swatch" metaobject definition
+  ONLY. Wood finishes are the separate "finish" definition and Shopify
+  REJECTS them here outright (INVALID_VALUE, "must belong to the specified
+  metaobject definition") - and metafieldsSet is all-or-nothing, so one bad
+  GID drops every metafield in the call. Wood belongs in aav.wood_finishes.
 
 aav.size_dimensions     json
   Per-size dual units: { "One Size": { "cm": "...", "in": "..." } }
@@ -36,6 +41,14 @@ Also set, where the family uses them:
                         source: "wood_finishes" - offer the full set, not one)
   aav.short_description multi_line_text_field      (see section 3)
   aav.dim_w / dim_d / dim_h   number_integer
+
+WOOD PICKERS ARE WIRED DIFFERENTLY FROM EVERY OTHER PICKER.
+A wood picker reads aav.wood_finishes via source: "wood_finishes". It does
+NOT read aav.swatches, so it takes NO category and NO include_names. Writing
+category: "Wood Tone" on a wood picker is the classic silent kill - the
+schema validates, the metafield saves, and the picker renders nothing,
+because it is filtering a pool the wood was never in. Copy the wiring from
+Bikaner Bed - Kilim, not from a leather or hardware picker.
 
 ================================================================
 2. SWATCH LIBRARIES - pick the right one
@@ -49,6 +62,7 @@ Also set, where the family uses them:
 "Handle"             Leather Handles / Metal Knobs / Metal Handles
 "Leg Wood"           Natural Oak / Walnut / Blackwood
 "Leg Metal"          Antique Brass / Matte Black / Brushed Nickel
+"Wood Tone"          wood finishes - NOT a swatch category. See section 1.
 
 Beds sit on "Leather" DELIBERATELY - the headboard is upholstery, not a
 wrapped carcass. This is not drift. Do not "fix" it.
@@ -70,9 +84,17 @@ description        Required. Five products shipped live with this EMPTY.
 NEVER claim "full-grain leather" anywhere. This has resurfaced twice after
 being swept. Grep before every launch.
 
+Every kilim product carries the vintage-rug disclosure - hand-cut from an
+assorted vintage rug, no two alike, will differ from the photographs. Every
+made-to-order product states the non-return / non-exchange position.
+
 Size nomenclature by category:
   sofas - seater count | rectangular coffee tables - Compact / Grand
+  square coffee tables - side length in cm ("90 cm", "120 cm", "150 cm")
   round tables - diameter in cm | rugs - ft with cm sublabels
+
+Compact / Grand carries only two sizes. A three-size table needs the cm
+form - do not stretch Compact / Grand to a third name.
 
 ================================================================
 4. VARIANTS
@@ -100,11 +122,17 @@ match a collection ruled on "chests-of-drawers" - that shipped as an empty
 live collection linked from the main menu. Add the hyphenated tag AND
 verify productsCount afterwards.
 
+CASE COUNTS TOO. The tag "Trunk" does NOT satisfy the Trunks collection,
+which is ruled on lowercase "trunks". The trunk products carry BOTH, and so
+must anything joining them. Same trap, different half.
+
 publishablePublish is a SEPARATE call after productSet and collectionCreate.
 Neither publishes automatically.
 
 Photos: hero first (clean 3/4 of the object), then front, then detail, then
 lifestyle. Never lead a made-to-order configurator with a lifestyle shot.
+The shoot almost always arrives lifestyle-first - reorder it, do not inherit
+the upload sequence.
 
 ================================================================
 6. VERIFY BEFORE CALLING IT DONE
@@ -118,6 +146,7 @@ lifestyle. Never lead a made-to-order configurator with a lifestyle shot.
 [ ] Price is GST-inclusive and consistent with its family.
 [ ] Product appears in every intended collection (check counts, not rules).
 [ ] Product and collections are published to Online Store.
+[ ] First image is a clean 3/4 of the object, not a room shot.
 
 Theme edits: themeFilesUpsert replaces the WHOLE file. Always re-query
 size + checksumMd5 afterwards to confirm no truncation. themeFilesDelete
