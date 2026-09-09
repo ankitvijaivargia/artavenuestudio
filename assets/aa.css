@@ -152,7 +152,7 @@ em.accent{color:var(--accent);font-style:italic;}
 
 /* product card */
 .aa-pcard{display:flex;flex-direction:column;color:inherit;}
-.aa-pcard__media{position:relative;overflow:hidden;background:var(--surface-stone);border-radius:var(--radius-xs);aspect-ratio:4/5;}
+.aa-pcard__media{position:relative;overflow:hidden;background:var(--surface-stone);border-radius:var(--radius-xs);aspect-ratio:2/3;}
 .aa-pcard:hover .aa-fig img{transform:scale(1.045);}
 .aa-pcard__badge{position:absolute;top:14px;left:14px;z-index:2;}
 .aa-pcard__cat{font-size:10.5px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);}
@@ -448,7 +448,7 @@ em.accent{color:var(--accent);font-style:italic;}
   .aa-hero{height:auto !important;min-height:78vh !important;}
   .aa-tile{min-height:300px !important;}
   .aa-rooms__tile{min-height:340px !important;}
-  .aa-pcard__media{aspect-ratio:4/5 !important;}
+  .aa-pcard__media{aspect-ratio:2/3 !important;}
   .aa-tallblock{min-height:440px !important;}
 }
 @media (max-width:520px){
