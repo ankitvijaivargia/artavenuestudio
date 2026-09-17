@@ -1,0 +1,102 @@
+{%- comment -%}
+  Art Avenue — cross-product colour links. Add-on to the GRID engine (aa-chair-config);
+  the engine itself is untouched. Rendered once in main-product, AFTER aa-customize-modal.
+  Purpose: one design photographed in two leathers lives as two products; a colour choice
+  can send the shopper to the sibling page photographed in that colour.
+  Per-picker keys in aav.configurator.pickers[]:
+    "links": {"Onyx":"/products/x"}      choosing Onyx opens /products/x
+    "links_else": "/products/y",           any choice NOT listed in links_self opens /products/y
+    "links_self": ["Onyx"]
+    "default_item": "Hazel"                picker starts on this item (else the first item)
+    "link_note": "..."                     appended to linked swatches' description in the drawer
+  Current picks travel as ?leather=Hazel&hardware=Gold and are preselected on arrival.
+  Mechanism: wraps window.aaCz.register / onChoose before the engine binds (engine waits for
+  DOMContentLoaded; this runs inline during parse).
+  params: product
+{%- endcomment -%}
+{%- assign _lcfg = product.metafields.aav.configurator.value -%}
+{%- assign _lhas = false -%}
+{%- if _lcfg.engine == 'grid' and _lcfg.pickers != blank -%}
+  {%- for lp in _lcfg.pickers -%}
+    {%- if lp.links != blank or lp.links_else != blank or lp.default_item != blank -%}{%- assign _lhas = true -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- if _lhas -%}
+<script type="application/json" id="aa-picker-links">{
+{%- for lp in _lcfg.pickers -%}
+  {{ lp.key | json }}: {"links": {{ lp.links | json }}, "orElse": {{ lp.links_else | json }}, "self": {{ lp.links_self | json }}, "def": {{ lp.default_item | json }}, "note": {{ lp.link_note | json }}}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+}</script>
+<script>
+(function(){
+  var cz=window.aaCz; if(!cz || !cz.register || !cz.onChoose) return;
+  var cfg={}; try{ cfg=JSON.parse(document.getElementById('aa-picker-links').textContent)||{}; }catch(e){ return; }
+  var qp={}; try{ new URLSearchParams(window.location.search).forEach(function(v,k){ qp[k]=v; }); }catch(e){}
+  var items={}, chosen={}, handler=null, done=false;
+
+  function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
+  function find(list,name){ if(!list || !name) return null; for(var i=0;i<list.length;i++){ if(lc(list[i].name)===lc(name)) return list[i]; } return null; }
+  function linkFor(pk,name){
+    var c=cfg[pk]; if(!c) return null;
+    if(c.links){ for(var k in c.links){ if(lc(k)===lc(name)) return c.links[k]; } }
+    if(c.orElse){
+      var self=c.self||[];
+      for(var i=0;i<self.length;i++){ if(lc(self[i])===lc(name)) return null; }
+      if(lc(window.location.pathname).indexOf(lc(c.orElse))===0) return null;
+      return c.orElse;
+    }
+    return null;
+  }
+  function go(url,pk,name){
+    var q={}; for(var k in chosen){ q[k]=chosen[k]; } q[pk]=name;
+    var parts=[]; for(var k2 in q){ parts.push(encodeURIComponent(k2)+'='+encodeURIComponent(q[k2])); }
+    window.location.href=url+(url.indexOf('?')>-1?'&':'?')+parts.join('&');
+  }
+
+  var origRegister=cz.register, origOnChoose=cz.onChoose;
+
+  cz.register=function(group,obj){
+    if(group && group.indexOf('gridp-')===0 && obj && obj.items){
+      var pk=group.slice(6), c=cfg[pk];
+      items[pk]=obj.items;
+      if(c && c.note){
+        var o={}; for(var k in obj){ o[k]=obj[k]; }
+        o.items=obj.items.map(function(it){
+          if(!linkFor(pk,it.name)) return it;
+          var x={}; for(var kk in it){ x[kk]=it[kk]; }
+          x.meta=(it.meta?it.meta+' ':'')+c.note;
+          return x;
+        });
+        obj=o;
+      }
+    }
+    return origRegister.call(cz,group,obj);
+  };
+
+  cz.onChoose=function(fn){
+    handler=fn;
+    origOnChoose.call(cz,function(group,item){
+      if(group && group.indexOf('gridp-')===0 && item){
+        var pk=group.slice(6), url=linkFor(pk,item.name);
+        if(url){ go(url,pk,item.name); return; }
+        chosen[pk]=item.name;
+      }
+      fn(group,item);
+    });
+    preselect();
+  };
+
+  function preselect(){
+    if(done || !handler) return; done=true;
+    for(var pk in items){
+      var list=items[pk]||[], c=cfg[pk]||{}, it=null;
+      var fromUrl=find(list,qp[pk]);
+      if(fromUrl && !linkFor(pk,fromUrl.name)) it=fromUrl;
+      if(!it && c.def) it=find(list,c.def);
+      if(it){ try{ handler('gridp-'+pk,it); }catch(e){} chosen[pk]=it.name; }
+      else if(list[0]){ chosen[pk]=list[0].name; }
+    }
+  }
+})();
+</script>
+{%- endif -%}
