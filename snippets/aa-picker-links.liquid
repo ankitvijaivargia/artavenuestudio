@@ -1,22 +1,28 @@
 {%- comment -%}
-  Art Avenue — cross-product colour links. Add-on to the GRID engine (aa-chair-config);
+  Art Avenue — cross-product links. Add-on to the GRID engine (aa-chair-config);
   the engine itself is untouched. Rendered once in main-product, AFTER aa-customize-modal.
-  Purpose: one design photographed in two leathers lives as two products; a colour choice
-  can send the shopper to the sibling page photographed in that colour.
+  Purpose: one design photographed in two colours (or two sizes) lives as two products;
+  a choice can send the shopper to the sibling page photographed in that colour/size.
   Per-picker keys in aav.configurator.pickers[]:
     "links": {"Onyx":"/products/x"}      choosing Onyx opens /products/x
     "links_else": "/products/y",           any choice NOT listed in links_self opens /products/y
     "links_self": ["Onyx"]
     "default_item": "Hazel"                picker starts on this item (else the first item)
     "link_note": "..."                     appended to linked swatches' description in the drawer
-  Current picks travel as ?leather=Hazel&hardware=Gold and are preselected on arrival.
+  Size keys at the top level of aav.configurator (size buttons = [data-grid-size]):
+    "size_links": {"120 cm":"/products/x"} choosing 120 cm opens /products/x
+    "size_links_else": "/products/y",      any size NOT in size_links_self opens /products/y
+    "size_links_self": ["120 cm"]
+    "size_default": "120 cm"               size selected on page load (else the engine's first)
+  Current picks travel as ?size=120%20cm&leather=Saddle&hardware=Gold and are preselected on arrival.
   Mechanism: wraps window.aaCz.register / onChoose before the engine binds (engine waits for
-  DOMContentLoaded; this runs inline during parse).
+  DOMContentLoaded; this runs inline during parse); size clicks are caught in the capture phase.
   params: product
 {%- endcomment -%}
 {%- assign _lcfg = product.metafields.aav.configurator.value -%}
 {%- assign _lhas = false -%}
-{%- if _lcfg.engine == 'grid' and _lcfg.pickers != blank -%}
+{%- if _lcfg.engine == 'grid' -%}
+  {%- if _lcfg.size_links != blank or _lcfg.size_links_else != blank or _lcfg.size_default != blank -%}{%- assign _lhas = true -%}{%- endif -%}
   {%- for lp in _lcfg.pickers -%}
     {%- if lp.links != blank or lp.links_else != blank or lp.default_item != blank -%}{%- assign _lhas = true -%}{%- endif -%}
   {%- endfor -%}
@@ -27,19 +33,21 @@
   {{ lp.key | json }}: {"links": {{ lp.links | json }}, "orElse": {{ lp.links_else | json }}, "self": {{ lp.links_self | json }}, "def": {{ lp.default_item | json }}, "note": {{ lp.link_note | json }}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 }</script>
+<script type="application/json" id="aa-size-links">{"links": {{ _lcfg.size_links | json }}, "orElse": {{ _lcfg.size_links_else | json }}, "self": {{ _lcfg.size_links_self | json }}, "def": {{ _lcfg.size_default | json }}}</script>
 <script>
 (function(){
-  var cz=window.aaCz; if(!cz || !cz.register || !cz.onChoose) return;
-  var cfg={}; try{ cfg=JSON.parse(document.getElementById('aa-picker-links').textContent)||{}; }catch(e){ return; }
+  var cfg={}, sz={};
+  try{ cfg=JSON.parse(document.getElementById('aa-picker-links').textContent)||{}; }catch(e){}
+  try{ sz=JSON.parse(document.getElementById('aa-size-links').textContent)||{}; }catch(e){}
   var qp={}; try{ new URLSearchParams(window.location.search).forEach(function(v,k){ qp[k]=v; }); }catch(e){}
   var items={}, chosen={}, handler=null, done=false;
 
   function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
   function path(s){ return lc(s).replace(/[?#].*$/,'').replace(/\/+$/,''); }
   function find(list,name){ if(!list || !name) return null; for(var i=0;i<list.length;i++){ if(lc(list[i].name)===lc(name)) return list[i]; } return null; }
-  function linkFor(pk,name){
-    var c=cfg[pk]; if(!c) return null;
-    if(c.links){ for(var k in c.links){ if(lc(k)===lc(name)) return c.links[k]; } }
+  function resolve(c,name){
+    if(!c) return null;
+    if(c.links){ for(var k in c.links){ if(lc(k)===lc(name)){ return path(window.location.pathname)===path(c.links[k]) ? null : c.links[k]; } } }
     if(c.orElse){
       var self=c.self||[];
       for(var i=0;i<self.length;i++){ if(lc(self[i])===lc(name)) return null; }
@@ -48,12 +56,39 @@
     }
     return null;
   }
-  function go(url,pk,name){
-    var q={}; for(var k in chosen){ q[k]=chosen[k]; } q[pk]=name;
+  function linkFor(pk,name){ return resolve(cfg[pk],name); }
+  function activeSize(){ var b=document.querySelector('[data-grid-size].is-active'); return b ? b.getAttribute('data-grid-size') : null; }
+  function go(url,key,name){
+    var q={}, s=activeSize(); if(s) q.size=s;
+    for(var k in chosen){ q[k]=chosen[k]; } q[key]=name;
     var parts=[]; for(var k2 in q){ parts.push(encodeURIComponent(k2)+'='+encodeURIComponent(q[k2])); }
     window.location.href=url+(url.indexOf('?')>-1?'&':'?')+parts.join('&');
   }
 
+  /* ---- size links ---- */
+  if(sz.links || sz.orElse || sz.def){
+    document.addEventListener('click',function(e){
+      var b=e.target && e.target.closest ? e.target.closest('[data-grid-size]') : null; if(!b) return;
+      var name=b.getAttribute('data-grid-size'), url=resolve(sz,name);
+      if(!url) return;
+      e.preventDefault(); e.stopImmediatePropagation(); go(url,'size',name);
+    },true);
+    var applySize=function(){
+      var want=null;
+      if(qp.size && !resolve(sz,qp.size)) want=qp.size;
+      if(!want && sz.def) want=sz.def;
+      if(!want) return;
+      var btns=document.querySelectorAll('[data-grid-size]');
+      for(var i=0;i<btns.length;i++){
+        if(lc(btns[i].getAttribute('data-grid-size'))===lc(want)){ if(!btns[i].classList.contains('is-active')) btns[i].click(); break; }
+      }
+    };
+    var later=function(){ setTimeout(applySize,0); };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',later); else later();
+  }
+
+  /* ---- picker links ---- */
+  var cz=window.aaCz; if(!cz || !cz.register || !cz.onChoose) return;
   var origRegister=cz.register, origOnChoose=cz.onChoose;
 
   cz.register=function(group,obj){
