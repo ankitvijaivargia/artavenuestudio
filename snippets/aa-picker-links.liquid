@@ -35,6 +35,7 @@
   var items={}, chosen={}, handler=null, done=false;
 
   function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
+  function path(s){ return lc(s).replace(/[?#].*$/,'').replace(/\/+$/,''); }
   function find(list,name){ if(!list || !name) return null; for(var i=0;i<list.length;i++){ if(lc(list[i].name)===lc(name)) return list[i]; } return null; }
   function linkFor(pk,name){
     var c=cfg[pk]; if(!c) return null;
@@ -42,7 +43,7 @@
     if(c.orElse){
       var self=c.self||[];
       for(var i=0;i<self.length;i++){ if(lc(self[i])===lc(name)) return null; }
-      if(lc(window.location.pathname).indexOf(lc(c.orElse))===0) return null;
+      if(path(window.location.pathname)===path(c.orElse)) return null;
       return c.orElse;
     }
     return null;
