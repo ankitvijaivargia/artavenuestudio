@@ -175,6 +175,8 @@
 </section>
 
 {% render 'aa-customize-modal' %}
+{%- comment -%} Cross-product colour links (sibling editions). Must stay directly after the modal. {%- endcomment -%}
+{% render 'aa-picker-links', product: p %}
 
 {% render 'aa-sticky-bar', product: p, show_cart: show_cart, price_text: price_text %}
 
