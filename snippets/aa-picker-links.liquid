@@ -19,6 +19,21 @@
   DOMContentLoaded; this runs inline during parse); size clicks are caught in the capture phase.
   params: product
 {%- endcomment -%}
+
+{%- comment -%}
+  Art Avenue — grid picker layout corrections. Always rendered (outside the links guard).
+  1. The grid engine hides the picker row / fixed line with the `hidden` attribute only.
+     Theme CSS sets display on those elements, which beats `[hidden]`, so BOTH render.
+  2. A single-option picker needs no second line at all: the chosen finish already prints
+     in the group label hint on the right. Kept as a stated spec, not a choice of one.
+  Engine file deliberately untouched.
+{%- endcomment -%}
+<style>
+  .aa-cz-row[hidden],
+  .aa-chair__fixed[hidden]{ display:none !important; }
+  .aa-chair--grid [data-grid-pfixed]{ display:none !important; }
+</style>
+
 {%- assign _lcfg = product.metafields.aav.configurator.value -%}
 {%- assign _lhas = false -%}
 {%- if _lcfg.engine == 'grid' -%}
