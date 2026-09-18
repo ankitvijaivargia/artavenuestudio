@@ -1,13 +1,19 @@
 {%- comment -%}
   Art Avenue — "Will my mattress fit?" disclosure.
   Renders ONLY when aav.mattress_fit is present, so it is bed-only by data, not by product type.
-  No JS and no coupling to aa-chair-config: it lists every size at once, so a shopper
-  comparing Queen against King sees both without toggling the picker.
+  Lists every size at once: a shopper opening this is usually still choosing between Queen and
+  King, so making them toggle the picker to compare is the friction the panel exists to remove.
+
+  Placement: rendered from sections/main-product.liquid (after the configurator), then moved by
+  the script below into the SIZE group — under the size buttons, above the custom-size link and
+  above every finish picker. Size questions get answered before leather, wood and metal choices.
+  If neither anchor is found it simply stays where it rendered. No dependency on the config
+  engine's JS, and its click delegation ignores this element.
   Shape: { "note": "...", "sizes": [ { "label": "Queen", "cm": "152 × 198 cm", "in": "60 × 78 in" } ] }
 {%- endcomment -%}
 {%- assign mf = product.metafields.aav.mattress_fit.value -%}
 {%- if mf and mf.sizes -%}
-<details class="aa-mattress">
+<details class="aa-mattress" data-aa-mattress>
   <summary class="aa-mattress__q">
     <span class="aa-mattress__label"><i class="ph ph-ruler" aria-hidden="true"></i>Will my mattress fit?</span>
     <i class="ph ph-caret-down aa-mattress__caret" aria-hidden="true"></i>
@@ -25,7 +31,7 @@
   </div>
 </details>
 <style>
-  .aa-mattress{margin:14px 0 0;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised);overflow:hidden}
+  .aa-mattress{margin:12px 0 0;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised);overflow:hidden}
   .aa-mattress__q{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:14px}
   .aa-mattress__q::-webkit-details-marker{display:none}
   .aa-mattress__label{display:inline-flex;align-items:center;gap:8px}
@@ -40,4 +46,22 @@
   .aa-mattress__in{display:block;font-size:12px;color:var(--text-accent);margin-top:2px}
   .aa-mattress__note{margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--text-secondary)}
 </style>
+<script>
+(function(){
+  function place(){
+    var el=document.querySelector('[data-aa-mattress]');
+    if(!el || el.dataset.aaPlaced) return;
+    // grid engine (Size x Material) first, then the single-axis engine's size group.
+    var group=document.querySelector('#aaChair [data-grid-axis="size"]')
+           || document.querySelector('#aaChair [data-chair-axis="size"]');
+    if(!group) return;
+    // Sit above the custom-size consult link where one exists, else close the group.
+    var consult=group.querySelector('[data-cz-consult]');
+    if(consult){ group.insertBefore(el, consult); } else { group.appendChild(el); }
+    el.dataset.aaPlaced='1';
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', place); }
+  else { place(); }
+})();
+</script>
 {%- endif -%}
