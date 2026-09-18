@@ -21,16 +21,15 @@
 {%- endcomment -%}
 
 {%- comment -%}
-  Art Avenue — grid picker layout corrections. Always rendered (outside the links guard).
-  1. The grid engine hides the picker row / fixed line with the `hidden` attribute only.
-     Theme CSS sets display on those elements, which beats `[hidden]`, so BOTH render.
-  2. A single-option picker needs no second line at all: the chosen finish already prints
-     in the group label hint on the right. Kept as a stated spec, not a choice of one.
+  Art Avenue — single-option grid picker. Always rendered (outside the links guard).
+  When a picker resolves to one item the engine hides the picker row and shows a plain
+  replacement line instead. House rule is the opposite: every finish keeps the same row
+  format whether it has one option or five, so the PDP reads consistently. The engine
+  hides the row with the `hidden` attribute only, which theme CSS already overrides, so
+  the row survives on its own — all this needs to do is drop the replacement line.
   Engine file deliberately untouched.
 {%- endcomment -%}
 <style>
-  .aa-cz-row[hidden],
-  .aa-chair__fixed[hidden]{ display:none !important; }
   .aa-chair--grid [data-grid-pfixed]{ display:none !important; }
 </style>
 
@@ -147,7 +146,7 @@
       if(it){ try{ handler('gridp-'+pk,it); }catch(e){} chosen[pk]=it.name; }
       else if(list[0]){ chosen[pk]=list[0].name; }
     }
-  }
+}
 })();
 </script>
 {%- endif -%}
