@@ -168,6 +168,8 @@
       {% render 'aa-size', mode: size_mode, product: p %}
       {% render 'aa-customize', product: p, show_material: material_on, show_finish: finish_on, show_upholstery: uphol_on %}
     {%- endif -%}
+    {%- comment -%} Bed-only: renders itself only when aav.mattress_fit exists on the product. {%- endcomment -%}
+    {% render 'aa-mattress-fit', product: p %}
     {% render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart %}
 
     {% render 'aa-pdp-details', product: p %}
