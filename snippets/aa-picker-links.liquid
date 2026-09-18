@@ -21,6 +21,28 @@
 {%- endcomment -%}
 
 {%- comment -%}
+  Art Avenue — PICKER GATE. Restricts one picker's options by another picker's current choice.
+  The grid engine cannot do this natively: branch_by_axis keys only off the second PRICED axis
+  (Construction), and leather is a picker, not an axis. Historically the workaround was
+  one-page-one-colour (Sojat / Mandawa / Mehrangarh / Kumbhalgarh). This gates in place instead.
+  Per-picker keys in aav.configurator.pickers[], set on the picker being RESTRICTED:
+    "gate_by": "leather"                   key of the picker this one is restricted by
+    "gate_allow": {                        source choice -> the only options allowed here
+      "Onyx":   ["Blackwood"],
+      "Saddle": ["English Chestnut","Walnut"],
+      "Hazel":  ["English Chestnut","Walnut"]
+    }
+  A source choice absent from gate_allow leaves this picker unrestricted (fail-open).
+  A gate that would empty the picker is ignored — a blank picker is the engine's worst
+  failure mode, so the full list is restored rather than rendering nothing.
+  When the live choice is no longer allowed it is moved to the first allowed option and the
+  cart property follows. Safe to re-register: the engine re-registers pickers itself
+  (syncInheritors -> registerPicker) so this uses the same supported path.
+  NOTE: do NOT name this leg_wood_map. That key is dead config still sitting on some products
+  with stale pre-Hazel values; reviving the name would silently activate them.
+{%- endcomment -%}
+
+{%- comment -%}
   Art Avenue — single-option grid picker. Always rendered (outside the links guard).
   When a picker resolves to one item the engine hides the picker row and shows a plain
   replacement line instead. House rule is the opposite: every finish keeps the same row
@@ -38,13 +60,13 @@
 {%- if _lcfg.engine == 'grid' -%}
   {%- if _lcfg.size_links != blank or _lcfg.size_links_else != blank or _lcfg.size_default != blank -%}{%- assign _lhas = true -%}{%- endif -%}
   {%- for lp in _lcfg.pickers -%}
-    {%- if lp.links != blank or lp.links_else != blank or lp.default_item != blank -%}{%- assign _lhas = true -%}{%- endif -%}
+    {%- if lp.links != blank or lp.links_else != blank or lp.default_item != blank or lp.gate_by != blank -%}{%- assign _lhas = true -%}{%- endif -%}
   {%- endfor -%}
 {%- endif -%}
 {%- if _lhas -%}
 <script type="application/json" id="aa-picker-links">{
 {%- for lp in _lcfg.pickers -%}
-  {{ lp.key | json }}: {"links": {{ lp.links | json }}, "orElse": {{ lp.links_else | json }}, "self": {{ lp.links_self | json }}, "def": {{ lp.default_item | json }}, "note": {{ lp.link_note | json }}}{%- unless forloop.last -%},{%- endunless -%}
+  {{ lp.key | json }}: {"links": {{ lp.links | json }}, "orElse": {{ lp.links_else | json }}, "self": {{ lp.links_self | json }}, "def": {{ lp.default_item | json }}, "note": {{ lp.link_note | json }}, "gateBy": {{ lp.gate_by | json }}, "gateAllow": {{ lp.gate_allow | json }}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 }</script>
 <script type="application/json" id="aa-size-links">{"links": {{ _lcfg.size_links | json }}, "orElse": {{ _lcfg.size_links_else | json }}, "self": {{ _lcfg.size_links_self | json }}, "def": {{ _lcfg.size_default | json }}}</script>
@@ -55,6 +77,7 @@
   try{ sz=JSON.parse(document.getElementById('aa-size-links').textContent)||{}; }catch(e){}
   var qp={}; try{ new URLSearchParams(window.location.search).forEach(function(v,k){ qp[k]=v; }); }catch(e){}
   var items={}, chosen={}, handler=null, done=false;
+  var fullItems={}, regObj={};
 
   function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
   function path(s){ return lc(s).replace(/[?#].*$/,'').replace(/\/+$/,''); }
@@ -78,6 +101,43 @@
     var parts=[]; for(var k2 in q){ parts.push(encodeURIComponent(k2)+'='+encodeURIComponent(q[k2])); }
     window.location.href=url+(url.indexOf('?')>-1?'&':'?')+parts.join('&');
   }
+
+  /* ---- picker gate ---- */
+  function gateOf(pk){ var c=cfg[pk]; return (c && c.gateBy && c.gateAllow) ? c : null; }
+  function allowedFor(pk){
+    var g=gateOf(pk); if(!g) return null;
+    var src=chosen[g.gateBy]; if(!src) return null;
+    for(var k in g.gateAllow){ if(lc(k)===lc(src)) return g.gateAllow[k]||null; }
+    return null;
+  }
+  function gateItems(pk,list){
+    if(!list || !list.length) return list;
+    var allow=allowedFor(pk); if(!allow || !allow.length) return list;
+    var out=[];
+    for(var i=0;i<list.length;i++){
+      for(var j=0;j<allow.length;j++){ if(lc(allow[j])===lc(list[i].name)){ out.push(list[i]); break; } }
+    }
+    return out.length ? out : list;
+  }
+  function regate(pk){
+    var base=fullItems[pk]; if(!base) return;
+    var next=gateItems(pk,base);
+    var o=regObj[pk]||{}; var out={};
+    for(var k in o){ out[k]=o[k]; }
+    out.items=next;
+    items[pk]=next;
+    try{ origRegister.call(cz,'gridp-'+pk,out); }catch(e){}
+    var cur=chosen[pk], ok=false;
+    for(var i=0;i<next.length;i++){ if(lc(next[i].name)===lc(cur)) { ok=true; break; } }
+    if(!ok && next[0]){
+      chosen[pk]=next[0].name;
+      if(handler){ try{ handler('gridp-'+pk,next[0]); }catch(e){} }
+    }
+  }
+  function regateBy(srcKey){
+    for(var pk in cfg){ var g=gateOf(pk); if(g && lc(g.gateBy)===lc(srcKey)) regate(pk); }
+  }
+  function regateAll(){ for(var pk in cfg){ if(gateOf(pk)) regate(pk); } }
 
   /* ---- size links ---- */
   if(sz.links || sz.orElse || sz.def){
@@ -108,17 +168,26 @@
   cz.register=function(group,obj){
     if(group && group.indexOf('gridp-')===0 && obj && obj.items){
       var pk=group.slice(6), c=cfg[pk];
-      items[pk]=obj.items;
+      var list=obj.items;
       if(c && c.note){
-        var o={}; for(var k in obj){ o[k]=obj[k]; }
-        o.items=obj.items.map(function(it){
+        list=list.map(function(it){
           if(!linkFor(pk,it.name)) return it;
           var x={}; for(var kk in it){ x[kk]=it[kk]; }
           x.meta=(it.meta?it.meta+' ':'')+c.note;
           return x;
         });
-        obj=o;
       }
+      var o={}; for(var k in obj){ o[k]=obj[k]; }
+      o.items=list;
+      fullItems[pk]=list; regObj[pk]=o;
+      if(gateOf(pk)){
+        var g={}; for(var k2 in o){ g[k2]=o[k2]; }
+        g.items=gateItems(pk,list);
+        items[pk]=g.items;
+        return origRegister.call(cz,group,g);
+      }
+      items[pk]=list;
+      obj=o;
     }
     return origRegister.call(cz,group,obj);
   };
@@ -130,6 +199,9 @@
         var pk=group.slice(6), url=linkFor(pk,item.name);
         if(url){ go(url,pk,item.name); return; }
         chosen[pk]=item.name;
+        fn(group,item);
+        regateBy(pk);
+        return;
       }
       fn(group,item);
     });
@@ -146,7 +218,8 @@
       if(it){ try{ handler('gridp-'+pk,it); }catch(e){} chosen[pk]=it.name; }
       else if(list[0]){ chosen[pk]=list[0].name; }
     }
-}
+    regateAll();
+  }
 })();
 </script>
 {%- endif -%}
