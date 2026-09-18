@@ -1,0 +1,43 @@
+{%- comment -%}
+  Art Avenue — "Will my mattress fit?" disclosure.
+  Renders ONLY when aav.mattress_fit is present, so it is bed-only by data, not by product type.
+  No JS and no coupling to aa-chair-config: it lists every size at once, so a shopper
+  comparing Queen against King sees both without toggling the picker.
+  Shape: { "note": "...", "sizes": [ { "label": "Queen", "cm": "152 × 198 cm", "in": "60 × 78 in" } ] }
+{%- endcomment -%}
+{%- assign mf = product.metafields.aav.mattress_fit.value -%}
+{%- if mf and mf.sizes -%}
+<details class="aa-mattress">
+  <summary class="aa-mattress__q">
+    <span class="aa-mattress__label"><i class="ph ph-ruler" aria-hidden="true"></i>Will my mattress fit?</span>
+    <i class="ph ph-caret-down aa-mattress__caret" aria-hidden="true"></i>
+  </summary>
+  <div class="aa-mattress__body">
+    <table class="aa-mattress__table">
+      {%- for s in mf.sizes -%}
+      <tr>
+        <th scope="row">{{ s.label }}</th>
+        <td>{{ s.cm }}{%- if s.in != blank -%}<span class="aa-mattress__in">{{ s.in }}</span>{%- endif -%}</td>
+      </tr>
+      {%- endfor -%}
+    </table>
+    {%- if mf.note != blank -%}<p class="aa-mattress__note">{{ mf.note }}</p>{%- endif -%}
+  </div>
+</details>
+<style>
+  .aa-mattress{margin:14px 0 0;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised);overflow:hidden}
+  .aa-mattress__q{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:14px}
+  .aa-mattress__q::-webkit-details-marker{display:none}
+  .aa-mattress__label{display:inline-flex;align-items:center;gap:8px}
+  .aa-mattress__label i{color:var(--text-accent)}
+  .aa-mattress__caret{transition:transform .2s ease;color:var(--text-secondary)}
+  .aa-mattress[open] .aa-mattress__caret{transform:rotate(180deg)}
+  .aa-mattress__body{padding:0 16px 16px}
+  .aa-mattress__table{width:100%;border-collapse:collapse}
+  .aa-mattress__table th{text-align:left;font-weight:500;font-size:14px;padding:9px 0;white-space:nowrap}
+  .aa-mattress__table td{text-align:right;font-size:14px;padding:9px 0;color:var(--text-secondary)}
+  .aa-mattress__table tr+tr th,.aa-mattress__table tr+tr td{border-top:1px solid var(--border-subtle,rgba(0,0,0,.08))}
+  .aa-mattress__in{display:block;font-size:12px;color:var(--text-accent);margin-top:2px}
+  .aa-mattress__note{margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--text-secondary)}
+</style>
+{%- endif -%}
