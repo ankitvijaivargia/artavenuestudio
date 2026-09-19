@@ -223,3 +223,99 @@
 })();
 </script>
 {%- endif -%}
+
+{%- comment -%}
+  Art Avenue — FABRIC HERO SWAP. Add-on; the grid engine and the gallery are both untouched.
+  Choosing a swatch repaints the FIRST gallery slide with a render of THIS product in that
+  fabric, so the shopper sees the choice instead of reading it.
+  Renders live in Content -> Files, NOT product media: as product media every fabric would
+  land in the thumbnail strip and drown the real photography.
+  Product metafield aav.swatch_images (JSON), either shape:
+    {"Pebble":"https://cdn.shopify.com/s/files/.../hampstead-pebble.jpg", ...}
+    {"picker":"fabric","images":{"Pebble":"https://...", ...}}
+  Keys are swatch NAMES (the metaobject display name), not handles. Without "picker" any
+  picker whose choice matches a key will swap; with it, only that picker key does.
+  Omit a swatch and its choice leaves the hero alone — that is how the colourway that was
+  actually photographed keeps its real photograph instead of a render.
+  Fail-open throughout: no metafield, no gallery, unmapped swatch, or an image that 404s all
+  leave the hero exactly as shot. The frame is preloaded and painted only once it has
+  decoded, so the hero never flashes empty mid-swap, and a stale slow load cannot overwrite
+  a newer choice (token guard).
+  Slide 0 is repainted IN PLACE, so data-idx numbering, the thumb strip, the arrows and the
+  IntersectionObserver in main-product all keep working untouched. The gallery is snapped
+  back to slide 1 on a change, but never on first paint — a page that scrolls itself on load
+  is worse than one that does nothing.
+  params: product
+{%- endcomment -%}
+{%- assign _swi = product.metafields.aav.swatch_images.value -%}
+{%- if _swi != blank and product.images.size > 0 -%}
+<script type="application/json" id="aa-swatch-images">{{ _swi | json }}</script>
+<script>
+(function(){
+  var raw={};
+  try{ raw=JSON.parse(document.getElementById('aa-swatch-images').textContent)||{}; }catch(e){ return; }
+  var map=(raw.images && typeof raw.images==='object') ? raw.images : raw;
+  var only=raw.picker ? String(raw.picker) : null;
+  var title={{ product.title | json }};
+
+  var main=document.getElementById('aaGalMain'); if(!main) return;
+  var slide=main.querySelector('.aa-gallery__slide[data-idx="0"]'); if(!slide) return;
+  var hero=slide.querySelector('img'); if(!hero) return;
+  var thumbBtn=document.querySelector('#aaGalThumbs .aa-gallery__thumb[data-idx="0"]');
+  var thumb=thumbBtn ? thumbBtn.querySelector('img') : null;
+
+  var origSrc=hero.getAttribute('src'), origAlt=hero.getAttribute('alt')||'';
+  var origThumb=thumb ? thumb.getAttribute('src') : null;
+  var booted=false, token=0, current=null;
+
+  function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
+  function lookup(name){ for(var k in map){ if(lc(k)===lc(name)) return map[k]; } return null; }
+  function sized(u,px){ if(!u) return u; return u+(u.indexOf('?')>-1?'&':'?')+'width='+px; }
+  function snap(){
+    if(!booted) return;
+    if(thumbBtn){ thumbBtn.click(); return; }
+    try{ slide.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }catch(e){}
+  }
+  function restore(){
+    if(current===null) return;
+    current=null;
+    hero.setAttribute('src',origSrc);
+    hero.setAttribute('alt',origAlt);
+    if(thumb && origThumb) thumb.setAttribute('src',origThumb);
+    snap();
+  }
+  function swap(name){
+    var url=lookup(name);
+    if(!url){ restore(); return; }
+    if(current!==null && lc(current)===lc(name)) return;
+    var id=++token, full=sized(url,1400);
+    var pre=new Image();
+    pre.onload=function(){
+      if(id!==token) return;
+      current=name;
+      hero.setAttribute('src',full);
+      hero.setAttribute('alt',title+' upholstered in '+name);
+      if(thumb) thumb.setAttribute('src',sized(url,160));
+      snap();
+    };
+    pre.onerror=function(){ if(id===token) restore(); };
+    pre.src=full;
+  }
+
+  var cz=window.aaCz; if(!cz || !cz.onChoose) return;
+  var origOnChoose=cz.onChoose;
+  cz.onChoose=function(fn){
+    origOnChoose.call(cz,function(group,item){
+      fn(group,item);
+      if(group && group.indexOf('gridp-')===0 && item && item.name){
+        var pk=group.slice(6);
+        if(!only || lc(only)===lc(pk)) swap(item.name);
+      }
+    });
+  };
+
+  var boot=function(){ setTimeout(function(){ booted=true; },0); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+</script>
+{%- endif -%}
