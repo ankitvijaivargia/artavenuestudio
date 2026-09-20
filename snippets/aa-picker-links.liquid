@@ -243,9 +243,20 @@
   matter most. Every route instead ends by writing the chosen name into
   [data-cz-selname="gridp-KEY"], so a MutationObserver there catches all of them — modal pick,
   first paint, and axis switch — using no private engine API at all.
+  SPEED. Three things, in order of how much they mattered:
+    1. Request the width actually displayed. The panel paints at roughly 400-500 CSS px in the
+       buybox; asking the CDN for width=1200 downloaded ~4x the pixels shown. The width is
+       measured once from the live box, multiplied by DPR (capped at 2) and snapped to a 100px
+       step so every render shares ONE url per device — a width that varies per call would miss
+       the browser cache every time and make this slower, not faster.
+    2. Warm the whole set in the background. After the first paint the remaining renders are
+       fetched one at a time on requestIdleCallback, so clicking through colours hits warm cache.
+       Skipped entirely on Save-Data or 2g/slow-2g: on a metered Indian mobile connection,
+       silently pulling 17 images to save a wait the shopper may never incur is the wrong trade.
+    3. Remember what has been fetched, so returning to a colour is instant rather than re-decoded.
+  decode() is awaited before painting, so the swap never janks the main thread mid-scroll.
   Fail-open throughout: no metafield, no picker row, unmapped swatch, or an image that 404s all
-  leave the page exactly as it was. The render is preloaded and shown only once decoded, and a
-  slow load cannot overwrite a newer choice (token guard).
+  leave the page exactly as it was, and a slow load cannot overwrite a newer choice (token guard).
   params: product
 {%- endcomment -%}
 {%- assign _swi = product.metafields.aav.swatch_images.value -%}
@@ -261,7 +272,7 @@
   .aa-fabricview__note{ font-size:11px; letter-spacing:.02em; color:var(--text-secondary); opacity:.75; }
 </style>
 <div class="aa-fabricview" id="aaFabricView" hidden>
-  <div class="aa-fabricview__frame"><img alt="" loading="lazy"></div>
+  <div class="aa-fabricview__frame"><img alt="" decoding="async"></div>
   <div class="aa-fabricview__cap">
     <span class="aa-fabricview__name" data-aafv-name></span>
     <span class="aa-fabricview__note">Styled render &middot; shade may vary slightly from the swatch</span>
@@ -278,6 +289,14 @@
   function lc(s){ return String(s==null?'':s).trim().toLowerCase(); }
   function lookup(n){ for(var k in map){ if(lc(k)===lc(n)) return map[k]; } return null; }
   function sized(u,px){ return u ? u+(u.indexOf('?')>-1?'&':'?')+'width='+px : u; }
+  var ric=window.requestIdleCallback || function(f){ return setTimeout(f,200); };
+
+  function thrifty(){
+    var c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+    if(!c) return false;
+    if(c.saveData) return true;
+    return c.effectiveType==='slow-2g' || c.effectiveType==='2g';
+  }
 
   function boot(){
     var panel=document.getElementById('aaFabricView'); if(!panel) return;
@@ -294,6 +313,13 @@
     /* sit directly under the picker the shopper is tapping */
     grp.appendChild(panel);
 
+    /* one width for the whole page load, so every url is cache-stable */
+    var W=(function(){
+      var w=panel.clientWidth||grp.clientWidth||document.documentElement.clientWidth||480;
+      var dpr=Math.min(window.devicePixelRatio||1,2);
+      return Math.max(400,Math.min(1200,Math.ceil(w*dpr/100)*100));
+    })();
+
     /* every route the engine takes ends by writing the name into one of these two nodes */
     var watch=[
       grp.querySelector('[data-cz-selname="gridp-'+key+'"]'),
@@ -301,25 +327,36 @@
     ].filter(Boolean);
     if(!watch.length){ panel.parentNode.removeChild(panel); return; }
 
-    var token=0, current=null;
+    var token=0, current=null, cache={};
+
+    function fetchImg(url,cb){
+      var full=sized(url,W);
+      var c=cache[full];
+      if(c==='err'){ cb(null); return; }
+      if(c){ cb(full); return; }
+      var im=new Image();
+      im.decoding='async';
+      im.onload=function(){ cache[full]=im; cb(full); };
+      im.onerror=function(){ cache[full]='err'; cb(null); };
+      im.src=full;
+    }
+
     function hide(){ current=null; panel.hidden=true; }
     function show(name){
       if(!name || lc(name)==='choose'){ hide(); return; }
       if(current!==null && lc(current)===lc(name)) return;
       var url=lookup(name);
       if(!url){ hide(); return; }
-      var id=++token, full=sized(url,1200);
-      var pre=new Image();
-      pre.onload=function(){
+      var id=++token;
+      fetchImg(url,function(full){
         if(id!==token) return;
+        if(!full){ hide(); return; }
         current=name;
         img.setAttribute('src',full);
         img.setAttribute('alt',title+' upholstered in '+name);
         if(cap) cap.textContent='Shown in '+name;
         panel.hidden=false;
-      };
-      pre.onerror=function(){ if(id===token) hide(); };
-      pre.src=full;
+      });
     }
     function read(){
       for(var i=0;i<watch.length;i++){
@@ -330,6 +367,22 @@
       }
       return (watch[0].textContent||'').trim();
     }
+
+    /* warm the rest one at a time while the browser is idle */
+    var warmed=false;
+    function warm(){
+      if(warmed || thrifty()) return; warmed=true;
+      var urls=[]; for(var k in map){ if(map[k]) urls.push(map[k]); }
+      var i=0;
+      (function next(){
+        if(i>=urls.length) return;
+        fetchImg(urls[i++],function(){ ric(next); });
+      })();
+    }
+    /* whichever comes first: the shopper reaching for the picker, or a quiet moment */
+    grp.addEventListener('pointerenter',warm,{once:true});
+    grp.addEventListener('touchstart',warm,{once:true,passive:true});
+    ric(function(){ setTimeout(warm,1200); });
 
     var mo=new MutationObserver(function(){ show(read()); });
     watch.forEach(function(n){ mo.observe(n,{childList:true,characterData:true,subtree:true}); });
