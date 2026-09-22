@@ -1,5 +1,5 @@
 {%- comment -%} Builds a WhatsApp lead URL. params: type, product, message {%- endcomment -%}
-{%- assign num = settings.wa_number | default: '919828060095' -%}
+{%- assign num = settings.wa_number | default: '919828080095' -%}
 {%- capture intent -%}{% case type %}{% when 'pricing' %}I'd like pricing{% when 'samples' %}I'd like to request a sample{% when 'custom' %}I'd like a custom version{% when 'project' %}I'd like to discuss a project{% when 'trade' %}I'd like to apply for a trade account{% else %}I'd like a design consultation{% endcase %}{%- endcapture -%}
 {%- capture msg -%}Hello Art Avenue, {{ intent }}{% if product %} for the {{ product.title }}{% endif %}.{% if message %} {{ message }}{% endif %}{% if product %} ({{ canonical_url }}){% endif %}{%- endcapture -%}
 https://wa.me/{{ num }}?text={{ msg | url_encode }}
