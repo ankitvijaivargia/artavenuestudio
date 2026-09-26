@@ -5,7 +5,8 @@
       "name": "display name", "size": "55 W × 45 D × 62 H cm each", "note": "...",
       "default": "<option1 pre-selected>", "labels": { "<option1>": "display label" },
       "crop": { "size": "537.6%", "pos": "1.5% 64.7%", "ratio": "226 / 434" },
-      "properties": { "Paint Finish": "Ivory" } }
+      "properties": { "Paint Finish": "Ivory" },
+      "inherit": [ "Wood Finish" ] }
   The add-on product is a cart vehicle only: keep it UNLISTED (hidden from search and
   collections, still resolvable here by handle). The customer never visits its page — there
   are no links to it. "crop" shows a region of the add-on's featured image (used while the
@@ -14,15 +15,17 @@
   Collapsed to one line until ticked; ticking reveals image, size and the Single/Pair choice.
   Adds to cart via a capture-phase submit listener on every /cart/add form (main buy form AND
   sticky bar): posts the add-on to /cart/add.js first, then re-submits the original form so the
-  parent product's own flow runs untouched. Paint Finish inherits from the parent's picker when
-  present. Fails open: if the add-on request errors, the parent product is still added.
+  parent product's own flow runs untouched. Every key named in "properties" or "inherit" is
+  copied from the parent's matching properties[...] input when present, so the add-on carries
+  the finish the customer actually picked ("properties" values are the fallback). Fails open:
+  if the add-on request errors, the parent product is still added.
 {%- endcomment -%}
 {%- assign ad = product.metafields.aav.addon.value -%}
 {%- if ad and ad.handle != blank -%}
 {%- assign ap = all_products[ad.handle] -%}
 {%- if ap and ap.id and ap.available -%}
 {%- assign def = ad.default | default: ap.variants.first.option1 -%}
-<div class="aa-addon" data-aa-addon data-parent="{{ product.title | escape }}" data-props="{{ ad.properties | json | escape }}">
+<div class="aa-addon" data-aa-addon data-parent="{{ product.title | escape }}" data-props="{{ ad.properties | json | escape }}" data-inherit="{{ ad.inherit | json | escape }}">
   <label class="aa-addon__head">
     <input type="checkbox" class="aa-addon__check" data-aa-addon-on aria-controls="aaAddonPanel">
     <span class="aa-addon__title">{{ ad.heading | default: 'Add the matching piece' }}</span>
@@ -93,10 +96,15 @@
     var r=box.querySelector('input[name="aa-addon-v"]:checked');
     if(!r) return;
     e.preventDefault(); e.stopImmediatePropagation();
-    var props={};
+    var props={}, keys=[];
     try{ props=JSON.parse(box.getAttribute('data-props')||'{}')||{}; }catch(x){ props={}; }
-    var pf=f.querySelector('[name="properties[Paint Finish]"]')||document.querySelector('[name="properties[Paint Finish]"]');
-    if(pf && pf.value) props['Paint Finish']=pf.value;
+    keys=Object.keys(props);
+    try{ keys=keys.concat(JSON.parse(box.getAttribute('data-inherit')||'[]')||[]); }catch(x){}
+    keys.forEach(function(k){
+      var sel='[name="properties['+k+']"]';
+      var el=f.querySelector(sel)||document.querySelector(sel);
+      if(el && el.value) props[k]=el.value;
+    });
     props['_Added with']=box.getAttribute('data-parent')||'';
     var root=(window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
     fetch(root+'cart/add.js',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:[{id:+r.value,quantity:1,properties:props}]})})
