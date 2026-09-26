@@ -170,6 +170,8 @@
     {%- endif -%}
     {%- comment -%} Bed-only: renders itself only when aav.mattress_fit exists on the product. {%- endcomment -%}
     {% render 'aa-mattress-fit', product: p %}
+    {%- comment -%} Add-on: renders only when aav.addon is set (e.g. matching bedside tables on a bed). {%- endcomment -%}
+    {% render 'aa-addon', product: p %}
     {% render 'aa-cta', product: p, primary: primary, secondary: secondary, show_cart: show_cart %}
 
     {% render 'aa-pdp-details', product: p %}
