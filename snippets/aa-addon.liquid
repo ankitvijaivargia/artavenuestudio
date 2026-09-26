@@ -1,17 +1,21 @@
 {%- comment -%}
-  Art Avenue — PDP add-on ("Add the matching bedside tables").
+  Art Avenue — PDP add-on ("Add matching side tables").
   Renders ONLY when the product carries aav.addon (json):
-    { "handle": "<product handle to offer>", "heading": "...", "note": "...",
-      "default": "<option1 value pre-selected, e.g. Pair>", "properties": { "Paint Finish": "Ivory" } }
-  The add-on product must be ACTIVE and published to Online Store (all_products cannot see drafts).
-  One radio per add-on variant (option1 as label), unticked by default.
+    { "handle": "<add-on product handle>", "heading": "...", "teaser": "₹20,000 each",
+      "name": "display name", "size": "55 W × 45 D × 62 H cm each", "note": "...",
+      "default": "<option1 pre-selected>", "labels": { "<option1>": "display label" },
+      "crop": { "size": "537.6%", "pos": "1.5% 64.7%", "ratio": "226 / 434" },
+      "properties": { "Paint Finish": "Ivory" } }
+  The add-on product is a cart vehicle only: keep it UNLISTED (hidden from search and
+  collections, still resolvable here by handle). The customer never visits its page — there
+  are no links to it. "crop" shows a region of the add-on's featured image (used while the
+  only photo of the piece is a room shot); omit it to show the whole image.
 
-  How it adds to cart: a capture-phase submit listener on every /cart/add form on the page
-  (main buy form AND sticky bar). If the box is ticked it posts the add-on to /cart/add.js first,
-  then re-submits the original form, so the bed's own add-to-cart flow (engine properties,
-  AJAX or redirect) runs untouched. Paint Finish is inherited from the parent's picker when
-  present, else from aav.addon.properties. The add-on line carries a hidden _Added with property.
-  Fails open: if the add-on request errors, the parent product is still added.
+  Collapsed to one line until ticked; ticking reveals image, size and the Single/Pair choice.
+  Adds to cart via a capture-phase submit listener on every /cart/add form (main buy form AND
+  sticky bar): posts the add-on to /cart/add.js first, then re-submits the original form so the
+  parent product's own flow runs untouched. Paint Finish inherits from the parent's picker when
+  present. Fails open: if the add-on request errors, the parent product is still added.
 {%- endcomment -%}
 {%- assign ad = product.metafields.aav.addon.value -%}
 {%- if ad and ad.handle != blank -%}
@@ -20,41 +24,57 @@
 {%- assign def = ad.default | default: ap.variants.first.option1 -%}
 <div class="aa-addon" data-aa-addon data-parent="{{ product.title | escape }}" data-props="{{ ad.properties | json | escape }}">
   <label class="aa-addon__head">
-    <input type="checkbox" class="aa-addon__check" data-aa-addon-on>
+    <input type="checkbox" class="aa-addon__check" data-aa-addon-on aria-controls="aaAddonPanel">
     <span class="aa-addon__title">{{ ad.heading | default: 'Add the matching piece' }}</span>
+    {%- if ad.teaser != blank -%}<span class="aa-addon__teaser">{{ ad.teaser }}</span>{%- endif -%}
   </label>
-  <div class="aa-addon__card">
-    {%- if ap.featured_image -%}<a class="aa-addon__img" href="{{ ap.url }}" target="_blank" rel="noopener"><img src="{{ ap.featured_image | image_url: width: 240 }}" alt="{{ ap.title | escape }}" loading="lazy"></a>{%- endif -%}
-    <div class="aa-addon__body">
-      <a class="aa-addon__name" href="{{ ap.url }}" target="_blank" rel="noopener">{{ ap.title }}</a>
-      <div class="aa-addon__opts" role="radiogroup" aria-label="{{ ap.title | escape }}">
-        {%- for v in ap.variants -%}
-        <label class="aa-addon__opt">
-          <input type="radio" name="aa-addon-v" value="{{ v.id }}"{% if v.option1 == def %} checked{% endif %}>
-          <span class="aa-addon__optname">{{ v.option1 }}</span>
-          <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price %}</span>
-        </label>
-        {%- endfor -%}
+  <div class="aa-addon__panel" id="aaAddonPanel">
+    <div class="aa-addon__card">
+      {%- if ap.featured_image -%}
+        {%- if ad.crop -%}
+          <div class="aa-addon__img" role="img" aria-label="{{ ad.name | default: ap.title | escape }}" style="aspect-ratio:{{ ad.crop.ratio }};background-image:url('{{ ap.featured_image | image_url: width: 1400 }}');background-size:{{ ad.crop.size }} auto;background-position:{{ ad.crop.pos }}"></div>
+        {%- else -%}
+          <div class="aa-addon__img"><img src="{{ ap.featured_image | image_url: width: 400 }}" alt="{{ ad.name | default: ap.title | escape }}" loading="lazy"></div>
+        {%- endif -%}
+      {%- endif -%}
+      <div class="aa-addon__body">
+        <div class="aa-addon__name">{{ ad.name | default: ap.title }}</div>
+        {%- if ad.size != blank -%}<div class="aa-addon__size"><i class="ph ph-ruler" aria-hidden="true"></i>{{ ad.size }}</div>{%- endif -%}
+        <div class="aa-addon__opts" role="radiogroup" aria-label="{{ ad.name | default: ap.title | escape }}">
+          {%- for v in ap.variants -%}
+          {%- assign lbl = v.option1 -%}{%- if ad.labels and ad.labels[v.option1] -%}{%- assign lbl = ad.labels[v.option1] -%}{%- endif -%}
+          <label class="aa-addon__opt">
+            <input type="radio" name="aa-addon-v" value="{{ v.id }}"{% if v.option1 == def %} checked{% endif %}>
+            <span class="aa-addon__optname">{{ lbl }}</span>
+            <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price %}</span>
+          </label>
+          {%- endfor -%}
+        </div>
+        {%- if ad.note != blank -%}<p class="aa-addon__note">{{ ad.note }}</p>{%- endif -%}
       </div>
-      {%- if ad.note != blank -%}<p class="aa-addon__note">{{ ad.note }}</p>{%- endif -%}
     </div>
   </div>
 </div>
 <style>
   .aa-addon{margin:14px 0 0;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised);padding:14px 16px}
   .aa-addon__head{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:500}
-  .aa-addon__check{width:18px;height:18px;accent-color:var(--text-accent);flex:none}
-  .aa-addon__card{display:flex;gap:14px;margin-top:12px;align-items:flex-start}
-  .aa-addon__img{flex:none;width:76px;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:var(--surface-alt,#f3eee6)}
+  .aa-addon__check{width:18px;height:18px;accent-color:var(--text-accent);flex:none;margin:0}
+  .aa-addon__title{flex:1}
+  .aa-addon__teaser{font-weight:400;font-size:13px;color:var(--text-secondary);white-space:nowrap}
+  .aa-addon__panel{display:none}
+  .aa-addon.is-on .aa-addon__panel{display:block}
+  .aa-addon__card{display:flex;gap:16px;margin-top:14px;align-items:flex-start}
+  .aa-addon__img{flex:none;width:112px;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background-color:var(--surface-alt,#f3eee6);background-repeat:no-repeat}
   .aa-addon__img img{width:100%;height:100%;object-fit:cover;display:block}
   .aa-addon__body{flex:1;min-width:0}
-  .aa-addon__name{font-size:14px;color:inherit;text-decoration:underline;text-underline-offset:3px}
+  .aa-addon__name{font-size:14px;font-weight:500}
+  .aa-addon__size{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:13px;color:var(--text-secondary)}
+  .aa-addon__size i{color:var(--text-accent)}
   .aa-addon__opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
   .aa-addon__opt{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-subtle,rgba(0,0,0,.14));border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
   .aa-addon__opt input{accent-color:var(--text-accent);margin:0}
   .aa-addon__optprice{color:var(--text-secondary)}
   .aa-addon__note{margin:10px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-secondary)}
-  .aa-addon:not(.is-on) .aa-addon__opts{opacity:.55}
 </style>
 <script>
 (function(){
@@ -62,9 +82,8 @@
   var box=document.querySelector('[data-aa-addon]');
   if(!box) return;
   var on=box.querySelector('[data-aa-addon-on]');
-  function sync(){ box.classList.toggle('is-on', !!(on && on.checked)); }
+  function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); }
   if(on) on.addEventListener('change', sync);
-  box.addEventListener('change', function(e){ if(e.target && e.target.name==='aa-addon-v' && on && !on.checked){ on.checked=true; sync(); } });
   sync();
   document.addEventListener('submit', function(e){
     var f=e.target;
