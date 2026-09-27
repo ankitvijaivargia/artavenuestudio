@@ -15,7 +15,7 @@
       "subheading": "Leather, vintage kilim, cane and solid wood — each piece built to order in your choice of size and finish, and made to be handed down.",
       "cta_label": "Shop Furniture", "cta_link": "/collections/furniture",
       "cta2_label": "Visit the Showroom", "cta2_link": "/pages/contact",
-      "proof": "Made to order|Custom sizes on request|Showroom in New Delhi",
+      "proof": "Made to order|Custom sizes on request|Showroom on MG Road, New Delhi",
       "product": "landour-tufted-upholstered-bed", "show_caption": true,
       "product_2": "mandawa-kilim-trunk-coffee-table"}},
     "categories": {"type": "aa-home-tiles", "settings": {
@@ -59,7 +59,7 @@
       "alt": false, "cta_label": "Bespoke & made to measure", "cta_link": "/pages/custom"},
       "blocks": {
         "s1": {"type": "step", "settings": {"icon": "ph-sliders-horizontal", "title": "Choose your piece", "text": "Pick the size, then the leather, fabric and wood finish right on the product page. Every combination is priced upfront."}},
-        "s2": {"type": "step", "settings": {"icon": "ph-swatches", "title": "See it in person", "text": "Order swatches of any leather or fabric to hold up in your own room — or visit our New Delhi showroom to see them all."}},
+        "s2": {"type": "step", "settings": {"icon": "ph-swatches", "title": "See it in person", "text": "Order swatches of any leather or fabric to hold up in your own room — or visit our showroom on MG Road, New Delhi to see them all."}},
         "s3": {"type": "step", "settings": {"icon": "ph-hammer", "title": "Crafted by hand", "text": "Your piece is made for you once you order — most in 6 to 8 weeks, smaller pieces sooner. Lead time is shown on every product."}},
         "s4": {"type": "step", "settings": {"icon": "ph-ruler", "title": "Made to measure", "text": "Need it longer, lower or narrower? Most designs can be built to your measurements. Just ask us on WhatsApp."}}
       },
@@ -67,7 +67,7 @@
     "showroom": {"type": "aa-home-feature", "settings": {
       "product": "windsor-tufted-leather-sofa", "reverse": true, "bg": "dark",
       "eyebrow": "Visit Us", "heading": "See it, sit on it, then decide.",
-      "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom in New Delhi to see our finishes, fabrics and pieces in person.</p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
+      "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom on MG Road, New Delhi to see our finishes, fabrics and pieces in person.</p><p><strong>2nd Floor, Plot No. 844, opposite Metro Pillar No. 113, MG Road, Ghitorni, New Delhi 110030</strong></p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
       "cta_label": "Chat on WhatsApp", "cta_link": "https://wa.me/919828080095",
       "cta2_label": "Showroom details", "cta2_link": "/pages/contact"}},
     "trade": {"type": "aa-trade-band", "settings": {
