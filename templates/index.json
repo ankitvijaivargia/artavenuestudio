@@ -9,280 +9,73 @@
  */
 {
   "sections": {
-    "hero": {
-      "type": "aa-hero",
-      "settings": {
-        "eyebrow": "The Spring Collection · 2026",
-        "heading": "Crafted spaces, collected stories.",
-        "subheading": "Handcrafted furniture, rugs and objects for homes that are made to be lived in — and remembered.",
-        "cta_label": "Explore the Collection",
-        "cta_link": "",
-        "image": "shopify://shop_images/luxurious-home-in-the-desert.jpg",
-        "tone": "clay"
-      }
-    },
-    "signature": {
-      "type": "aa-signature",
+    "hero": {"type": "aa-home-hero", "settings": {
+      "eyebrow": "Art Avenue Design House · New Delhi",
+      "heading": "Handcrafted furniture, made to your measure.",
+      "subheading": "Leather, vintage kilim, cane and solid wood — each piece built to order in your choice of size and finish, and made to be handed down.",
+      "cta_label": "Shop Furniture", "cta_link": "/collections/furniture",
+      "cta2_label": "Visit the Showroom", "cta2_link": "/pages/contact",
+      "proof": "Made to order|Custom sizes on request|Showroom in New Delhi",
+      "product": "landour-tufted-upholstered-bed", "show_caption": true,
+      "product_2": "mandawa-kilim-trunk-coffee-table"}},
+    "categories": {"type": "aa-home-tiles", "settings": {
+      "eyebrow": "Shop by Category", "heading": "Find your piece.",
+      "columns": "4", "ratio": "3/4", "alt": false,
+      "link_label": "All furniture", "link": "/collections/furniture"},
       "blocks": {
-        "s1": {
-          "type": "tile",
-          "settings": {
-            "eyebrow": "01 — Furniture",
-            "title": "Furniture",
-            "link": "/collections/furniture",
-            "tone": "clay"
-          }
-        },
-        "s2": {
-          "type": "tile",
-          "settings": {
-            "eyebrow": "02 — Rugs",
-            "title": "Rugs",
-            "link": "/collections/rugs",
-            "tone": "olive"
-          }
-        },
-        "s3": {
-          "type": "tile",
-          "settings": {
-            "eyebrow": "03 — Lighting",
-            "title": "Lighting",
-            "link": "/collections/lighting",
-            "tone": "bronze"
-          }
-        },
-        "s4": {
-          "type": "tile",
-          "settings": {
-            "eyebrow": "04 — Decor",
-            "title": "Decor",
-            "link": "/collections/decor",
-            "tone": "stone"
-          }
-        },
-        "s5": {
-          "type": "tile",
-          "settings": {
-            "eyebrow": "05 — Wall Art",
-            "title": "Wall Art",
-            "link": "/collections/wall-art",
-            "tone": "sand"
-          }
-        }
+        "c1": {"type": "tile", "settings": {"title": "Sofas", "collection": "sofas", "product": "kingston-buttoned-fabric-sofa", "subtitle": "Shop now"}},
+        "c2": {"type": "tile", "settings": {"title": "Beds", "collection": "beds", "product": "coonoor-cane-four-poster-bed", "subtitle": "Shop now"}},
+        "c3": {"type": "tile", "settings": {"title": "Coffee Tables", "collection": "coffee-tables", "product": "kuchaman-leather-trunk-coffee-table", "subtitle": "Shop now"}},
+        "c4": {"type": "tile", "settings": {"title": "Armchairs & Ottomans", "collection": "chairs-and-ottomans", "product": "chail-buttoned-leather-club-chair", "subtitle": "Shop now"}},
+        "c5": {"type": "tile", "settings": {"title": "Sideboards", "collection": "sideboards", "product": "sardargarh-kilim-leather-sideboard", "subtitle": "Shop now"}},
+        "c6": {"type": "tile", "settings": {"title": "Bedside Tables", "collection": "bedside-tables", "product": "kishangarh-studded-leather-bedside-table", "subtitle": "Shop now"}},
+        "c7": {"type": "tile", "settings": {"title": "Trunks", "collection": "trunks", "product": "bundi-kilim-steamer-trunk", "subtitle": "Shop now"}},
+        "c8": {"type": "tile", "settings": {"title": "Chests of Drawers", "collection": "chests-of-drawers", "product": "sariska-studded-leather-chest-of-drawers", "subtitle": "Shop now"}}
       },
-      "block_order": [
-        "s1",
-        "s2",
-        "s3",
-        "s4",
-        "s5"
-      ],
-      "settings": {
-        "eyebrow": "Signature Collections",
-        "heading": "Five disciplines, one point of view.",
-        "intro": "Each category is curated and commissioned in-house — a considered edit rather than an endless catalog."
-      }
-    },
-    "craft": {
-      "type": "aa-craft",
-      "settings": {
-        "eyebrow": "The Atelier",
-        "heading": "Made slowly, by hand, to last.",
-        "intro": "Every piece begins in the hands of an artisan — turned, joined and finished the way furniture was always meant to be made.",
-        "cta_link": ""
-      }
-    },
-    "arrivals": {
-      "type": "aa-arrivals",
-      "settings": {
-        "eyebrow": "Just Arrived",
-        "heading": "New this season",
-        "collection": "",
-        "link": ""
-      }
-    },
-    "rooms": {
-      "type": "aa-rooms",
+      "block_order": ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"]},
+    "kilim": {"type": "aa-home-feature", "settings": {
+      "product": "mandawa-kilim-trunk-coffee-table", "reverse": false, "bg": "alt",
+      "eyebrow": "Our Signature", "heading": "Vintage kilim, bound in leather.",
+      "body": "<p>Every kilim we use is a hand-woven textile with a past. We cut it, lay it and stitch it into leather by hand, then finish it with brass corners and hand-driven studs.</p><p>No two kilims match — so no two pieces are alike. The one you receive will be yours alone.</p>",
+      "points": "One-of-a-kind hand-woven panels\nFull-grain leather in your choice of colour\nSolid wood frames, brass hardware",
+      "cta_label": "Shop Kilim & Leather", "cta_link": "/collections/kilim-leather",
+      "cta2_label": "Explore materials", "cta2_link": "/pages/materials"}},
+    "edit": {"type": "aa-home-products", "settings": {
+      "eyebrow": "The Edit", "heading": "Pieces we're known for.",
+      "intro": "A place to begin — each one made to order in the size and finish you choose.",
+      "products": ["narlai-kilim-leather-storage-bed", "mandawa-kilim-trunk-coffee-table", "kasauli-studded-leather-wing-chair", "fatehpur-cane-leather-sideboard", "kingston-buttoned-fabric-sofa", "kishangarh-studded-leather-bedside-table", "ranikhet-vanity-trunk-chest", "darjeeling-colonial-wooden-bed"],
+      "alt": false, "link_label": "New arrivals", "link": "/collections/new-arrivals"}},
+    "rooms": {"type": "aa-home-tiles", "settings": {
+      "eyebrow": "Shop by Room", "heading": "Begin with the space.",
+      "columns": "2", "ratio": "5/4", "alt": true},
       "blocks": {
-        "r1": {
-          "type": "room",
-          "settings": {
-            "title": "Living Room",
-            "link": "/collections/living-room",
-            "tone": "clay"
-          }
-        },
-        "r2": {
-          "type": "room",
-          "settings": {
-            "title": "Dining",
-            "link": "/collections/dining-room",
-            "tone": "espresso"
-          }
-        },
-        "r3": {
-          "type": "room",
-          "settings": {
-            "title": "Bedroom",
-            "link": "/collections/bedroom",
-            "tone": "stone"
-          }
-        },
-        "r4": {
-          "type": "room",
-          "settings": {
-            "title": "Study",
-            "link": "/collections/study",
-            "tone": "olive"
-          }
-        },
-        "r5": {
-          "type": "room",
-          "settings": {
-            "title": "Outdoor",
-            "link": "/collections/outdoor",
-            "tone": "bronze"
-          }
-        }
+        "r1": {"type": "tile", "settings": {"title": "The Living Room", "collection": "living-room-furniture", "product": "hampstead-fabric-chesterfield-sofa", "subtitle": "Shop the room"}},
+        "r2": {"type": "tile", "settings": {"title": "The Bedroom", "collection": "bedroom-furniture", "product": "darjeeling-colonial-wooden-bed", "subtitle": "Shop the room"}}
       },
-      "block_order": [
-        "r1",
-        "r2",
-        "r3",
-        "r4",
-        "r5"
-      ],
-      "settings": {
-        "eyebrow": "Shop by Room",
-        "heading": "Begin with the space.",
-        "intro": "See how our pieces live together — then make the room your own."
-      }
-    },
-    "featured": {
-      "type": "aa-featured",
-      "settings": {
-        "eyebrow": "The Featured Collection",
-        "heading": "The Marwar Collection",
-        "intro": "An ode to the courtyards of Rajasthan — low silhouettes, hand-carved frames, and the deep warmth of aged teak and brass.",
-        "collection": "",
-        "link": ""
-      }
-    },
-    "trade": {
-      "type": "aa-trade-band",
-      "settings": {
-        "eyebrow": "Trade & Design Program",
-        "heading": "For designers & architects.",
-        "intro": "We partner with interior designers, architects and hospitality buyers to source with confidence — from a single statement piece to an entire property."
-      }
-    },
-    "homes": {
-      "type": "aa-homes",
+      "block_order": ["r1", "r2"]},
+    "process": {"type": "aa-home-steps", "settings": {
+      "eyebrow": "Made to Order", "heading": "Made for you, not pulled from a warehouse.",
+      "intro": "Every Art Avenue piece is built after you order it — here is how it works.",
+      "alt": false, "cta_label": "Bespoke & made to measure", "cta_link": "/pages/custom"},
       "blocks": {
-        "h1": {
-          "type": "img",
-          "settings": {
-            "label": "@studio.kohl",
-            "tone": "clay"
-          }
-        },
-        "h2": {
-          "type": "img",
-          "settings": {
-            "label": "@thebandracs",
-            "tone": "stone"
-          }
-        },
-        "h3": {
-          "type": "img",
-          "settings": {
-            "label": "@maison.rao",
-            "tone": "olive"
-          }
-        },
-        "h4": {
-          "type": "img",
-          "settings": {
-            "label": "@verandah.co",
-            "tone": "bronze"
-          }
-        }
+        "s1": {"type": "step", "settings": {"icon": "ph-sliders-horizontal", "title": "Choose your piece", "text": "Pick the size, then the leather, fabric and wood finish right on the product page. Every combination is priced upfront."}},
+        "s2": {"type": "step", "settings": {"icon": "ph-swatches", "title": "See it in person", "text": "Order swatches of any leather or fabric to hold up in your own room — or visit our New Delhi showroom to see them all."}},
+        "s3": {"type": "step", "settings": {"icon": "ph-hammer", "title": "Crafted by hand", "text": "Your piece is made for you once you order — most in 6 to 8 weeks, smaller pieces sooner. Lead time is shown on every product."}},
+        "s4": {"type": "step", "settings": {"icon": "ph-ruler", "title": "Made to measure", "text": "Need it longer, lower or narrower? Most designs can be built to your measurements. Just ask us on WhatsApp."}}
       },
-      "block_order": [
-        "h1",
-        "h2",
-        "h3",
-        "h4"
-      ],
-      "settings": {
-        "eyebrow": "Customer Homes",
-        "heading": "Lived in, beautifully.",
-        "intro": "Real spaces, shared by the homeowners and designers who made them. Tag #ArtAvenueAtHome."
-      }
-    },
-    "journal": {
-      "type": "aa-journal",
-      "blocks": {
-        "j1": {
-          "type": "post",
-          "settings": {
-            "category": "Styling",
-            "title": "How to layer a living room like a designer",
-            "read": "6 min",
-            "link": "",
-            "tone": "stone"
-          }
-        },
-        "j2": {
-          "type": "post",
-          "settings": {
-            "category": "Materials",
-            "title": "Why hand-knotted wool ages so beautifully",
-            "read": "4 min",
-            "link": "",
-            "tone": "olive"
-          }
-        },
-        "j3": {
-          "type": "post",
-          "settings": {
-            "category": "At Home",
-            "title": "Inside a Bandra apartment, restored",
-            "read": "8 min",
-            "link": "",
-            "tone": "clay"
-          }
-        }
-      },
-      "block_order": [
-        "j1",
-        "j2",
-        "j3"
-      ],
-      "settings": {
-        "eyebrow": "The Journal",
-        "heading": "Design notes & stories",
-        "link": ""
-      }
-    },
-    "statement": {
-      "type": "aa-statement",
-      "settings": {
-        "eyebrow": "Art Avenue",
-        "text": "We are not a furniture store. We are a design house — curating the handcrafted, the considered, and the made-to-last, so your home can hold its stories for generations."
-      }
-    }
+      "block_order": ["s1", "s2", "s3", "s4"]},
+    "showroom": {"type": "aa-home-feature", "settings": {
+      "product": "windsor-tufted-leather-sofa", "reverse": true, "bg": "dark",
+      "eyebrow": "Visit Us", "heading": "See it, sit on it, then decide.",
+      "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom in New Delhi to see our finishes, fabrics and pieces in person.</p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
+      "cta_label": "Chat on WhatsApp", "cta_link": "https://wa.me/919828080095",
+      "cta2_label": "Showroom details", "cta2_link": "/pages/contact"}},
+    "trade": {"type": "aa-trade-band", "settings": {
+      "eyebrow": "Trade & Design Program", "heading": "For designers & architects.",
+      "intro": "We work with interior designers, architects and hospitality buyers — from a single statement piece to a full property, with custom sizes and finishes."}},
+    "statement": {"type": "aa-statement", "settings": {
+      "eyebrow": "Art Avenue",
+      "text": "We are not a furniture store. We are a design house — making the handcrafted, the considered and the made-to-last, so your home can hold its stories for generations."}}
   },
-  "order": [
-    "hero",
-    "signature",
-    "craft",
-    "arrivals",
-    "rooms",
-    "featured",
-    "trade",
-    "homes",
-    "journal",
-    "statement"
-  ]
+  "order": ["hero", "categories", "kilim", "edit", "rooms", "process", "showroom", "trade", "statement"]
 }
