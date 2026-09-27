@@ -4,6 +4,7 @@
     { "handle": "<add-on product handle>", "heading": "...", "teaser": "₹20,000 each",
       "name": "display name", "size": "55 W × 45 D × 62 H cm each", "note": "...",
       "default": "<option1 pre-selected>", "labels": { "<option1>": "display label" },
+      "total_labels": { "<option1>": "phrase after 'with' in the headline total line" },
       "crop": { "size": "537.6%", "pos": "1.5% 64.7%", "ratio": "226 / 434" },
       "properties": { "Paint Finish": "Ivory" },
       "inherit": [ "Wood Finish" ] }
@@ -21,14 +22,17 @@
   if the add-on request errors, the parent product is still added.
 
   Order summary + totals: while ticked, a summary at the foot of the panel (directly above the
-  CTA) shows the parent's selected variant x quantity, the add-on choice and the combined total,
-  and the main Add to Cart button and the sticky-bar price show that same total. The parent
-  variant is read from the buy form's [name="id"] against a variant price map rendered here; it
-  re-reads on any click/change, on a light poll, and via MutationObservers on the button and
-  sticky price (the configurator rewrites those itself without firing events). Whatever text the
-  configurator last wrote is remembered and restored the moment the add-on is unticked, so the
-  bed-only behaviour is unchanged. Fails safe: if the variant cannot be resolved nothing is
-  overridden and the summary stays hidden. The product's headline price is never touched.
+  CTA) shows the parent's selected variant x quantity, the add-on choice and the combined total;
+  the main Add to Cart button and the sticky-bar price show that same total; and a secondary
+  line appears under each headline price ("₹ 1,81,000 with a pair of side tables"). The
+  headline price itself is NEVER changed — it stays the parent's own price (Ankit's decision).
+  "total_labels" is optional: Pair / Single default to "a pair of side tables" / "one side
+  table", anything else to the lower-cased label. The parent variant is read from the buy
+  form's [name="id"] against a variant price map rendered here; it re-reads on any
+  click/change/input, on a light poll, and via MutationObservers on the button and sticky price
+  (aa-price.liquid and the configurator rewrite those without firing events). Whatever text they
+  last wrote is remembered and restored the moment the add-on is unticked. Fails safe: if the
+  variant cannot be resolved nothing is overridden and the summary lines stay hidden.
 {%- endcomment -%}
 {%- assign ad = product.metafields.aav.addon.value -%}
 {%- if ad and ad.handle != blank -%}
@@ -57,8 +61,10 @@
         <div class="aa-addon__opts" role="radiogroup" aria-label="{{ ad.name | default: ap.title | escape }}">
           {%- for v in ap.variants -%}
           {%- assign lbl = v.option1 -%}{%- if ad.labels and ad.labels[v.option1] -%}{%- assign lbl = ad.labels[v.option1] -%}{%- endif -%}
+          {%- assign wth = lbl | downcase -%}
+          {%- if ad.total_labels and ad.total_labels[v.option1] -%}{%- assign wth = ad.total_labels[v.option1] -%}{%- elsif v.option1 == 'Pair' -%}{%- assign wth = 'a pair of side tables' -%}{%- elsif v.option1 == 'Single' -%}{%- assign wth = 'one side table' -%}{%- endif -%}
           <label class="aa-addon__opt">
-            <input type="radio" name="aa-addon-v" value="{{ v.id }}" data-price="{{ v.price }}" data-label="{{ lbl | escape }}"{% if v.option1 == def %} checked{% endif %}>
+            <input type="radio" name="aa-addon-v" value="{{ v.id }}" data-price="{{ v.price }}" data-label="{{ lbl | escape }}" data-with="{{ wth | escape }}"{% if v.option1 == def %} checked{% endif %}>
             <span class="aa-addon__optname">{{ lbl }}</span>
             <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price %}</span>
           </label>
@@ -100,6 +106,9 @@
   .aa-addon__row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0;color:var(--text-secondary)}
   .aa-addon__row span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}
   .aa-addon__row--tot{color:var(--text-primary,inherit);font-weight:500;font-size:14px;margin-top:4px}
+  .aa-addon__ptot{display:none;margin-top:6px;font-size:14px;line-height:1.4;color:var(--text-secondary)}
+  .aa-addon__ptot.is-shown{display:block}
+  .aa-addon__ptot b{font-weight:500;color:var(--text-primary,inherit);font-variant-numeric:tabular-nums}
 </style>
 <script>
 (function(){
@@ -141,13 +150,14 @@
     o.mine=want;
     if(el.textContent!==want) el.textContent=want;
   }
-  var bOv=null, sOv=null;
+  var bOv=null, sOv=null, ptl=[];
 
   function render(){
     var r=box.querySelector('input[name="aa-addon-v"]:checked');
     var pv=vmap[curId()];
     if(!on || !on.checked || !r || !pv){
       if(sum) sum.classList.remove('is-shown');
+      ptl.forEach(function(d){ d.classList.remove('is-shown'); });
       setOv(bOv, null); setOv(sOv, null);
       return;
     }
@@ -158,6 +168,13 @@
     txt('[data-sum-ap]', fmt(addP));
     txt('[data-sum-tot]', fmt(tot));
     if(sum) sum.classList.add('is-shown');
+    var wth=' with '+(r.getAttribute('data-with')||'side tables');
+    ptl.forEach(function(d){
+      var b=d.firstChild, s=d.lastChild, tv=fmt(tot);
+      if(b.textContent!==tv) b.textContent=tv;
+      if(s.textContent!==wth) s.textContent=wth;
+      d.classList.add('is-shown');
+    });
     setOv(bOv, tot); setOv(sOv, tot);
   }
   function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); render(); }
@@ -166,6 +183,19 @@
     var btn=f && f.querySelector('[type="submit"]');
     bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmt(t); });
     sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmt(t); });
+    /* Secondary total line under each headline price (mobile head + desktop buybox). The
+       headline price element itself is left alone. Sticky bar is outside .aa-product. */
+    document.querySelectorAll('.aa-product [data-aa-price-display]').forEach(function(el){
+      var row=el.parentNode;
+      if(!row || !row.parentNode) return;
+      var d=document.createElement('div');
+      d.className='aa-addon__ptot';
+      d.setAttribute('aria-live','polite');
+      d.appendChild(document.createElement('b'));
+      d.appendChild(document.createElement('span'));
+      row.parentNode.insertBefore(d, row.nextSibling);
+      ptl.push(d);
+    });
     render();
   }
   if(on) on.addEventListener('change', sync);
