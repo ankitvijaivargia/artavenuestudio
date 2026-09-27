@@ -67,7 +67,7 @@
     "showroom": {"type": "aa-home-feature", "settings": {
       "product": "windsor-tufted-leather-sofa", "reverse": true, "bg": "dark",
       "eyebrow": "Visit Us", "heading": "See it, sit on it, then decide.",
-      "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom on MG Road, New Delhi to see our finishes, fabrics and pieces in person.</p><p><strong>2nd Floor, Plot No. 844, opposite Metro Pillar No. 113, MG Road, Ghitorni, New Delhi 110030</strong></p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
+      "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom on MG Road, New Delhi to see our finishes, fabrics and pieces in person.</p><p><strong>2nd Floor, Plot No. 844, opposite Metro Pillar No. 113, MG Road, Ghitorni, New Delhi 110030</strong><br>Open every day, 11 am to 8 pm</p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
       "cta_label": "Chat on WhatsApp", "cta_link": "https://wa.me/919828080095",
       "cta2_label": "Book a visit", "cta2_link": "/pages/contact?type=visit"}},
     "trade": {"type": "aa-trade-band", "settings": {
