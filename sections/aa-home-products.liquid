@@ -1,0 +1,28 @@
+{%- comment -%} Art Avenue — hand-picked product grid. {%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="aa-section{% if s.alt %} aa-alt{% endif %}">
+  <div class="aa-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px">
+      <div style="max-width:640px">
+        {%- if s.eyebrow != blank -%}<span class="aa-eyebrow aa-eyebrow--rule">{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="aa-display-2" style="margin-top:18px">{{ s.heading }}</h2>
+        {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:16px">{{ s.intro }}</p>{%- endif -%}
+      </div>
+      {%- if s.link_label != blank -%}<a class="btn btn--ghost" href="{{ s.link | default: '/collections/furniture' }}">{{ s.link_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+    </div>
+    <div class="grid-4" style="margin-top:44px">
+      {%- for product in s.products limit: 12 -%}{% render 'aa-product-card', product: product %}{%- endfor -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name":"AA Product Picks","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow"},
+  {"type":"text","id":"heading","label":"Heading","default":"Pieces we are known for"},
+  {"type":"textarea","id":"intro","label":"Intro"},
+  {"type":"product_list","id":"products","label":"Products","limit":12},
+  {"type":"checkbox","id":"alt","label":"Alternate background","default":false},
+  {"type":"text","id":"link_label","label":"View-all label"},
+  {"type":"url","id":"link","label":"View-all link"}
+],"presets":[{"name":"AA Product Picks"}]}
+{% endschema %}

@@ -1,0 +1,87 @@
+{%- comment -%} Art Avenue — image tiles (categories / rooms). Image: block image > product image > collection image > collection's first product. {%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- assign cols = s.columns | default: 4 -%}
+<style>
+  #aat-{{ section.id }} .aat-grid{display:grid;grid-template-columns:repeat({{ cols }},minmax(0,1fr));gap:clamp(14px,2vw,28px) clamp(12px,1.6vw,24px);margin-top:clamp(32px,4vw,52px);}
+  #aat-{{ section.id }} .aat-tile{display:block;color:inherit;}
+  #aat-{{ section.id }} .aat-img{overflow:hidden;background:var(--surface-alt,#efe8dc);aspect-ratio:{{ s.ratio | default: '3/4' }};}
+  #aat-{{ section.id }} .aat-img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease-luxe);}
+  #aat-{{ section.id }} .aat-tile:hover .aat-img img{transform:scale(1.04);}
+  #aat-{{ section.id }} .aat-meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:14px;}
+  #aat-{{ section.id }} .aat-t{font-family:var(--font-serif);font-size:{% if cols <= 2 %}clamp(24px,2.4vw,34px){% else %}clamp(19px,1.6vw,23px){% endif %};line-height:1.15;color:var(--text-primary);}
+  #aat-{{ section.id }} .aat-s{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);white-space:nowrap;transition:color var(--dur-base);}
+  #aat-{{ section.id }} .aat-tile:hover .aat-s{color:var(--text-accent);}
+  #aat-{{ section.id }} .aat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+  @media (max-width:899px){
+    #aat-{{ section.id }} .aat-grid{grid-template-columns:repeat({% if cols <= 2 %}1{% else %}2{% endif %},minmax(0,1fr));}
+    #aat-{{ section.id }} .aat-s{display:none;}
+  }
+</style>
+<section id="aat-{{ section.id }}" class="aa-section{% if s.alt %} aa-alt{% endif %}">
+  <div class="aa-wrap">
+    <div class="aat-head">
+      <div style="max-width:640px">
+        {%- if s.eyebrow != blank -%}<span class="aa-eyebrow aa-eyebrow--rule">{{ s.eyebrow }}</span>{%- endif -%}
+        {%- if s.heading != blank -%}<h2 class="aa-display-2" style="margin-top:18px">{{ s.heading }}</h2>{%- endif -%}
+        {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:16px">{{ s.intro }}</p>{%- endif -%}
+      </div>
+      {%- if s.link_label != blank -%}<a class="btn btn--ghost" href="{{ s.link | default: '/collections/furniture' }}">{{ s.link_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+    </div>
+    <div class="aat-grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign img = b.image
+          if img == blank and b.product != blank
+            assign img = b.product.featured_image
+          endif
+          if img == blank and b.collection != blank
+            assign img = b.collection.image
+            if img == blank
+              assign img = b.collection.products.first.featured_image
+            endif
+          endif
+          assign url = b.link
+          if url == blank and b.collection != blank
+            assign url = b.collection.url
+          endif
+          assign title = b.title
+          if title == blank and b.collection != blank
+            assign title = b.collection.title
+          endif
+        -%}
+        <a class="aat-tile" href="{{ url | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="aat-img">
+            {%- if img -%}
+              {%- if cols <= 2 -%}
+                {{ img | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '500, 800, 1100, 1400', sizes: '(min-width: 900px) 48vw, 100vw', alt: title }}
+              {%- else -%}
+                {{ img | image_url: width: 800 | image_tag: loading: 'lazy', widths: '360, 540, 800', sizes: '(min-width: 900px) 24vw, 50vw', alt: title }}
+              {%- endif -%}
+            {%- else -%}{% render 'aa-figure', tone: 'clay', class: 'aa-full-bg' %}{%- endif -%}
+          </div>
+          <div class="aat-meta"><span class="aat-t">{{ title }}</span><span class="aat-s">{{ b.subtitle | default: 'Shop now' }} <i class="ph ph-arrow-right"></i></span></div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name":"AA Image Tiles","max_blocks":12,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow"},
+  {"type":"text","id":"heading","label":"Heading"},
+  {"type":"textarea","id":"intro","label":"Intro"},
+  {"type":"select","id":"columns","label":"Columns (desktop)","default":"4","options":[{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"}]},
+  {"type":"text","id":"ratio","label":"Image ratio","default":"3/4"},
+  {"type":"checkbox","id":"alt","label":"Alternate background","default":false},
+  {"type":"text","id":"link_label","label":"View-all label"},
+  {"type":"url","id":"link","label":"View-all link"}
+],"blocks":[{"type":"tile","name":"Tile","settings":[
+  {"type":"text","id":"title","label":"Title (defaults to collection title)"},
+  {"type":"text","id":"subtitle","label":"Link text","default":"Shop now"},
+  {"type":"collection","id":"collection","label":"Collection"},
+  {"type":"url","id":"link","label":"Link (overrides collection)"},
+  {"type":"product","id":"product","label":"Image from product"},
+  {"type":"image_picker","id":"image","label":"Image (overrides product)"}
+]}],"presets":[{"name":"AA Image Tiles"}]}
+{% endschema %}

@@ -1,0 +1,90 @@
+{%- comment -%} Art Avenue — home hero: editorial split, copy left, shoppable image right. Image falls back to a product's featured image. {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign img1 = s.image
+  if img1 == blank and s.product != blank
+    assign img1 = s.product.featured_image
+  endif
+  assign img2 = s.image_2
+  if img2 == blank and s.product_2 != blank
+    assign img2 = s.product_2.featured_image
+  endif
+-%}
+<style>
+  .aah-hero{background:var(--surface-page);padding:clamp(24px,4vw,56px) 0 clamp(56px,7vw,104px);}
+  .aah-hero__grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(36px,6vw,104px);align-items:center;}
+  .aah-hero__h{margin-top:22px;}
+  .aah-hero__sub{margin-top:22px;max-width:470px;}
+  .aah-hero__ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px;}
+  .aah-hero__proof{list-style:none;margin:40px 0 0;padding:26px 0 0;border-top:1px solid var(--border-hairline);display:flex;flex-wrap:wrap;gap:10px 28px;}
+  .aah-hero__proof li{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-secondary);display:flex;align-items:center;gap:8px;}
+  .aah-hero__proof li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .aah-hero__media{position:relative;padding:0 0 clamp(44px,6vw,84px) clamp(48px,8vw,130px);}
+  .aah-hero__main,.aah-hero__inset{display:block;overflow:hidden;}
+  .aah-hero__main img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform 1.2s var(--ease-luxe);}
+  .aah-hero__main:hover img{transform:scale(1.025);}
+  .aah-hero__inset{position:absolute;left:0;bottom:0;width:38%;border:10px solid var(--surface-page);background:var(--surface-page);}
+  .aah-hero__inset img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;}
+  .aah-hero__cap{position:absolute;right:0;bottom:clamp(10px,2vw,28px);font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-secondary);display:flex;align-items:center;gap:8px;}
+  .aah-hero__cap:hover{color:var(--text-accent);}
+  @media (max-width:899px){
+    .aah-hero{padding-top:0;}
+    .aah-hero__grid{grid-template-columns:1fr;gap:34px;}
+    .aah-hero__media{order:-1;padding:0 0 56px 0;margin:0 calc(var(--gutter) * -1);}
+    .aah-hero__inset{width:34%;left:var(--gutter);border-width:6px;}
+    .aah-hero__cap{right:var(--gutter);bottom:14px;max-width:52%;text-align:right;justify-content:flex-end;}
+  }
+</style>
+<section class="aah-hero">
+  <div class="aa-wrap aah-hero__grid">
+    <div class="aah-hero__copy">
+      {%- if s.eyebrow != blank -%}<span class="aa-eyebrow aa-eyebrow--rule">{{ s.eyebrow }}</span>{%- endif -%}
+      <h1 class="aa-display-1 aah-hero__h">{{ s.heading }}</h1>
+      {%- if s.subheading != blank -%}<p class="aa-lead aah-hero__sub">{{ s.subheading }}</p>{%- endif -%}
+      <div class="aah-hero__ctas">
+        <a class="btn btn--primary" href="{{ s.cta_link | default: '/collections/furniture' }}">{{ s.cta_label }}</a>
+        {%- if s.cta2_label != blank -%}<a class="btn btn--ghost" href="{{ s.cta2_link | default: '#' }}">{{ s.cta2_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+      </div>
+      {%- if s.proof != blank -%}
+        {%- assign pts = s.proof | split: '|' -%}
+        <ul class="aah-hero__proof">{%- for p in pts -%}<li>{{ p | strip }}</li>{%- endfor -%}</ul>
+      {%- endif -%}
+    </div>
+    <div class="aah-hero__media">
+      {%- if img1 -%}
+        <a class="aah-hero__main" href="{% if s.product != blank %}{{ s.product.url }}{% else %}{{ s.cta_link | default: '/collections/furniture' }}{% endif %}">
+          {{ img1 | image_url: width: 1600 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '600, 900, 1200, 1600', sizes: '(min-width: 900px) 48vw, 100vw', alt: img1.alt }}
+        </a>
+      {%- else -%}
+        {% render 'aa-figure', tone: 'clay', ratio: '4/5' %}
+      {%- endif -%}
+      {%- if img2 -%}
+        <a class="aah-hero__inset" href="{% if s.product_2 != blank %}{{ s.product_2.url }}{% else %}{{ s.cta_link | default: '/collections/furniture' }}{% endif %}">
+          {{ img2 | image_url: width: 700 | image_tag: loading: 'eager', widths: '300, 500, 700', sizes: '(min-width: 900px) 18vw, 34vw', alt: img2.alt }}
+        </a>
+      {%- endif -%}
+      {%- if s.product != blank and s.show_caption -%}
+        <a class="aah-hero__cap" href="{{ s.product.url }}">Shown: {{ s.product.title }} <i class="ph ph-arrow-right"></i></a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name":"AA Home Hero","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Art Avenue Design House"},
+  {"type":"text","id":"heading","label":"Heading","default":"Handcrafted furniture, made to your measure."},
+  {"type":"textarea","id":"subheading","label":"Subheading"},
+  {"type":"text","id":"cta_label","label":"Primary button","default":"Shop Furniture"},
+  {"type":"url","id":"cta_link","label":"Primary link"},
+  {"type":"text","id":"cta2_label","label":"Secondary button"},
+  {"type":"url","id":"cta2_link","label":"Secondary link"},
+  {"type":"text","id":"proof","label":"Proof points (separate with |)"},
+  {"type":"header","content":"Main image"},
+  {"type":"image_picker","id":"image","label":"Image (overrides product)"},
+  {"type":"product","id":"product","label":"Product (image + link)"},
+  {"type":"checkbox","id":"show_caption","label":"Show 'Shown:' caption","default":true},
+  {"type":"header","content":"Inset image"},
+  {"type":"image_picker","id":"image_2","label":"Inset image (overrides product)"},
+  {"type":"product","id":"product_2","label":"Inset product"}
+],"presets":[{"name":"AA Home Hero"}]}
+{% endschema %}

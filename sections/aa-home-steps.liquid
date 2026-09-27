@@ -1,0 +1,48 @@
+{%- comment -%} Art Avenue — how made-to-order works. {%- endcomment -%}
+{%- assign s = section.settings -%}
+<style>
+  #aas-{{ section.id }} .aas-grid{display:grid;grid-template-columns:repeat({{ section.blocks.size | at_least: 1 | at_most: 4 }},minmax(0,1fr));gap:0;margin-top:clamp(36px,4vw,56px);border-top:1px solid var(--border-hairline);}
+  #aas-{{ section.id }} .aas-step{padding:34px clamp(18px,2.4vw,36px) 8px 0;}
+  #aas-{{ section.id }} .aas-step + .aas-step{padding-left:clamp(18px,2.4vw,36px);border-left:1px solid var(--border-hairline);}
+  #aas-{{ section.id }} .aas-n{font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent);display:flex;align-items:center;gap:10px;}
+  #aas-{{ section.id }} .aas-n i{font-size:26px;color:var(--text-primary);}
+  #aas-{{ section.id }} .aas-t{font-family:var(--font-serif);font-size:clamp(21px,1.8vw,25px);line-height:1.2;margin:18px 0 10px;color:var(--text-primary);}
+  #aas-{{ section.id }} .aas-p{font-size:14.5px;line-height:1.65;color:var(--text-secondary);margin:0;}
+  @media (max-width:899px){
+    #aas-{{ section.id }} .aas-grid{grid-template-columns:1fr;border-top:0;}
+    #aas-{{ section.id }} .aas-step,#aas-{{ section.id }} .aas-step + .aas-step{padding:24px 0;border-left:0;border-top:1px solid var(--border-hairline);}
+  }
+</style>
+<section id="aas-{{ section.id }}" class="aa-section{% if s.alt %} aa-alt{% endif %}">
+  <div class="aa-wrap">
+    <div style="max-width:680px">
+      {%- if s.eyebrow != blank -%}<span class="aa-eyebrow aa-eyebrow--rule">{{ s.eyebrow }}</span>{%- endif -%}
+      <h2 class="aa-display-2" style="margin-top:18px">{{ s.heading }}</h2>
+      {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:16px">{{ s.intro }}</p>{%- endif -%}
+    </div>
+    <div class="aas-grid">
+      {%- for block in section.blocks -%}
+        <div class="aas-step" {{ block.shopify_attributes }}>
+          <span class="aas-n"><i class="ph-light {{ block.settings.icon }}"></i>{{ forloop.index | prepend: '0' }}</span>
+          <h3 class="aas-t">{{ block.settings.title }}</h3>
+          <p class="aas-p">{{ block.settings.text }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+    {%- if s.cta_label != blank -%}<a class="btn btn--ghost" style="margin-top:36px" href="{{ s.cta_link | default: '#' }}">{{ s.cta_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+  </div>
+</section>
+{% schema %}
+{ "name":"AA Steps","max_blocks":4,"settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow"},
+  {"type":"text","id":"heading","label":"Heading"},
+  {"type":"textarea","id":"intro","label":"Intro"},
+  {"type":"checkbox","id":"alt","label":"Alternate background","default":false},
+  {"type":"text","id":"cta_label","label":"Link label"},
+  {"type":"url","id":"cta_link","label":"Link"}
+],"blocks":[{"type":"step","name":"Step","settings":[
+  {"type":"text","id":"icon","label":"Phosphor icon class","default":"ph-ruler"},
+  {"type":"text","id":"title","label":"Title"},
+  {"type":"textarea","id":"text","label":"Text"}
+]}],"presets":[{"name":"AA Steps"}]}
+{% endschema %}
