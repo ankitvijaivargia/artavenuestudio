@@ -20,12 +20,15 @@
   the finish the customer actually picked ("properties" values are the fallback). Fails open:
   if the add-on request errors, the parent product is still added.
 
-  Order summary: while ticked, a summary at the foot of the panel (directly above the CTA)
-  shows the parent's selected variant, the add-on choice and the combined total. The parent
-  variant is read from the buy form's [name="id"] against a variant price map rendered here;
-  it re-reads on any click/change and on a light poll, because the configurator can set the
-  variant id without firing an event. Fails safe: if the variant cannot be resolved the
-  summary stays hidden. The product's own price display is never touched.
+  Order summary + totals: while ticked, a summary at the foot of the panel (directly above the
+  CTA) shows the parent's selected variant x quantity, the add-on choice and the combined total,
+  and the main Add to Cart button and the sticky-bar price show that same total. The parent
+  variant is read from the buy form's [name="id"] against a variant price map rendered here; it
+  re-reads on any click/change, on a light poll, and via MutationObservers on the button and
+  sticky price (the configurator rewrites those itself without firing events). Whatever text the
+  configurator last wrote is remembered and restored the moment the add-on is unticked, so the
+  bed-only behaviour is unchanged. Fails safe: if the variant cannot be resolved nothing is
+  overridden and the summary stays hidden. The product's headline price is never touched.
 {%- endcomment -%}
 {%- assign ad = product.metafields.aav.addon.value -%}
 {%- if ad and ad.handle != blank -%}
@@ -108,37 +111,71 @@
   var vmap={};
   try{ var vm=box.querySelector('[data-aa-addon-vmap]'); vmap=JSON.parse(vm ? vm.textContent : '{}')||{}; }catch(x){ vmap={}; }
   var ptype=box.getAttribute('data-ptype')||'';
-  var last='';
+  var MID='\u00b7';
   function fmt(c){ return '\u20b9\u00a0'+Math.round((+c||0)/100).toLocaleString('en-IN'); }
-  function curId(){
-    var el=document.querySelector('.aa-buybox form[action*="/cart/add"] [name="id"]')||document.querySelector('form[action*="/cart/add"] [name="id"]');
-    return el ? String(el.value||'') : '';
-  }
-  function txt(sel,v){ var n=sum.querySelector(sel); if(n && n.textContent!==v) n.textContent=v; }
-  function render(){
-    if(!sum) return;
-    var r=box.querySelector('input[name="aa-addon-v"]:checked');
-    var id=curId(), pv=vmap[id];
-    if(!on || !on.checked || !r || !pv){ sum.classList.remove('is-shown'); last=''; return; }
-    var key=id+'|'+r.value;
-    if(key===last) return;
-    last=key;
-    var addP=+r.getAttribute('data-price')||0;
-    txt('[data-sum-pl]', ptype + (pv.l ? ' \u00b7 '+pv.l : ''));
-    txt('[data-sum-pp]', fmt(pv.p));
-    txt('[data-sum-al]', r.getAttribute('data-label')||'');
-    txt('[data-sum-ap]', fmt(addP));
-    txt('[data-sum-tot]', fmt(pv.p + addP));
-    sum.classList.add('is-shown');
-  }
+  function buyForm(){ return document.querySelector('.aa-buybox form[action*="/cart/add"]')||document.querySelector('form[action*="/cart/add"]'); }
+  function curId(){ var f=buyForm(), el=f && f.querySelector('[name="id"]'); return el ? String(el.value||'') : ''; }
+  function qty(){ var f=buyForm(), el=f && f.querySelector('[name="quantity"]'); var n=el ? parseInt(el.value,10) : 1; return (n && n>0) ? n : 1; }
+  function txt(sel,v){ var n=sum && sum.querySelector(sel); if(n && n.textContent!==v) n.textContent=v; }
+
+  /* Overrides: remember whatever the configurator last wrote, show the total while ticked,
+     restore the remembered text when unticked. Writes only when the text differs. */
   var tmr=null;
   function later(){ if(tmr) clearTimeout(tmr); tmr=setTimeout(render, 60); }
-  function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); last=''; render(); }
+  function ov(el, make){
+    var o={el:el, orig:null, mine:null, make:make};
+    if(el && window.MutationObserver){
+      new MutationObserver(function(){ if(el.textContent!==o.mine) later(); }).observe(el,{childList:true,characterData:true,subtree:true});
+    }
+    return o;
+  }
+  function setOv(o, total){
+    if(!o || !o.el) return;
+    var el=o.el;
+    if(total==null){
+      if(o.mine!==null){ if(el.textContent===o.mine && o.orig!==null) el.textContent=o.orig; o.mine=null; }
+      return;
+    }
+    if(el.textContent!==o.mine) o.orig=el.textContent;
+    var want=o.make(o.orig||'', total);
+    o.mine=want;
+    if(el.textContent!==want) el.textContent=want;
+  }
+  var bOv=null, sOv=null;
+
+  function render(){
+    var r=box.querySelector('input[name="aa-addon-v"]:checked');
+    var pv=vmap[curId()];
+    if(!on || !on.checked || !r || !pv){
+      if(sum) sum.classList.remove('is-shown');
+      setOv(bOv, null); setOv(sOv, null);
+      return;
+    }
+    var q=qty(), bp=pv.p*q, addP=+r.getAttribute('data-price')||0, tot=bp+addP;
+    txt('[data-sum-pl]', ptype + (pv.l ? ' '+MID+' '+pv.l : '') + (q>1 ? ' \u00d7 '+q : ''));
+    txt('[data-sum-pp]', fmt(bp));
+    txt('[data-sum-al]', r.getAttribute('data-label')||'');
+    txt('[data-sum-ap]', fmt(addP));
+    txt('[data-sum-tot]', fmt(tot));
+    if(sum) sum.classList.add('is-shown');
+    setOv(bOv, tot); setOv(sOv, tot);
+  }
+  function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); render(); }
+  function setup(){
+    var f=buyForm();
+    var btn=f && f.querySelector('[type="submit"]');
+    bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmt(t); });
+    sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmt(t); });
+    render();
+  }
   if(on) on.addEventListener('change', sync);
   document.addEventListener('change', later, true);
+  document.addEventListener('input', later, true);
   document.addEventListener('click', later, true);
   setInterval(function(){ if(on && on.checked) render(); }, 700);
   sync();
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', setup); } else { setup(); }
+
   document.addEventListener('submit', function(e){
     var f=e.target;
     if(!f || !f.matches || !f.matches('form[action*="/cart/add"]')) return;
