@@ -8,9 +8,16 @@
   Enable per rug with cfg.custom_size (default true; set false for fixed-size rugs).
   cfg.size_sublabels gives cm equivalents, format: "5×8 ft|152 × 244 cm~6×9 ft|183 × 274 cm"
   Rectangular / runner: width x length in cm.  Round: a single diameter in cm.
+  Custom-size wording follows construction (aav.rug_specs.construction, else the
+  hand-tufted-rugs tag): tufted rugs say "Tufted to your measurements", every other
+  construction keeps "Woven".
   params: product
 {%- endcomment -%}
 {%- assign cfg = product.metafields.aav.rug_custom.value -%}
+{%- assign rug_constr = product.metafields.aav.rug_specs.value.construction -%}
+{%- if rug_constr == blank and product.tags contains 'hand-tufted-rugs' -%}{%- assign rug_constr = 'Hand-Tufted' -%}{%- endif -%}
+{%- assign made_verb = 'Woven' -%}{%- assign made_verb_lc = 'woven' -%}
+{%- if rug_constr == 'Hand-Tufted' -%}{%- assign made_verb = 'Tufted' -%}{%- assign made_verb_lc = 'tufted' -%}{%- endif -%}
 {%- assign shape = cfg.shape | default: 'rect' -%}
 {%- assign allow_custom = true -%}
 {%- if cfg.custom_size == false -%}{%- assign allow_custom = false -%}{%- endif -%}
@@ -86,7 +93,7 @@
       {%- endunless -%}
     {%- endfor -%}
     {%- if allow_custom -%}
-      <button type="button" class="aa-rug__btn" data-rug-size data-custom="1" data-title="Custom Size" style="flex-basis:100%">Custom Size<span class="aa-rug__sub">Woven to your measurements</span></button>
+      <button type="button" class="aa-rug__btn" data-rug-size data-custom="1" data-title="Custom Size" style="flex-basis:100%">Custom Size<span class="aa-rug__sub">{{ made_verb }} to your measurements</span></button>
     {%- endif -%}
   </div>
 
@@ -101,7 +108,7 @@
       </div>
     </div>
     <div class="aa-rug__hint">
-      A perfect circle, woven to your diameter from {{ cfg.min_d_cm | default: 90 }}&ndash;{{ cfg.max_d_cm | default: 300 }} cm.
+      A perfect circle, {{ made_verb_lc }} to your diameter from {{ cfg.min_d_cm | default: 90 }}&ndash;{{ cfg.max_d_cm | default: 300 }} cm.
     </div>
     {%- else -%}
     <div class="aa-rug__fields">
@@ -118,7 +125,7 @@
       </div>
     </div>
     <div class="aa-rug__hint">
-      Woven to your exact measurements, from {{ cfg.min_w_cm | default: 60 }}&ndash;{{ cfg.max_w_cm | default: 450 }} cm wide and {{ cfg.min_l_cm | default: 60 }}&ndash;{{ cfg.max_l_cm | default: 900 }} cm long. A consultant confirms the final price and timeline before anything is woven.
+      {{ made_verb }} to your exact measurements, from {{ cfg.min_w_cm | default: 60 }}&ndash;{{ cfg.max_w_cm | default: 450 }} cm wide and {{ cfg.min_l_cm | default: 60 }}&ndash;{{ cfg.max_l_cm | default: 900 }} cm long. A consultant confirms the final price and timeline before anything is made.
     </div>
     {%- endif -%}
     <div class="aa-rug__err" data-rug-err hidden></div>
@@ -166,7 +173,7 @@
   var money = function(rupees){
     try{
       return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(rupees);
-    }catch(e){ return '\\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
+    }catch(e){ return '\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
   };
 
   function setVariant(id){
