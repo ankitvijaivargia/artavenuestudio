@@ -11,6 +11,8 @@
   Pre-fills lead_type / product / sku / a friendly heading from the query string
   produced by snippets/aa-lead-url.liquid. ?type=visit switches the form to
   "Book a showroom visit" (date + time fields shown, phone required).
+  Showroom hours: open every day, 11 am – 8 pm. After 7 pm the date picker
+  starts from tomorrow.
 
   Optional params when rendered inline on a PDP:
     product (object), default_type (string)
@@ -33,7 +35,7 @@
 <div class="aa-leadform" data-aa-leadform>
   <p class="aa-eyebrow" data-aa-lead-eyebrow>{% if is_visit %}Showroom Visit{% else %}Enquiry{% endif %}</p>
   <h2 class="aa-h2" data-aa-lead-heading>{% if is_visit %}Book a showroom visit{% else %}Speak with a design consultant{% endif %}</h2>
-  <p class="aa-lead" data-aa-lead-sub>{% if is_visit %}Choose a day and we'll confirm your visit by phone or WhatsApp within one business day.{% else %}Tell us about your space and we'll be in touch within one business day.{% endif %}</p>
+  <p class="aa-lead" data-aa-lead-sub>{% if is_visit %}We're open every day, 11 am to 8 pm. Choose a day and we'll confirm your visit by phone or WhatsApp within a day.{% else %}Tell us about your space and we'll be in touch within one business day.{% endif %}</p>
 
   {%- form 'contact', class: 'aa-lead', id: uid -%}
     {%- if form.posted_successfully? -%}
@@ -68,9 +70,10 @@
       <label class="aa-field aa-field--full" data-aa-visit{% unless is_visit %} style="display:none"{% endunless %}>
         <span>Preferred time</span>
         <select name="contact[preferred_time]"{% unless is_visit %} disabled{% endunless %}>
-          <option value="Flexible">Flexible</option>
-          <option value="Morning">Morning</option>
-          <option value="Afternoon">Afternoon</option>
+          <option value="Flexible">Flexible — any time 11 am to 8 pm</option>
+          <option value="Morning (11 am – 2 pm)">Morning · 11 am – 2 pm</option>
+          <option value="Afternoon (2 pm – 5 pm)">Afternoon · 2 pm – 5 pm</option>
+          <option value="Evening (5 pm – 8 pm)">Evening · 5 pm – 8 pm</option>
         </select>
       </label>
       <label class="aa-field aa-field--full">
@@ -98,7 +101,7 @@
       custom:       ['Bespoke', 'Customize this piece', 'Tell us what you have in mind — dimensions, materials, finishes.'],
       project:      ['Trade & Projects', 'Start a project enquiry', 'Tell us about your project and timeline; our trade team will follow up.'],
       trade:        ['Trade Program', 'Apply to the trade program', 'Share your studio details to access trade pricing and services.'],
-      visit:        ['Showroom Visit', 'Book a showroom visit', "Choose a day and we'll confirm your visit by phone or WhatsApp within one business day."]
+      visit:        ['Showroom Visit', 'Book a showroom visit', "We're open every day, 11 am to 8 pm. Choose a day and we'll confirm your visit by phone or WhatsApp within a day."]
     };
     function set(sel, val) { var el = root.querySelector(sel); if (el && val) el.value = val; }
     function text(sel, val) { var el = root.querySelector(sel); if (el) el.textContent = val; }
@@ -117,6 +120,7 @@
     var dateEl = root.querySelector('[data-aa-visit-date]');
     if (dateEl) {
       var t = new Date();
+      if (t.getHours() >= 19) t.setDate(t.getDate() + 1);
       t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
       dateEl.min = t.toISOString().slice(0, 10);
     }
