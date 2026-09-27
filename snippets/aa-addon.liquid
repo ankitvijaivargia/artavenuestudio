@@ -19,13 +19,21 @@
   copied from the parent's matching properties[...] input when present, so the add-on carries
   the finish the customer actually picked ("properties" values are the fallback). Fails open:
   if the add-on request errors, the parent product is still added.
+
+  Order summary: while ticked, a summary at the foot of the panel (directly above the CTA)
+  shows the parent's selected variant, the add-on choice and the combined total. The parent
+  variant is read from the buy form's [name="id"] against a variant price map rendered here;
+  it re-reads on any click/change and on a light poll, because the configurator can set the
+  variant id without firing an event. Fails safe: if the variant cannot be resolved the
+  summary stays hidden. The product's own price display is never touched.
 {%- endcomment -%}
 {%- assign ad = product.metafields.aav.addon.value -%}
 {%- if ad and ad.handle != blank -%}
 {%- assign ap = all_products[ad.handle] -%}
 {%- if ap and ap.id and ap.available -%}
 {%- assign def = ad.default | default: ap.variants.first.option1 -%}
-<div class="aa-addon" data-aa-addon data-parent="{{ product.title | escape }}" data-props="{{ ad.properties | json | escape }}" data-inherit="{{ ad.inherit | json | escape }}">
+{%- capture aa_vmap -%}{ {%- for v in product.variants -%}{%- assign parts = '' -%}{%- for o in product.options_with_values -%}{%- if o.values.size > 1 -%}{%- assign val = v.options[forloop.index0] -%}{%- if parts == '' -%}{%- assign parts = val -%}{%- else -%}{%- assign parts = parts | append: ', ' | append: val -%}{%- endif -%}{%- endif -%}{%- endfor -%}"{{ v.id }}":{"p":{{ v.price }},"l":{{ parts | json }}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%} }{%- endcapture -%}
+<div class="aa-addon" data-aa-addon data-parent="{{ product.title | escape }}" data-ptype="{{ product.type | default: 'Main piece' | escape }}" data-props="{{ ad.properties | json | escape }}" data-inherit="{{ ad.inherit | json | escape }}">
   <label class="aa-addon__head">
     <input type="checkbox" class="aa-addon__check" data-aa-addon-on aria-controls="aaAddonPanel">
     <span class="aa-addon__title">{{ ad.heading | default: 'Add the matching piece' }}</span>
@@ -47,7 +55,7 @@
           {%- for v in ap.variants -%}
           {%- assign lbl = v.option1 -%}{%- if ad.labels and ad.labels[v.option1] -%}{%- assign lbl = ad.labels[v.option1] -%}{%- endif -%}
           <label class="aa-addon__opt">
-            <input type="radio" name="aa-addon-v" value="{{ v.id }}"{% if v.option1 == def %} checked{% endif %}>
+            <input type="radio" name="aa-addon-v" value="{{ v.id }}" data-price="{{ v.price }}" data-label="{{ lbl | escape }}"{% if v.option1 == def %} checked{% endif %}>
             <span class="aa-addon__optname">{{ lbl }}</span>
             <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price %}</span>
           </label>
@@ -56,7 +64,13 @@
         {%- if ad.note != blank -%}<p class="aa-addon__note">{{ ad.note }}</p>{%- endif -%}
       </div>
     </div>
+    <div class="aa-addon__sum" data-aa-sum aria-live="polite">
+      <div class="aa-addon__row"><span data-sum-pl></span><span data-sum-pp></span></div>
+      <div class="aa-addon__row"><span data-sum-al></span><span data-sum-ap></span></div>
+      <div class="aa-addon__row aa-addon__row--tot"><span>Total</span><span data-sum-tot></span></div>
+    </div>
   </div>
+  <script type="application/json" data-aa-addon-vmap>{{ aa_vmap }}</script>
 </div>
 <style>
   .aa-addon{margin:14px 0 0;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised);padding:14px 16px}
@@ -78,6 +92,11 @@
   .aa-addon__opt input{accent-color:var(--text-accent);margin:0}
   .aa-addon__optprice{color:var(--text-secondary)}
   .aa-addon__note{margin:10px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-secondary)}
+  .aa-addon__sum{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-subtle,rgba(0,0,0,.12));font-size:13px}
+  .aa-addon__sum.is-shown{display:block}
+  .aa-addon__row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0;color:var(--text-secondary)}
+  .aa-addon__row span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .aa-addon__row--tot{color:var(--text-primary,inherit);font-weight:500;font-size:14px;margin-top:4px}
 </style>
 <script>
 (function(){
@@ -85,8 +104,40 @@
   var box=document.querySelector('[data-aa-addon]');
   if(!box) return;
   var on=box.querySelector('[data-aa-addon-on]');
-  function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); }
+  var sum=box.querySelector('[data-aa-sum]');
+  var vmap={};
+  try{ var vm=box.querySelector('[data-aa-addon-vmap]'); vmap=JSON.parse(vm ? vm.textContent : '{}')||{}; }catch(x){ vmap={}; }
+  var ptype=box.getAttribute('data-ptype')||'';
+  var last='';
+  function fmt(c){ return '\u20b9\u00a0'+Math.round((+c||0)/100).toLocaleString('en-IN'); }
+  function curId(){
+    var el=document.querySelector('.aa-buybox form[action*="/cart/add"] [name="id"]')||document.querySelector('form[action*="/cart/add"] [name="id"]');
+    return el ? String(el.value||'') : '';
+  }
+  function txt(sel,v){ var n=sum.querySelector(sel); if(n && n.textContent!==v) n.textContent=v; }
+  function render(){
+    if(!sum) return;
+    var r=box.querySelector('input[name="aa-addon-v"]:checked');
+    var id=curId(), pv=vmap[id];
+    if(!on || !on.checked || !r || !pv){ sum.classList.remove('is-shown'); last=''; return; }
+    var key=id+'|'+r.value;
+    if(key===last) return;
+    last=key;
+    var addP=+r.getAttribute('data-price')||0;
+    txt('[data-sum-pl]', ptype + (pv.l ? ' \u00b7 '+pv.l : ''));
+    txt('[data-sum-pp]', fmt(pv.p));
+    txt('[data-sum-al]', r.getAttribute('data-label')||'');
+    txt('[data-sum-ap]', fmt(addP));
+    txt('[data-sum-tot]', fmt(pv.p + addP));
+    sum.classList.add('is-shown');
+  }
+  var tmr=null;
+  function later(){ if(tmr) clearTimeout(tmr); tmr=setTimeout(render, 60); }
+  function sync(){ var v=!!(on && on.checked); box.classList.toggle('is-on', v); if(on) on.setAttribute('aria-expanded', v ? 'true' : 'false'); last=''; render(); }
   if(on) on.addEventListener('change', sync);
+  document.addEventListener('change', later, true);
+  document.addEventListener('click', later, true);
+  setInterval(function(){ if(on && on.checked) render(); }, 700);
   sync();
   document.addEventListener('submit', function(e){
     var f=e.target;
