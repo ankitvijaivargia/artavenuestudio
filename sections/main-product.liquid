@@ -184,6 +184,14 @@
 
 {% render 'aa-sticky-bar', product: p, show_cart: show_cart, price_text: price_text %}
 
+{%- comment -%}
+  Gallery. Variant images: when the buy form's variant id changes to a variant whose image
+  (Admin > variant image) is a different photo from the previous variant's, the gallery slides
+  to that photo. Same photo (e.g. Queen -> King) = no move, so the customer keeps their place.
+  The configurator sets the id without events, so it is polled (same approach as aa-price).
+  All scrolling is done INSIDE the gallery track / thumb strip only (scrollBy on the container),
+  never scrollIntoView — so picking an option lower down the page never yanks the page up.
+{%- endcomment -%}
 <script>
   (function(){
     var main=document.getElementById('aaGalMain');
@@ -193,21 +201,30 @@
     if(slides.length<2) return;
     var prev=document.getElementById('aaGalPrev'), next=document.getElementById('aaGalNext');
     var cur=0;
+    var VIMG={ {%- for v in p.variants -%}{%- assign vi = -1 -%}{%- if v.featured_image -%}{%- for img in p.images -%}{%- if img.id == v.featured_image.id -%}{%- assign vi = forloop.index0 -%}{%- endif -%}{%- endfor -%}{%- endif -%}"{{ v.id }}":{{ vi }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%} };
     function tbs(){ return thumbs ? thumbs.querySelectorAll('.aa-gallery__thumb') : []; }
+    function inScroll(box, target, smooth){
+      if(!box || !target) return;
+      var br=box.getBoundingClientRect(), tr=target.getBoundingClientRect();
+      var dx=(tr.left-br.left)-(br.width-tr.width)/2, dy=(tr.top-br.top)-(br.height-tr.height)/2;
+      if(box.scrollWidth<=box.clientWidth+1) dx=0;
+      if(box.scrollHeight<=box.clientHeight+1) dy=0;
+      if(Math.abs(dx)>1 || Math.abs(dy)>1){ box.scrollBy({left:dx, top:dy, behavior:(smooth===false?'auto':'smooth')}); }
+    }
     function setActive(i){
       cur=i;
       Array.prototype.forEach.call(tbs(), function(t,n){ t.classList.toggle('is-active', n===i); });
       var active=tbs()[i];
-      if(active && thumbs){ active.scrollIntoView({behavior:'smooth',inline:'nearest',block:'nearest'}); }
+      if(active && thumbs){ inScroll(thumbs, active); }
       updateArrows();
     }
     function updateArrows(){
       if(prev) prev.classList.toggle('is-hidden', cur<=0);
       if(next) next.classList.toggle('is-hidden', cur>=slides.length-1);
     }
-    function goTo(i){
+    function goTo(i, smooth){
       i=Math.max(0, Math.min(slides.length-1, i));
-      if(slides[i]){ slides[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); setActive(i); }
+      if(slides[i]){ inScroll(main, slides[i], smooth); setActive(i); }
     }
     if(thumbs){
       thumbs.addEventListener('click', function(e){
@@ -222,6 +239,27 @@
     },{root:main,threshold:0.6});
     slides.forEach(function(s){ obs.observe(s); });
     updateArrows();
+
+    /* variant image follow */
+    function idEl(){
+      var f=document.querySelector('.aa-buybox form[action*="/cart/add"]')||document.querySelector('form[action*="/cart/add"]');
+      return f ? f.querySelector('[name="id"]') : null;
+    }
+    var lastV=null, lastI=null;
+    function follow(){
+      var el=idEl(); if(!el) return;
+      var v=String(el.value||''); if(v===lastV) return;
+      lastV=v;
+      var i=VIMG[v];
+      if(typeof i!=='number' || i<0) return;
+      if(i===lastI) return;
+      var first=(lastI===null);
+      lastI=i;
+      if(first && i===0) return;
+      goTo(i, !first);
+    }
+    follow();
+    setInterval(follow, 250);
   })();
 </script>
 
