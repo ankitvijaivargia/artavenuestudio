@@ -1,8 +1,8 @@
 {%- comment -%}
-  Left-rail mega menu (Furniture / Rugs style).
+  Left-rail mega menu.
   params:
     rail  — records sep '~', fields sep '^' (label ^ url ^ panel). panel = 'link' OR pairs sep ';' each 'Label|url'
-    feat_eyebrow, feat_title, feat_url — featured card
+    feat_eyebrow, feat_title, feat_url — featured card; feat_img (optional image object) fills the card
 {%- endcomment -%}
 <div class="aa-mega__inner">
   {%- assign rows = rail | split: '~' -%}
@@ -22,5 +22,8 @@
       </li>
     {%- endfor -%}
   </ul>
-  <a class="aa-mega__feature" href="{{ feat_url }}"><span>{{ feat_eyebrow }}</span><h4>{{ feat_title }}</h4><em>Explore <i class="ph ph-arrow-right"></i></em></a>
+  <a class="aa-mega__feature{% if feat_img %} has-img{% endif %}" href="{{ feat_url }}">
+    {%- if feat_img -%}{{ feat_img | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320, 640', sizes: '300px', alt: feat_title }}{%- endif -%}
+    <span>{{ feat_eyebrow }}</span><h4>{{ feat_title }}</h4><em>Explore <i class="ph ph-arrow-right"></i></em>
+  </a>
 </div>
