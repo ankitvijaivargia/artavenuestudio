@@ -14,7 +14,7 @@
       "heading": "Handcrafted furniture, made to your measure.",
       "subheading": "Leather, vintage kilim, cane and solid wood — each piece built to order in your choice of size and finish, and made to be handed down.",
       "cta_label": "Shop Furniture", "cta_link": "/collections/furniture",
-      "cta2_label": "Visit the Showroom", "cta2_link": "/pages/contact",
+      "cta2_label": "Visit the Showroom", "cta2_link": "/pages/contact?type=visit",
       "proof": "Made to order|Custom sizes on request|Showroom on MG Road, New Delhi",
       "product": "landour-tufted-upholstered-bed", "show_caption": true,
       "product_2": "mandawa-kilim-trunk-coffee-table"}},
@@ -69,7 +69,7 @@
       "eyebrow": "Visit Us", "heading": "See it, sit on it, then decide.",
       "body": "<p>Leather is best judged by hand, and a sofa by sitting in it. Visit our showroom on MG Road, New Delhi to see our finishes, fabrics and pieces in person.</p><p><strong>2nd Floor, Plot No. 844, opposite Metro Pillar No. 113, MG Road, Ghitorni, New Delhi 110030</strong></p><p>Can't make it? Message us on WhatsApp with any question — about a piece, a size or a finish.</p>",
       "cta_label": "Chat on WhatsApp", "cta_link": "https://wa.me/919828080095",
-      "cta2_label": "Showroom details", "cta2_link": "/pages/contact"}},
+      "cta2_label": "Book a visit", "cta2_link": "/pages/contact?type=visit"}},
     "trade": {"type": "aa-trade-band", "settings": {
       "eyebrow": "Trade & Design Program", "heading": "For designers & architects.",
       "intro": "We work with interior designers, architects and hospitality buyers — from a single statement piece to a full property, with custom sizes and finishes."}},
