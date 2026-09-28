@@ -3,6 +3,7 @@
     level 1 = top nav item · level 2 = rail group · level 3 = links in that group
   A top item WITH children opens a left-rail mega menu; a top item WITHOUT children is a plain link.
   To launch Rugs / Lighting / Decor later: add them to the Main menu in Admin — no code change needed.
+  Keep the Main menu to 3–4 top-level items: the left column shares the bar with the centred wordmark.
   Mega feature card: first mega shows the product set in `aa_feat_handle` below; others show the category name.
 {%- endcomment -%}
 {%- assign aa_menu = linklists['main-menu'] -%}
@@ -68,6 +69,21 @@
     .aa-nav{display:none;}
     .aa-nav__icons .aa-nav__item,.aa-nav__icons > span{display:none;}
     .aa-burger{display:inline-flex;}
+  }
+
+  /* Desktop bar fit — side columns can shrink, so nav never runs into the centred wordmark;
+     right-side text links share one baseline with the left nav. */
+  @media (min-width:1001px){
+    .aa-header__bar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);column-gap:clamp(24px,3vw,48px);}
+    .aa-nav{gap:clamp(20px,2.4vw,34px);min-width:0;}
+    .aa-wordmark{white-space:nowrap;}
+    .aa-nav__icons{gap:clamp(14px,1.6vw,22px);min-width:0;align-self:stretch;}
+    .aa-nav__icons .aa-nav__item{display:inline-flex;align-items:center;align-self:stretch;font-size:12px;line-height:1;}
+    .aa-nav__icons > a{display:inline-flex;align-items:center;line-height:1;}
+  }
+  @media (min-width:1001px) and (max-width:1180px){
+    .aa-nav__top{letter-spacing:.1em;}
+    .aa-nav__icons .aa-nav__item:nth-child(2){display:none;}
   }
 </style>
 
