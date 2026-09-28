@@ -1,4 +1,5 @@
-{%- comment -%} Art Avenue — home hero: editorial split, copy left, shoppable image right. Image falls back to a product's featured image. {%- endcomment -%}
+{%- comment -%} Art Avenue — home hero: editorial split, copy left, shoppable image right. Image falls back to a product's featured image.
+  Images use height:auto so the CSS aspect-ratio wins over the width/height attributes image_tag writes (otherwise a portrait product shot renders at its full pixel height). {%- endcomment -%}
 {%- liquid
   assign s = section.settings
   assign img1 = s.image
@@ -21,16 +22,18 @@
   .aah-hero__proof li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);}
   .aah-hero__media{position:relative;padding:0 0 clamp(44px,6vw,84px) clamp(48px,8vw,130px);}
   .aah-hero__main,.aah-hero__inset{display:block;overflow:hidden;}
-  .aah-hero__main img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform 1.2s var(--ease-luxe);}
+  .aah-hero__main{aspect-ratio:4/5;max-height:calc(100vh - 170px);}
+  .aah-hero__main img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease-luxe);}
   .aah-hero__main:hover img{transform:scale(1.025);}
-  .aah-hero__inset{position:absolute;left:0;bottom:0;width:38%;border:10px solid var(--surface-page);background:var(--surface-page);}
-  .aah-hero__inset img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;}
+  .aah-hero__inset{position:absolute;left:0;bottom:0;width:38%;aspect-ratio:3/4;border:10px solid var(--surface-page);background:var(--surface-page);}
+  .aah-hero__inset img{display:block;width:100%;height:100%;object-fit:cover;}
   .aah-hero__cap{position:absolute;right:0;bottom:clamp(10px,2vw,28px);font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-secondary);display:flex;align-items:center;gap:8px;}
   .aah-hero__cap:hover{color:var(--text-accent);}
   @media (max-width:899px){
     .aah-hero{padding-top:0;}
     .aah-hero__grid{grid-template-columns:1fr;gap:34px;}
     .aah-hero__media{order:-1;padding:0 0 56px 0;margin:0 calc(var(--gutter) * -1);}
+    .aah-hero__main{max-height:none;}
     .aah-hero__inset{width:34%;left:var(--gutter);border-width:6px;}
     .aah-hero__cap{right:var(--gutter);bottom:14px;max-width:52%;text-align:right;justify-content:flex-end;}
   }
