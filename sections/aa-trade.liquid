@@ -1,6 +1,16 @@
+{%- liquid
+  assign hero_img = section.settings.image
+  if hero_img == blank and section.settings.product != blank
+    assign hero_img = section.settings.product.featured_image
+  endif
+-%}
 <section style="position:relative;min-height:540px;display:flex;align-items:center">
-  {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
-  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.78),rgba(34,31,27,.3) 65%,transparent)"></div>
+  {%- if hero_img -%}
+    <div class="aa-fig aa-full-bg">{{ hero_img | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '800, 1200, 1600, 2000, 2400', sizes: '100vw', alt: hero_img.alt }}</div>
+  {%- else -%}
+    {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  {%- endif -%}
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.8),rgba(34,31,27,.42) 65%,rgba(34,31,27,.18))"></div>
   <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:580px">
     <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Trade &amp; Design Program</span>
     <h1 class="aa-display-1" style="color:var(--text-on-dark);margin-top:22px">Source like the <em class="accent">design house you are.</em></h1>
@@ -30,4 +40,7 @@
     </div>
   {% endform %}
 </div></section>
-{% schema %}{ "name": "Art Avenue Trade", "settings": [] }{% endschema %}
+{% schema %}{ "name": "Art Avenue Trade", "settings": [
+  {"type":"image_picker","id":"image","label":"Hero image (overrides product)"},
+  {"type":"product","id":"product","label":"Hero image from product"}
+] }{% endschema %}

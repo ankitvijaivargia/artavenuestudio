@@ -1,5 +1,15 @@
+{%- liquid
+  assign hero_img = section.settings.image
+  if hero_img == blank and section.settings.product != blank
+    assign hero_img = section.settings.product.featured_image
+  endif
+-%}
 <section class="aa-tallblock" style="position:relative;min-height:640px;display:flex;align-items:flex-end">
-  {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  {%- if hero_img -%}
+    <div class="aa-fig aa-full-bg">{{ hero_img | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '800, 1200, 1600, 2000, 2400', sizes: '100vw', alt: hero_img.alt }}</div>
+  {%- else -%}
+    {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  {%- endif -%}
   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(28,25,22,.82),rgba(28,25,22,.32) 55%,rgba(28,25,22,.45))"></div>
   <div class="aa-wrap" style="position:relative;width:100%;padding-top:88px;padding-bottom:64px"><div style="max-width:760px">
     <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Custom &amp; Bespoke · The Atelier</span>
@@ -30,4 +40,7 @@
     </div>
   {% endform %}
 </div></section>
-{% schema %}{ "name": "Art Avenue Custom", "settings": [] }{% endschema %}
+{% schema %}{ "name": "Art Avenue Custom", "settings": [
+  {"type":"image_picker","id":"image","label":"Hero image (overrides product)"},
+  {"type":"product","id":"product","label":"Hero image from product"}
+] }{% endschema %}

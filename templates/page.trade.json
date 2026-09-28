@@ -11,7 +11,9 @@
   "sections": {
     "main": {
       "type": "aa-trade",
-      "settings": {}
+      "settings": {
+        "product": "fatehpur-cane-leather-sideboard"
+      }
     }
   },
   "order": [

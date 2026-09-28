@@ -1,10 +1,43 @@
+{%- comment -%}
+  Art Avenue — all collections. Shows only collections with live products (so hidden
+  categories and empty colour/material collections never appear), each with its
+  collection image or, failing that, a product photo not already used on the page.
+{%- endcomment -%}
+{%- assign used = ',' -%}
 <section class="aa-section"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Collections</span>
   <h1 class="aa-display-2" style="margin:16px 0 40px">Explore the house.</h1>
   <div class="grid-3">
     {%- for col in collections -%}
+      {%- liquid
+        assign live = false
+        if col.products_count > 0
+          assign live = true
+        endif
+        if live == false or col.handle == 'frontpage'
+          continue
+        endif
+        assign timg = col.image
+        if timg == blank
+          for p in col.products limit: 12
+            if p.featured_image
+              assign k = ',' | append: p.featured_image.id | append: ','
+              unless used contains k
+                assign timg = p.featured_image
+                break
+              endunless
+            endif
+          endfor
+        endif
+        if timg == blank
+          assign timg = col.products.first.featured_image
+        endif
+        if timg
+          assign used = used | append: timg.id | append: ','
+        endif
+      -%}
       <a class="aa-tile" href="{{ col.url }}" style="min-height:300px">
-        {% if col.image %}<div class="aa-fig aa-tile__bg"><img src="{{ col.image | image_url: width:900 }}" alt="{{ col.title }}"></div>{% else %}{% render 'aa-figure', tone:'clay', class:'aa-tile__bg' %}{% endif %}
+        {%- if timg -%}<div class="aa-fig aa-tile__bg">{{ timg | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 900px) 33vw, 50vw', alt: col.title }}</div>{%- else -%}{% render 'aa-figure', tone:'clay', class:'aa-tile__bg' %}{%- endif -%}
         <span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title">{{ col.title }}</span><span class="aa-tile__cta">Explore <i class="ph ph-arrow-right"></i></span></span>
       </a>
     {%- endfor -%}
