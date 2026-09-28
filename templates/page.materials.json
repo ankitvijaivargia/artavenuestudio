@@ -1,0 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "aa-hero",
+      "settings": {
+        "eyebrow": "Materials Library",
+        "heading": "The materials we build with.",
+        "subheading": "Vintage kilim, leather, woven cane, solid wood and our upholstery fabrics — see and feel them before you order, with a swatch sent to your door.",
+        "cta_label": "Order a swatch",
+        "cta_link": "/products/swatch"
+      }
+    },
+    "library": {
+      "type": "aa-materials-library",
+      "blocks": {
+        "m1": { "type": "material", "settings": { "name": "Vintage Kilim", "note": "Hand-woven and one of a kind — no two panels alike", "tone": "olive", "link": "/collections/kilim-leather" } },
+        "m2": { "type": "material", "settings": { "name": "Leather", "note": "Hand-stitched, and develops a patina with use", "tone": "clay" } },
+        "m3": { "type": "material", "settings": { "name": "Woven Cane", "note": "Hand-woven, in its natural golden tone", "tone": "sand" } },
+        "m4": { "type": "material", "settings": { "name": "Solid Wood", "note": "Legs and bases, hand-finished in your choice of tone", "tone": "espresso" } },
+        "m5": { "type": "material", "settings": { "name": "Linen Cotton", "note": "Relaxed and breathable, in ten colours", "tone": "stone", "link": "/collections/fabric-sofas" } },
+        "m6": { "type": "material", "settings": { "name": "Velvet", "note": "A deep, light-catching pile, in seventeen colours", "tone": "espresso", "link": "/collections/fabric-sofas" } },
+        "m7": { "type": "material", "settings": { "name": "Metal Hardware", "note": "Studs, corners and pulls in antique brass, nickel or gold", "tone": "bronze" } }
+      },
+      "block_order": ["m1","m2","m3","m4","m5","m6","m7"],
+      "settings": { "eyebrow": "Explore", "heading": "Material families", "intro": "Every piece is made to order in the materials you choose. Order a swatch of any leather or fabric, or see them all at our showroom on MG Road, New Delhi.", "center": false, "cta_label": "", "bg": "page" }
+    }
+  },
+  "order": ["hero", "library"]
+}
