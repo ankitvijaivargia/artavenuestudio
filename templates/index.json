@@ -11,8 +11,8 @@
   "sections": {
     "hero": {"type": "aa-home-hero", "settings": {
       "eyebrow": "Art Avenue Design House · New Delhi",
-      "heading": "Handcrafted furniture, made to your measure.",
-      "subheading": "Leather, vintage kilim, cane and solid wood — each piece built to order in your choice of size and finish, and made to be handed down.",
+      "heading": "Handcrafted furniture and rugs, made to your measure.",
+      "subheading": "Leather, vintage kilim, cane and solid wood — and now hand-tufted rugs in New Zealand wool. Each piece made in your choice of size and finish, and made to be handed down.",
       "cta_label": "Shop Furniture", "cta_link": "/collections/furniture",
       "cta2_label": "Visit the Showroom", "cta2_link": "/pages/contact?type=visit",
       "proof": "Made to order|Custom sizes on request|Showroom on MG Road, New Delhi",
@@ -21,7 +21,7 @@
     "categories": {"type": "aa-home-tiles", "settings": {
       "eyebrow": "Shop by Category", "heading": "Find your piece.",
       "columns": "4", "ratio": "3/4", "alt": false,
-      "link_label": "All furniture", "link": "/collections/furniture"},
+      "link_label": "Shop everything", "link": "/collections/furniture"},
       "blocks": {
         "c1": {"type": "tile", "settings": {"title": "Sofas", "collection": "sofas", "product": "kingston-buttoned-fabric-sofa", "subtitle": "Shop now"}},
         "c2": {"type": "tile", "settings": {"title": "Beds", "collection": "beds", "product": "coonoor-cane-four-poster-bed", "subtitle": "Shop now"}},
@@ -30,7 +30,7 @@
         "c5": {"type": "tile", "settings": {"title": "Sideboards", "collection": "sideboards", "product": "sardargarh-kilim-leather-sideboard", "subtitle": "Shop now"}},
         "c6": {"type": "tile", "settings": {"title": "Bedside Tables", "collection": "bedside-tables", "product": "kishangarh-studded-leather-bedside-table", "subtitle": "Shop now"}},
         "c7": {"type": "tile", "settings": {"title": "Trunks", "collection": "trunks", "product": "bundi-kilim-steamer-trunk", "subtitle": "Shop now"}},
-        "c8": {"type": "tile", "settings": {"title": "Chests of Drawers", "collection": "chests-of-drawers", "product": "sariska-studded-leather-chest-of-drawers", "subtitle": "Shop now"}}
+        "c8": {"type": "tile", "settings": {"title": "Rugs", "collection": "rugs", "product": "mumbai-hand-tufted-rug", "subtitle": "New · Shop now"}}
       },
       "block_order": ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"]},
     "kilim": {"type": "aa-home-feature", "settings": {
@@ -45,6 +45,19 @@
       "intro": "A place to begin — each one made to order in the size and finish you choose.",
       "products": ["narlai-kilim-leather-storage-bed", "mandawa-kilim-trunk-coffee-table", "kasauli-studded-leather-wing-chair", "fatehpur-cane-leather-sideboard", "kingston-buttoned-fabric-sofa", "kishangarh-studded-leather-bedside-table", "ranikhet-vanity-trunk-chest", "darjeeling-colonial-wooden-bed"],
       "alt": false, "link_label": "New arrivals", "link": "/collections/new-arrivals"}},
+    "rugs": {"type": "aa-home-feature", "settings": {
+      "image": "shopify://shop_images/DSC_0081.jpg",
+      "product": "hampi-hand-tufted-rug", "reverse": true, "bg": "alt",
+      "eyebrow": "New · Rugs", "heading": "Hand-tufted in wool, drawn from India.",
+      "body": "<p>Our first rugs — each design taken from a place: the Art Deco of Mumbai's Marine Drive, the embroidered medallions of Kutch, the temple lattices of Chettinad.</p><p>Made by hand in 100% New Zealand wool, dense underfoot and bound at the edge.</p>",
+      "points": "Every design in stock at 4×6 ft — ready to ship\nMade to order up to 9×12 ft\nAny design made to your exact size",
+      "cta_label": "Shop Rugs", "cta_link": "/collections/rugs",
+      "cta2_label": "Custom size rugs", "cta2_link": "/collections/custom-rugs"}},
+    "rug_edit": {"type": "aa-home-products", "settings": {
+      "eyebrow": "The Rug Edit", "heading": "Rugs with a sense of place.",
+      "intro": "Each one ready to ship at 4×6 ft — or made to order in the size your room needs.",
+      "products": ["mumbai-hand-tufted-rug", "kutch-hand-tufted-rug", "hampi-hand-tufted-rug", "nilgiri-hand-knotted-rug"],
+      "alt": false, "link_label": "All rugs", "link": "/collections/rugs"}},
     "rooms": {"type": "aa-home-tiles", "settings": {
       "eyebrow": "Shop by Room", "heading": "Begin with the space.",
       "columns": "2", "ratio": "5/4", "alt": true},
@@ -77,5 +90,5 @@
       "eyebrow": "Art Avenue",
       "text": "We are not a furniture store. We are a design house — making the handcrafted, the considered and the made-to-last, so your home can hold its stories for generations."}}
   },
-  "order": ["hero", "categories", "kilim", "edit", "rooms", "process", "showroom", "trade", "statement"]
+  "order": ["hero", "categories", "kilim", "edit", "rugs", "rug_edit", "rooms", "process", "showroom", "trade", "statement"]
 }
