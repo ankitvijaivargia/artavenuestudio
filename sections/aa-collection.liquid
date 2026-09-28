@@ -1,15 +1,87 @@
+{%- comment -%}
+  Art Avenue — collection page.
+  No placeholder art: every image slot (hero banner, Shop by Room, the made-to-measure
+  band, Continue Exploring) uses the collection image if one is set, otherwise a real
+  product photo from that collection. Tiles for collections with no live products are
+  skipped, so hidden categories (rugs, lighting, decor at launch) never appear.
+  The whole section sits inside paginate so product images can be read safely.
+{%- endcomment -%}
 {%- assign col = collection -%}
 {%- assign t = col.title | downcase -%}
 {%- assign isRug = false -%}{%- if t contains 'rug' -%}{%- assign isRug = true -%}{%- endif -%}
 
+{%- paginate col.products by 9 -%}
+{%- liquid
+  assign used = ','
+
+  comment Hero image: collection image, else the first landscape product photo on this page, else the first product photo
+  endcomment
+  assign hero_img = col.image
+  if hero_img == blank
+    for p in col.products
+      if p.featured_image and p.featured_image.aspect_ratio >= 1.2
+        assign hero_img = p.featured_image
+        break
+      endif
+    endfor
+  endif
+  if hero_img == blank
+    for p in col.products
+      if p.featured_image
+        assign hero_img = p.featured_image
+        break
+      endif
+    endfor
+  endif
+  if hero_img
+    assign used = used | append: hero_img.id | append: ','
+  endif
+
+  comment Made-to-measure band image: a product photo from further down this page
+  endcomment
+  assign mid_img = blank
+  for p in col.products offset: 6
+    if p.featured_image
+      assign k = ',' | append: p.featured_image.id | append: ','
+      unless used contains k
+        assign mid_img = p.featured_image
+        break
+      endunless
+    endif
+  endfor
+
+  if isRug
+    assign rooms = 'living-room-rugs|Living Room,bedroom-rugs|Bedroom,dining-room-rugs|Dining' | split: ','
+    assign rel = 'hand-knotted-rugs|Hand-Knotted Rugs,hand-tufted-rugs|Hand-Tufted Rugs,flat-weave-rugs|Flat-Weave Rugs,custom-rugs|Custom Rugs,furniture|Furniture' | split: ','
+  else
+    assign rooms = 'living-room-furniture|Living Room,bedroom-furniture|Bedroom,dining-furniture|Dining,outdoor-furniture|Outdoor' | split: ','
+    assign rel = 'sofas|Sofas,beds|Beds,coffee-tables|Coffee Tables,chairs-and-ottomans|Armchairs & Ottomans,sideboards|Sideboards,bedside-tables|Bedside Tables,trunks|Trunks,chests-of-drawers|Chests of Drawers,cabinets|Cabinets,console-tables|Console Tables,dining-furniture|Dining' | split: ','
+  endif
+
+  comment Count live room collections (excluding this one) to size the rail
+  endcomment
+  assign room_count = 0
+  for r in rooms
+    assign rp = r | split: '|'
+    assign rc = collections[rp[0]]
+    if rc.products_count > 0 and rp[0] != col.handle
+      assign room_count = room_count | plus: 1
+    endif
+  endfor
+-%}
+
 {%- comment -%} Collection hero {%- endcomment -%}
 <section style="position:relative;height:420px;display:flex;align-items:center;text-align:center">
-  {% if col.image %}<div class="aa-fig aa-full-bg"><img src="{{ col.image | image_url: width:2000 }}" alt="{{ col.title | escape }}"></div>{% else %}{% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}{% endif %}
-  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(34,31,27,.5),rgba(34,31,27,.3))"></div>
+  {%- if hero_img -%}
+    <div class="aa-fig aa-full-bg">{{ hero_img | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '800, 1200, 1600, 2000, 2400', sizes: '100vw', alt: col.title }}</div>
+  {%- else -%}
+    {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  {%- endif -%}
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(34,31,27,.62),rgba(34,31,27,.38))"></div>
   <div style="position:relative;max-width:720px;margin:0 auto;padding:0 var(--gutter)">
     <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--center">{% if isRug %}The Rug Atelier{% else %}Signature Collection{% endif %}</span>
     <h1 class="aa-display-2" style="color:var(--text-on-dark);margin-top:16px">{{ col.title }}</h1>
-    {%- if col.description != blank -%}<p class="aa-lead" style="color:rgba(250,246,239,.84);margin-top:16px">{{ col.description | strip_html | truncatewords: 32 }}</p>{%- endif -%}
+    {%- if col.description != blank -%}<p class="aa-lead" style="color:rgba(250,246,239,.88);margin-top:16px">{{ col.description | strip_html | truncatewords: 32 }}</p>{%- endif -%}
     {%- if isRug -%}<div style="margin-top:26px"><a class="btn btn--secondary" href="#aa-edit" style="border-color:rgba(250,246,239,.4);color:#fff">Need help choosing a rug size? <i class="ph ph-arrow-right"></i></a></div>{%- endif -%}
   </div>
 </section>
@@ -18,16 +90,48 @@
 <section class="aa-wrap" id="aa-edit" style="padding-top:var(--section-y-tight)">
   <div style="max-width:640px"><span class="aa-eyebrow aa-eyebrow--rule">Begin Your Edit</span><h2 class="aa-h1" style="margin:14px 0 0">Shop the way you design.</h2></div>
 
-  {%- assign room_tags = "living-room-rugs|Living Room|clay,dining-room-rugs|Dining|espresso,bedroom-rugs|Bedroom|stone,study-rugs|Study|olive,outdoor-rugs|Outdoor|bronze" | split: "," -%}
-  {%- unless isRug -%}{%- assign room_tags = "living-room|Living Room|clay,dining-room|Dining|espresso,bedroom|Bedroom|stone,study|Study|olive,outdoor|Outdoor|bronze" | split: "," -%}{%- endunless -%}
+  {%- if room_count > 0 -%}
+  <style>
+    .aa-col-roomrail{display:grid;grid-template-columns:repeat({{ room_count }},minmax(0,1fr));gap:var(--gap-card);}
+    @media (max-width:680px){ .aa-col-roomrail{grid-template-columns:repeat({% if room_count > 1 %}2{% else %}1{% endif %},minmax(0,1fr));} }
+  </style>
   <div style="margin-top:30px">
     <div class="aa-eyebrow" style="margin-bottom:16px">Shop by Room</div>
-    <div class="aa-col-roomrail" style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap-card)">
-      {%- for r in room_tags -%}{%- assign rp = r | split: "|" -%}
-        <a class="aa-tile" href="/collections/{{ col.handle }}/{{ rp[0] }}" style="min-height:170px;border-radius:var(--radius-xs)">{% render 'aa-figure', tone: rp[2], class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title" style="font-size:18px">{{ rp[1] }}</span></span></a>
+    <div class="aa-col-roomrail">
+      {%- for r in rooms -%}
+        {%- liquid
+          assign rp = r | split: '|'
+          assign rc = collections[rp[0]]
+          if rc.products_count == 0 or rp[0] == col.handle
+            continue
+          endif
+          assign timg = rc.image
+          if timg == blank
+            for p in rc.products limit: 12
+              if p.featured_image
+                assign k = ',' | append: p.featured_image.id | append: ','
+                unless used contains k
+                  assign timg = p.featured_image
+                  break
+                endunless
+              endif
+            endfor
+          endif
+          if timg == blank
+            assign timg = rc.products.first.featured_image
+          endif
+          if timg
+            assign used = used | append: timg.id | append: ','
+          endif
+        -%}
+        <a class="aa-tile" href="{{ rc.url }}" style="min-height:200px;border-radius:var(--radius-xs)">
+          {%- if timg -%}<div class="aa-fig aa-tile__bg">{{ timg | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 900px) 30vw, 50vw', alt: rp[1] }}</div>{%- else -%}{% render 'aa-figure', tone: 'clay', class:'aa-tile__bg' %}{%- endif -%}
+          <span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title" style="font-size:20px">{{ rp[1] }}</span></span>
+        </a>
       {%- endfor -%}
     </div>
   </div>
+  {%- endif -%}
 
   {%- if col.all_tags.size > 0 -%}
   <div style="margin-top:30px">
@@ -100,39 +204,78 @@
 
   <div>
     {%- comment -%} Sort handled by the dropdown in the toolbar above {%- endcomment -%}
-
-    {%- paginate col.products by 9 -%}
-      {%- assign half = col.products_count | divided_by: 2 -%}
-      <div class="grid-3">
-        {%- for product in col.products -%}
-          {% render 'aa-product-card', product: product %}
-          {%- if forloop.index == 6 and paginate.current_page == 1 -%}
-            </div>
-            <a class="aa-tile" href="{{ col.url }}" style="display:block;min-height:300px;border-radius:var(--radius-sm);margin:var(--gap-card) 0">{% render 'aa-figure', tone:'clay', class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__eyebrow">Room Inspiration</span><span class="aa-tile__title">{% if isRug %}The layered living room{% else %}The slow-living living room{% endif %}</span><span class="aa-tile__cta">Shop the look <i class="ph ph-arrow-right"></i></span></span></a>
-            <div class="grid-3">
-          {%- endif -%}
-        {%- endfor -%}
-      </div>
-      {%- if paginate.pages > 1 -%}<div style="text-align:center;margin-top:56px">{{ paginate | default_pagination }}</div>{%- endif -%}
-    {%- endpaginate -%}
+    <div class="grid-3">
+      {%- for product in col.products -%}
+        {% render 'aa-product-card', product: product %}
+        {%- if forloop.index == 6 and paginate.current_page == 1 and forloop.last == false -%}
+          </div>
+          <a class="aa-tile" href="/pages/custom" style="display:block;min-height:300px;border-radius:var(--radius-sm);margin:var(--gap-card) 0">
+            {%- if mid_img -%}<div class="aa-fig aa-tile__bg">{{ mid_img | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '800, 1200, 1800', sizes: '(min-width: 900px) 70vw, 100vw', alt: '' }}</div>{%- else -%}{% render 'aa-figure', tone:'clay', class:'aa-tile__bg' %}{%- endif -%}
+            <span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__eyebrow">Made to Measure</span><span class="aa-tile__title">{% if isRug %}Need a rug in your own size?{% else %}Need it longer, lower or narrower?{% endif %}</span><span class="aa-tile__cta">Ask about custom sizes <i class="ph ph-arrow-right"></i></span></span>
+          </a>
+          <div class="grid-3">
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    {%- if paginate.pages > 1 -%}<div style="text-align:center;margin-top:56px">{{ paginate | default_pagination }}</div>{%- endif -%}
   </div>
 </div>
 </section>
 
-{%- comment -%} Related collections {%- endcomment -%}
+{%- comment -%} Related collections — the next three live categories after this one {%- endcomment -%}
+{%- liquid
+  assign n = rel.size
+  assign idx = -1
+  for c in rel
+    assign cp = c | split: '|'
+    if cp[0] == col.handle
+      assign idx = forloop.index0
+    endif
+  endfor
+-%}
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Continue Exploring</span>
   <div class="grid-3" style="margin-top:32px">
-    {%- assign rel = "rugs|Rugs|olive,lighting|Lighting|bronze,decor|Decor|stone,furniture|Furniture|clay" | split: "," -%}
     {%- assign rn = 0 -%}
-    {%- for c in rel -%}{%- assign cp = c | split: "|" -%}
-      {%- unless cp[0] == col.handle or rn >= 3 -%}
-        <a class="aa-tile" href="/collections/{{ cp[0] }}" style="min-height:300px">{% render 'aa-figure', tone: cp[2], class:'aa-tile__bg' %}<span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title">{{ cp[1] }}</span><span class="aa-tile__cta">Explore <i class="ph ph-arrow-right"></i></span></span></a>
-        {%- assign rn = rn | plus: 1 -%}
-      {%- endunless -%}
+    {%- for i in (1..n) -%}
+      {%- liquid
+        if rn >= 3
+          break
+        endif
+        assign j = idx | plus: i | modulo: n
+        assign cp = rel[j] | split: '|'
+        assign rc = collections[cp[0]]
+        if rc.products_count == 0 or cp[0] == col.handle
+          continue
+        endif
+        assign timg = rc.image
+        if timg == blank
+          for p in rc.products limit: 12
+            if p.featured_image
+              assign k = ',' | append: p.featured_image.id | append: ','
+              unless used contains k
+                assign timg = p.featured_image
+                break
+              endunless
+            endif
+          endfor
+        endif
+        if timg == blank
+          assign timg = rc.products.first.featured_image
+        endif
+        if timg
+          assign used = used | append: timg.id | append: ','
+        endif
+        assign rn = rn | plus: 1
+      -%}
+      <a class="aa-tile" href="{{ rc.url }}" style="min-height:300px">
+        {%- if timg -%}<div class="aa-fig aa-tile__bg">{{ timg | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 900px) 33vw, 50vw', alt: cp[1] }}</div>{%- else -%}{% render 'aa-figure', tone: 'clay', class:'aa-tile__bg' %}{%- endif -%}
+        <span class="aa-tile__scrim"></span><span class="aa-tile__inner"><span class="aa-tile__title">{{ cp[1] }}</span><span class="aa-tile__cta">Explore <i class="ph ph-arrow-right"></i></span></span>
+      </a>
     {%- endfor -%}
   </div>
 </div></section>
+{%- endpaginate -%}
 <script>
   window.aaQuickAdd = window.aaQuickAdd || function(btn){
     var id = btn.getAttribute('data-vid'); if(!id) return;
