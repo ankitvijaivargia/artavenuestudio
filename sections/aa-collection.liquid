@@ -2,8 +2,8 @@
   Art Avenue — collection page.
   No placeholder art: every image slot (hero banner, Shop by Room, the made-to-measure
   band, Continue Exploring) uses the collection image if one is set, otherwise a real
-  product photo from that collection. Tiles for collections with no live products are
-  skipped, so hidden categories (rugs, lighting, decor at launch) never appear.
+  product photo from that collection. Tiles for collections with no live products (or
+  that don't exist) are skipped, so hidden categories never appear.
   The whole section sits inside paginate so product images can be read safely.
 {%- endcomment -%}
 {%- assign col = collection -%}
@@ -14,8 +14,6 @@
 {%- liquid
   assign used = ','
 
-  comment Hero image: collection image, else the first landscape product photo on this page, else the first product photo
-  endcomment
   assign hero_img = col.image
   if hero_img == blank
     for p in col.products
@@ -37,8 +35,6 @@
     assign used = used | append: hero_img.id | append: ','
   endif
 
-  comment Made-to-measure band image: a product photo from further down this page
-  endcomment
   assign mid_img = blank
   for p in col.products offset: 6
     if p.featured_image
@@ -58,8 +54,6 @@
     assign rel = 'sofas|Sofas,beds|Beds,coffee-tables|Coffee Tables,chairs-and-ottomans|Armchairs & Ottomans,sideboards|Sideboards,bedside-tables|Bedside Tables,trunks|Trunks,chests-of-drawers|Chests of Drawers,cabinets|Cabinets,console-tables|Console Tables,dining-furniture|Dining' | split: ','
   endif
 
-  comment Count live room collections (excluding this one) to size the rail
-  endcomment
   assign room_count = 0
   for r in rooms
     assign rp = r | split: '|'
@@ -102,7 +96,11 @@
         {%- liquid
           assign rp = r | split: '|'
           assign rc = collections[rp[0]]
-          if rc.products_count == 0 or rp[0] == col.handle
+          assign live = false
+          if rc.products_count > 0
+            assign live = true
+          endif
+          if live == false or rp[0] == col.handle
             continue
           endif
           assign timg = rc.image
@@ -203,7 +201,6 @@
   {%- endif -%}
 
   <div>
-    {%- comment -%} Sort handled by the dropdown in the toolbar above {%- endcomment -%}
     <div class="grid-3">
       {%- for product in col.products -%}
         {% render 'aa-product-card', product: product %}
@@ -245,7 +242,11 @@
         assign j = idx | plus: i | modulo: n
         assign cp = rel[j] | split: '|'
         assign rc = collections[cp[0]]
-        if rc.products_count == 0 or cp[0] == col.handle
+        assign live = false
+        if rc.products_count > 0
+          assign live = true
+        endif
+        if live == false or cp[0] == col.handle
           continue
         endif
         assign timg = rc.image
