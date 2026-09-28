@@ -1,15 +1,74 @@
+{%- comment -%}
+  Art Avenue — buy-box fulfilment bar. params: type (fulfillment), product
+  STOCK-AWARE MODE — made-to-order products whose aav.lead_time mentions "in stock"
+  (rugs with a finished 4×6 ft piece, Ranikhet's canvas edition). A variant is in stock
+  when it is tracked (inventory_management = shopify) with quantity above 0. The bar
+  follows the buy form's variant id: In Stock on the finished piece, Made to Order on
+  every other option, and it flips to Made to Order by itself once the piece sells.
+  The made-to-order lead is the text after the LAST " in " of aav.lead_time
+  ("Other sizes crafted in 4–6 weeks" -> "Crafted in 4–6 weeks"), so keep that phrasing.
+  Rug Custom Size shows Custom Order while the custom panel is open.
+{%- endcomment -%}
 {%- assign t = type | default: 'made-to-order' -%}
 {%- assign lead = product.metafields.aav.lead_time.value -%}
+{%- assign lead_lc = lead | downcase -%}
+{%- assign stock_aware = false -%}
+{%- if t == 'made-to-order' and lead_lc contains 'in stock' -%}{%- assign stock_aware = true -%}{%- endif -%}
 {%- case t -%}
 {%- when 'in-stock' -%}{%- assign fl='In Stock' -%}{%- assign fi='ph-package' -%}{%- assign fd='Ships in 3–5 days' -%}{%- assign fm='In stock and ready to ship — dispatched within 3–5 business days, securely packed and insured.' -%}
 {%- when 'custom' -%}{%- assign fl='Custom Order' -%}{%- assign fi='ph-pencil-ruler' -%}{%- assign fd='Timeline set at consultation' -%}{%- assign fm='Made to your specification — dimensions, finish and materials of your choosing, shaped with a design consultant before you commit.' -%}
 {%- when 'project' -%}{%- assign fl='Project Enquiry' -%}{%- assign fi='ph-buildings' -%}{%- assign fd='Planned to your project schedule' -%}{%- assign fm='For multi-room, hospitality and contract orders — planned, sourced and delivered to your project timeline by a dedicated consultant.' -%}
 {%- else -%}{%- assign fl='Made to Order' -%}{%- assign fi='ph-hammer' -%}{%- if lead != blank -%}{%- assign fd=lead -%}{%- else -%}{%- assign fd='Crafted in 3–4 weeks' -%}{%- endif -%}{%- assign fm='This piece isn’t kept in stock — your order sets our workshop to work, building it to your chosen size and finish. The wait is what makes it yours alone.' -%}
 {%- endcase -%}
-<div class="aa-fulfillment">
+{%- if stock_aware -%}
+  {%- assign is_rug = false -%}
+  {%- if product.type == 'Rug' or product.metafields.aav.rug_custom.value != blank -%}{%- assign is_rug = true -%}{%- endif -%}
+  {%- if is_rug -%}{%- assign pack = 'rolled, wrapped and insured' -%}{%- assign opt_noun = 'This size' -%}{%- assign mto_verb = 'making it to your chosen size' -%}{%- else -%}{%- assign pack = 'securely packed and insured' -%}{%- assign opt_noun = 'This option' -%}{%- assign mto_verb = 'building it to your chosen size and finish' -%}{%- endif -%}
+  {%- assign mto_tail = lead | split: ' in ' | last | strip | remove: '.' -%}
+  {%- assign mto_lead = 'Crafted in ' | append: mto_tail -%}
+  {%- capture stk_msg -%}Finished and waiting in our studio — dispatched within 3–5 business days, {{ pack }}.{%- endcapture -%}
+  {%- capture mto_msg -%}{{ opt_noun }} isn’t kept in stock — your order sets our workshop to work, {{ mto_verb }}. The wait is what makes it yours alone.{%- endcapture -%}
+  {%- assign sv = product.selected_or_first_available_variant -%}
+  {%- assign sq = -1 -%}{%- if sv.inventory_management == 'shopify' -%}{%- assign sq = sv.inventory_quantity -%}{%- endif -%}
+  {%- if sq > 0 -%}
+    {%- assign fl='In Stock' -%}{%- assign fi='ph-package' -%}{%- assign fm=stk_msg -%}
+    {%- if sq == 1 -%}{%- assign fd='One in stock · ships in 3–5 days' -%}{%- else -%}{%- assign fd='In stock · ships in 3–5 days' -%}{%- endif -%}
+  {%- else -%}
+    {%- assign fl='Made to Order' -%}{%- assign fi='ph-hammer' -%}{%- assign fd=mto_lead -%}{%- assign fm=mto_msg -%}
+  {%- endif -%}
+{%- endif -%}
+<div class="aa-fulfillment"{% if stock_aware %} data-aa-ful{% endif %}>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <span class="aa-pill"><i class="ph {{ fi }}" style="color:var(--accent-deep)"></i>{{ fl }}</span>
-    <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-secondary)"><i class="ph-light ph-clock" style="color:var(--accent-deep)"></i>{{ fd }}</span>
+    <span class="aa-pill"><i class="ph {{ fi }}" style="color:var(--accent-deep)" data-ful-icon></i><span data-ful-label>{{ fl }}</span></span>
+    <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-secondary)"><i class="ph-light ph-clock" style="color:var(--accent-deep)"></i><span data-ful-lead>{{ fd }}</span></span>
   </div>
-  <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:11px">{{ fm }}</p>
+  <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:11px" data-ful-msg>{{ fm }}</p>
 </div>
+{%- if stock_aware -%}
+<script type="application/json" id="aaFulData">{"q":{ {%- for v in product.variants -%}"{{ v.id }}":{% if v.inventory_management == 'shopify' %}{{ v.inventory_quantity }}{% else %}-1{% endif %}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%} },"stock":{"i":"ph-package","l":"In Stock","d":"In stock · ships in 3–5 days","m":{{ stk_msg | json }}},"one":{"i":"ph-package","l":"In Stock","d":"One in stock · ships in 3–5 days","m":{{ stk_msg | json }}},"mto":{"i":"ph-hammer","l":"Made to Order","d":{{ mto_lead | json }},"m":{{ mto_msg | json }}},"custom":{"i":"ph-pencil-ruler","l":"Custom Order","d":"Timeline set at consultation","m":"Made to your measurements — a design consultant confirms the final price and timeline before anything is made."}}</script>
+<script>
+(function(){
+  function start(){
+    var box=document.querySelector('[data-aa-ful]'), src=document.getElementById('aaFulData');
+    if(!box||!src) return;
+    var D; try{ D=JSON.parse(src.textContent); }catch(e){ return; }
+    var ic=box.querySelector('[data-ful-icon]'), lb=box.querySelector('[data-ful-label]'), ld=box.querySelector('[data-ful-lead]'), ms=box.querySelector('[data-ful-msg]');
+    function paint(s){ if(!s) return; ic.className='ph '+s.i; lb.textContent=s.l; ld.textContent=s.d; ms.textContent=s.m; }
+    function stateFor(id){ var q=D.q[String(id)]; if(typeof q==='number' && q>0) return q===1 ? D.one : D.stock; return D.mto; }
+    function idEl(){ var f=document.querySelector('.aa-buybox form[action*="/cart/add"]')||document.querySelector('form[action*="/cart/add"]'); return f ? f.querySelector('[name="id"]') : null; }
+    var last=null, custom=false;
+    function tick(){ if(custom) return; var el=idEl(); if(!el) return; var v=String(el.value||''); if(!v || v===last) return; last=v; paint(stateFor(v)); }
+    var rug=document.querySelector('[data-aa-rug]');
+    if(rug){
+      rug.addEventListener('click', function(e){
+        var b=e.target.closest('[data-rug-size]'); if(!b) return;
+        if(b.dataset.custom){ custom=true; paint(D.custom); }
+        else { custom=false; if(b.dataset.vid){ last=String(b.dataset.vid); paint(stateFor(last)); } }
+      });
+    }
+    tick(); setInterval(tick, 250);
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>
+{%- endif -%}

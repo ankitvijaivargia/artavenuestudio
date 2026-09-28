@@ -19,6 +19,14 @@
 {%- assign lead = rs.lead_time -%}
 {%- if lead == blank -%}{%- assign lead = p.metafields.aav.lead_time.value -%}{%- endif -%}
 {%- if lead == blank -%}{%- assign lead = 'Made to order' -%}{%- endif -%}
+{%- comment -%} Stock-aware: once the in-stock piece sells (tracked quantity 0), stop claiming stock.
+  "4×6 ft in stock — ready to ship. Other sizes crafted in 4–6 weeks" -> "Crafted in 4–6 weeks" {%- endcomment -%}
+{%- assign lead_lc = lead | downcase -%}
+{%- if lead_lc contains 'in stock' -%}
+  {%- assign any_stock = false -%}
+  {%- for v in p.variants -%}{%- if v.inventory_management == 'shopify' and v.inventory_quantity > 0 -%}{%- assign any_stock = true -%}{%- endif -%}{%- endfor -%}
+  {%- unless any_stock -%}{%- assign lead = lead | split: ' in ' | last | strip | remove: '.' | prepend: 'Crafted in ' -%}{%- endunless -%}
+{%- endif -%}
 
 {%- assign rug_shape = p.metafields.aav.rug_custom.value.shape | default: 'rect' -%}
 {%- if rug_shape == 'round' -%}{%- assign shape_label = 'Round' -%}
