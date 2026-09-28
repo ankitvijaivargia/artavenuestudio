@@ -11,7 +11,9 @@
   "sections": {
     "main": {
       "type": "aa-custom",
-      "settings": {}
+      "settings": {
+        "product": "narlai-kilim-leather-storage-bed"
+      }
     }
   },
   "order": [
