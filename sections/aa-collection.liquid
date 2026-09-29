@@ -48,7 +48,7 @@
 
   if isRug
     assign rooms = 'living-room-rugs|Living Room,bedroom-rugs|Bedroom,dining-room-rugs|Dining' | split: ','
-    assign rel = 'hand-knotted-rugs|Hand-Knotted Rugs,hand-tufted-rugs|Hand-Tufted Rugs,flat-weave-rugs|Flat-Weave Rugs,custom-rugs|Custom Rugs,furniture|Furniture' | split: ','
+    assign rel = 'hand-knotted-rugs|Hand-Knotted Rugs,hand-tufted-rugs|Hand-Tufted Rugs,abstract-rugs|Abstract Rugs,flat-weave-rugs|Flat-Weave Rugs,custom-rugs|Custom Rugs,furniture|Furniture' | split: ','
   else
     assign rooms = 'living-room-furniture|Living Room,bedroom-furniture|Bedroom,dining-furniture|Dining,outdoor-furniture|Outdoor' | split: ','
     assign rel = 'sofas|Sofas,beds|Beds,coffee-tables|Coffee Tables,chairs-and-ottomans|Armchairs & Ottomans,sideboards|Sideboards,bedside-tables|Bedside Tables,trunks|Trunks,chests-of-drawers|Chests of Drawers,cabinets|Cabinets,console-tables|Console Tables,dining-furniture|Dining' | split: ','
@@ -137,7 +137,7 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       {%- for tag in col.all_tags limit: 12 -%}
         {%- assign tl = tag | downcase -%}
-        {%- unless tl contains 'room' or tl == 'aa-demo' or tl == 'rug' or tl == 'rugs' -%}
+        {%- unless tl contains 'room' or tl == 'aa-demo' or tl == 'aa-catalogue' or tl == 'rug' or tl == 'rugs' -%}
           {%- assign label = tag | replace: '-rugs', '' | replace: '-', ' ' | capitalize -%}
           <a href="/collections/{{ col.handle }}/{{ tag | handleize }}" style="padding:9px 18px;border-radius:var(--radius-pill);font-size:13px;color:var(--text-secondary);border:1px solid var(--border-strong);text-decoration:none">{{ label }}</a>
         {%- endunless -%}
