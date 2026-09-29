@@ -80,6 +80,15 @@
   </details>
   {%- endif -%}
 
+  {%- comment -%} Delivery copy (rugs and furniture) follows aav.lead_time and live stock. The made-to-order window is
+    the text after the last " in " of aav.lead_time; a tracked variant with quantity above 0 is named as ready to ship,
+    using its last option value (e.g. "4×6 ft", "Ivory Canvas"). {%- endcomment -%}
+  {%- assign r_lead = product.metafields.aav.lead_time.value | default: '' -%}
+  {%- assign r_weeks = '3&ndash;4 weeks' -%}
+  {%- if r_lead contains ' in ' -%}{%- assign r_weeks = r_lead | split: ' in ' | last | strip | remove: '.' -%}{%- endif -%}
+  {%- assign r_stock = '' -%}
+  {%- for v in product.variants -%}{%- if r_stock == '' and v.inventory_management == 'shopify' and v.inventory_quantity > 0 -%}{%- assign r_stock = v.title | split: ' / ' | last -%}{%- endif -%}{%- endfor -%}
+
   {%- if is_rug -%}
   <details><summary>Materials &amp; Construction{% if rc_label != blank %} &mdash; {{ rc_label }}{% endif %} <i class="ph ph-plus aa-acc-pm"></i></summary>
     {%- case rc -%}
@@ -144,14 +153,7 @@
     {%- endcase -%}
   </details>
 
-  {%- comment -%} Delivery follows aav.lead_time and live stock. The made-to-order window is the text after the
-    last " in " of aav.lead_time; a tracked variant with quantity above 0 is named as ready to ship. {%- endcomment -%}
-  {%- assign r_lead = product.metafields.aav.lead_time.value | default: '' -%}
-  {%- assign r_weeks = '3&ndash;4 weeks' -%}
-  {%- if r_lead contains ' in ' -%}{%- assign r_weeks = r_lead | split: ' in ' | last | strip | remove: '.' -%}{%- endif -%}
-  {%- assign r_stock = '' -%}
-  {%- for v in product.variants -%}{%- if r_stock == '' and v.inventory_management == 'shopify' and v.inventory_quantity > 0 -%}{%- assign r_stock = v.title -%}{%- endif -%}{%- endfor -%}
-  <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>{% if r_stock != '' %}The {{ r_stock }} rug is finished and waiting in our studio, dispatched within 3&ndash;5 business days. Every other size is made to order, crafted in {{ r_weeks }} and then dispatched. All rugs travel{% else %}Made-to-order rugs are crafted in {{ r_weeks }} and then dispatched,{% endif %} by safe, insured delivery, rolled and wrapped for transit. A rug may arrive with fold marks or a slight curl at the edges &mdash; lay it flat and allow a few days for it to settle. International freight is quoted at checkout.</p></details>
+  <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>{% if r_stock != '' %}The {{ r_stock }} rug is finished and waiting in our studio, dispatched within 3&ndash;5 business days. Every other size is made to order, crafted in {{ r_weeks }} and then dispatched. All rugs travel{% else %}Made-to-order rugs are crafted in {{ r_weeks }} and then dispatched{% endif %} by safe, insured delivery, rolled and wrapped for transit. A rug may arrive with fold marks or a slight curl at the edges &mdash; lay it flat and allow a few days for it to settle. International freight is quoted at checkout.</p></details>
   {%- else -%}
   <details><summary>Materials <i class="ph ph-plus aa-acc-pm"></i></summary><p>Built from carefully selected, natural materials — kiln-dried hardwoods, hand-spun textiles, cast metal and quarried stone, chosen to last for decades. Naturally occurring grain and tone variation is intrinsic to each handmade piece.</p></details>
   {%- if has_leather -%}
@@ -167,7 +169,7 @@
   {%- endif -%}
   <details><summary>Assembly &amp; Installation <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most pieces arrive securely packed and ready to use. Some larger items may require simple assembly; installation assistance may be available depending on the product and your location — speak with a consultant to confirm before ordering.</p></details>
   <details><summary>Care <i class="ph ph-plus aa-acc-pm"></i></summary><p>Dust timber with a soft dry cloth and treat with wax balm twice yearly. Vacuum upholstery gently and treat marks promptly. Keep out of prolonged direct sun to preserve the finish.</p></details>
-  <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>Made-to-order pieces ship in 3&ndash;4 weeks via safe, insured delivery, securely packed for transit. Assembly assistance is available on selected pieces. International freight is quoted at checkout.</p></details>
+  <details><summary>Delivery &amp; Shipping <i class="ph ph-plus aa-acc-pm"></i></summary><p>{% if r_stock != '' %}The {{ r_stock }} version is in stock and waiting in our studio, dispatched within 3&ndash;5 business days. Every other option is made to order, crafted in {{ r_weeks }} and then dispatched. All pieces travel{% else %}Made-to-order pieces are crafted in {{ r_weeks }} and then dispatched{% endif %} by safe, insured delivery, securely packed for transit. Assembly assistance is available on selected pieces. International freight is quoted at checkout.</p></details>
   {%- endif -%}
 
   <details><summary>Designer Notes <i class="ph ph-plus aa-acc-pm"></i></summary><p>&ldquo;We design for the way you actually live &mdash; pieces generous enough to sink into, detailed enough to reward a second look, and made to age beautifully.&rdquo; &mdash; Art Avenue Design Studio</p></details>
