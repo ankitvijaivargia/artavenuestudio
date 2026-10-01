@@ -77,6 +77,20 @@
         "s4": {"type": "step", "settings": {"icon": "ph-ruler", "title": "Made to measure", "text": "Need it longer, lower or narrower? Most designs can be built to your measurements. Just ask us on WhatsApp."}}
       },
       "block_order": ["s1", "s2", "s3", "s4"]},
+    "design": {"type": "aa-home-design", "settings": {
+      "product": "kasauli-studded-leather-wing-chair",
+      "eyebrow": "Interior Design & Consultation",
+      "heading": "Let us design the room around you.",
+      "intro": "We help you plan the space, choose the pieces and make each one to the measure of your room — from a single room to a whole home.",
+      "cta_label": "Explore Design Services", "cta_link": "/pages/interior-design",
+      "cta2_label": "Book a Consultation", "cta2_link": "/pages/interior-design#design-enquiry"},
+      "blocks": {
+        "d1": {"type": "service", "settings": {"title": "Design Consultation", "text": "Space planning and material curation at our showroom or by video call."}},
+        "d2": {"type": "service", "settings": {"title": "Made to Measure", "text": "Every piece built to your dimensions — longer, lower, narrower."}},
+        "d3": {"type": "service", "settings": {"title": "Material Curation", "text": "Leathers, fabrics, wood finishes and kilims selected for your palette."}},
+        "d4": {"type": "service", "settings": {"title": "Whole-Home Projects", "text": "A single point of contact from first sketch to final delivery."}}
+      },
+      "block_order": ["d1", "d2", "d3", "d4"]},
     "showroom": {"type": "aa-home-feature", "settings": {
       "product": "windsor-tufted-leather-sofa", "reverse": true, "bg": "dark",
       "eyebrow": "Visit Us", "heading": "See it, sit on it, then decide.",
@@ -95,5 +109,5 @@
       "link_label": "Visit the Art Avenue Archive",
       "url": "https://www.artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_home"}}
   },
-  "order": ["hero", "categories", "kilim", "edit", "rugs", "rug_edit", "rooms", "process", "showroom", "trade", "statement", "archive"]
+  "order": ["hero", "categories", "kilim", "edit", "rugs", "rug_edit", "rooms", "process", "design", "showroom", "trade", "statement", "archive"]
 }
