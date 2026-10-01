@@ -1,43 +1,205 @@
-<section class="aa-section"><div class="aa-wrap" style="max-width:980px">
-  <span class="aa-eyebrow aa-eyebrow--rule">Your Cart</span>
+{%- comment -%}
+  Cart page — two-column (items + order summary), stacked on mobile.
+  Prices use Jost with lining, tabular figures (Cormorant's old-style numerals read uneven for money).
+{%- endcomment -%}
+<style>
+  .aa-cart{padding:clamp(40px,6vw,88px) 0 clamp(56px,7vw,104px);}
+  .aa-cart .num{font-family:var(--font-sans);font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;letter-spacing:.02em;}
+  .aa-cart__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--border-strong);}
+  .aa-cart__title{font-family:var(--font-serif);font-weight:400;font-size:clamp(34px,4.4vw,52px);line-height:1.05;margin:14px 0 0;color:var(--text-primary);}
+  .aa-cart__count{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);white-space:nowrap;padding-bottom:6px;}
+  .aa-cart__grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:clamp(32px,5vw,72px);align-items:start;margin-top:8px;}
+
+  .aa-line{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:24px;padding:28px 0;border-bottom:1px solid var(--border-hairline);}
+  .aa-line__img{display:block;aspect-ratio:4/5;background:#efe8dc;overflow:hidden;}
+  .aa-line__img img{width:100%;height:100%;object-fit:cover;display:block;}
+  .aa-line__name{font-family:var(--font-serif);font-size:23px;line-height:1.15;color:var(--text-primary);margin:0;}
+  .aa-line__name a{color:inherit;}
+  .aa-line__opts{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:13px;color:var(--text-secondary);}
+  .aa-line__opts span{color:var(--text-muted);}
+  .aa-line__mto{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent);}
+  .aa-line__actions{display:flex;align-items:center;gap:22px;margin-top:20px;}
+  .aa-line__remove{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid transparent;padding-bottom:2px;}
+  .aa-line__remove:hover{color:var(--text-primary);border-bottom-color:currentColor;}
+  .aa-line__price{text-align:right;white-space:nowrap;}
+  .aa-line__price b{display:block;font-weight:400;font-size:17px;color:var(--text-primary);}
+  .aa-line__price small{display:block;margin-top:6px;font-size:12px;color:var(--text-muted);}
+
+  .aa-qty{display:inline-flex;align-items:center;height:40px;border:1px solid var(--border-strong);}
+  .aa-qty button{width:38px;height:100%;background:none;border:0;cursor:pointer;color:var(--text-primary);font-size:14px;display:inline-flex;align-items:center;justify-content:center;}
+  .aa-qty button:hover{background:rgba(43,40,36,.04);}
+  .aa-qty input{width:36px;height:100%;border:0;background:transparent;text-align:center;font-size:14px;color:var(--text-primary);-moz-appearance:textfield;appearance:textfield;padding:0;}
+  .aa-qty input::-webkit-outer-spin-button,.aa-qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+
+  .aa-cart__continue{display:inline-flex;align-items:center;gap:8px;margin-top:26px;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-secondary);}
+
+  .aa-sum{position:sticky;top:110px;background:var(--surface-raised);border:1px solid var(--border-hairline);padding:32px 30px 28px;margin-top:28px;}
+  .aa-sum__h{font-size:11px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-accent);margin:0 0 22px;}
+  .aa-sum__row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:14px;color:var(--text-secondary);padding:9px 0;}
+  .aa-sum__row em{font-style:normal;color:var(--text-muted);font-size:13px;}
+  .aa-sum__total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:20px;border-top:1px solid var(--border-strong);}
+  .aa-sum__total span{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-primary);}
+  .aa-sum__total b{font-weight:400;font-size:24px;color:var(--text-primary);}
+  .aa-sum__tax{margin:8px 0 0;font-size:12px;color:var(--text-muted);text-align:right;}
+  .aa-sum__note{margin-top:22px;}
+  .aa-sum__note summary{list-style:none;cursor:pointer;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-secondary);display:flex;justify-content:space-between;align-items:center;}
+  .aa-sum__note summary::-webkit-details-marker{display:none;}
+  .aa-sum__note[open] summary i{transform:rotate(45deg);}
+  .aa-sum__note summary i{transition:transform .25s;}
+  .aa-sum__note textarea{width:100%;min-height:88px;margin-top:12px;padding:12px;border:1px solid var(--border-strong);background:var(--surface-page);font:inherit;font-size:14px;color:var(--text-primary);resize:vertical;}
+  .aa-sum__cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;margin-top:24px;background:var(--text-primary);color:#fff;border:0;cursor:pointer;font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;transition:background .25s;}
+  .aa-sum__cta:hover{background:#000;}
+  .aa-sum__trust{list-style:none;margin:24px 0 0;padding:20px 0 0;border-top:1px solid var(--border-hairline);display:grid;gap:12px;font-size:13px;color:var(--text-secondary);}
+  .aa-sum__trust li{display:flex;gap:12px;align-items:flex-start;line-height:1.45;}
+  .aa-sum__trust i{font-size:17px;color:var(--text-accent);flex:none;margin-top:1px;}
+  .aa-sum__trust a{color:var(--text-primary);border-bottom:1px solid var(--border-strong);}
+
+  .aa-cart__empty{text-align:center;padding:40px 0 20px;}
+  .aa-cart__empty p{color:var(--text-secondary);max-width:440px;margin:14px auto 30px;}
+
+  .aa-cart__bar{display:none;}
+
+  @media (max-width:900px){
+    .aa-cart__grid{grid-template-columns:1fr;gap:0;}
+    .aa-sum{position:static;margin-top:32px;padding:26px 22px;}
+  }
+  @media (max-width:600px){
+    .aa-cart__head{align-items:baseline;}
+    .aa-line{grid-template-columns:96px minmax(0,1fr);gap:18px;padding:24px 0;}
+    .aa-line__name{font-size:20px;}
+    .aa-line__price{grid-column:2;grid-row:2;text-align:left;margin-top:-6px;}
+    .aa-line__price b{font-size:16px;}
+    .aa-line__price small{margin-top:3px;}
+    .aa-line__body{display:contents;}
+    .aa-line__info{grid-column:2;grid-row:1;}
+    .aa-line__actions{grid-column:2;grid-row:3;margin-top:4px;}
+    .aa-line__img{grid-row:1 / span 3;align-self:start;}
+    .aa-cart__bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;align-items:center;justify-content:space-between;gap:16px;padding:12px var(--gutter) calc(12px + env(safe-area-inset-bottom));background:var(--surface-page);border-top:1px solid var(--border-hairline);box-shadow:0 -6px 20px rgba(43,40,36,.06);transform:translateY(110%);transition:transform .3s;}
+    .aa-cart__bar.is-on{transform:none;}
+    .aa-cart__bar span{display:block;font-size:10px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);}
+    .aa-cart__bar b{font-weight:400;font-size:18px;color:var(--text-primary);}
+    .aa-cart__bar button{height:48px;padding:0 26px;background:var(--text-primary);color:#fff;border:0;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;}
+  }
+</style>
+
+{%- capture aa_wa -%}{{ settings.wa_number | default: '919828080095' }}{%- endcapture -%}
+
+<section class="aa-cart"><div class="aa-wrap" style="max-width:1240px">
   {%- if cart.item_count == 0 -%}
-    <h1 class="aa-h1" style="margin:16px 0 24px">Your cart is empty.</h1>
-    <a class="btn btn--primary" href="/collections/all">Explore the Collection</a>
+    <div class="aa-cart__empty">
+      <span class="aa-eyebrow">Your Cart</span>
+      <h1 class="aa-cart__title">Your cart is empty.</h1>
+      <p>Every piece is handcrafted to order. Begin with our furniture, or speak to us about something made to your measure.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a class="btn btn--primary" href="/collections/furniture">Explore Furniture</a>
+        <a class="btn btn--secondary" href="/pages/custom">Bespoke Enquiry</a>
+      </div>
+    </div>
   {%- else -%}
-    <form action="{{ routes.cart_url }}" method="post">
-      <table style="width:100%;border-collapse:collapse;margin:24px 0">
-        {%- for item in cart.items -%}
-          {%- assign is_custom = false -%}{%- if item.variant.title contains 'Custom' -%}{%- assign is_custom = true -%}{%- endif -%}
-          <tr style="border-bottom:1px solid var(--border-hairline)">
-            <td style="padding:18px 0;width:96px">{% if item.image %}<div class="aa-fig" style="width:80px;aspect-ratio:1/1"><img src="{{ item.image | image_url: width:200 }}" alt="{{ item.title }}"></div>{% endif %}</td>
-            <td style="padding:18px 16px">
-              <div class="serif" style="font-size:19px">{{ item.product.title }}</div>
-              {%- unless is_custom or item.variant.title == 'Default Title' -%}<div style="font-size:13px;color:var(--text-muted)">{{ item.variant.title }}</div>{%- endunless -%}
-              {%- for pr in item.properties -%}
-                {%- assign pv = pr.last -%}
-                {%- unless pv == blank -%}{%- assign fc = pr.first | slice: 0 -%}{%- unless fc == '_' -%}
-                  <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px">{{ pr.first }}: {{ pv }}</div>
-                {%- endunless -%}{%- endunless -%}
-              {%- endfor -%}
-              <a href="{{ item.url_to_remove }}" style="display:inline-block;margin-top:8px;font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted)">Remove</a>
-            </td>
-            <td style="padding:18px 16px;vertical-align:top">
-              {%- if is_custom -%}
-                <input type="hidden" name="updates[]" value="{{ item.quantity }}">
-                <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent)"><i class="ph ph-ruler" style="font-size:14px"></i> Made to order</div>
-              {%- else -%}
-                <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" class="aa-control" style="width:72px">
-              {%- endif -%}
-            </td>
-            <td style="padding:18px 0;text-align:right;font-family:var(--font-serif);font-size:18px">{{ item.final_line_price | money }}</td>
-          </tr>
-        {%- endfor -%}
-      </table>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
-        <button class="btn btn--secondary" type="submit" name="update">Update</button>
-        <div style="display:flex;align-items:center;gap:24px"><span class="serif" style="font-size:22px">Subtotal {{ cart.total_price | money }}</span><button class="btn btn--primary" type="submit" name="checkout">Checkout</button></div>
+    <form action="{{ routes.cart_url }}" method="post" id="aaCartForm" novalidate>
+      <div class="aa-cart__head">
+        <div>
+          <span class="aa-eyebrow aa-eyebrow--rule">Your Cart</span>
+          <h1 class="aa-cart__title">Your selection</h1>
+        </div>
+        <span class="aa-cart__count num">{{ cart.item_count }} {% if cart.item_count == 1 %}piece{% else %}pieces{% endif %}</span>
+      </div>
+
+      <div class="aa-cart__grid">
+        <div>
+          {%- for item in cart.items -%}
+            {%- assign is_custom = false -%}{%- if item.variant.title contains 'Custom' -%}{%- assign is_custom = true -%}{%- endif -%}
+            <div class="aa-line">
+              <a class="aa-line__img" href="{{ item.url }}">{%- if item.image -%}{{ item.image | image_url: width: 480 | image_tag: loading: 'lazy', widths: '200, 320, 480', sizes: '132px', alt: item.product.title }}{%- endif -%}</a>
+              <div class="aa-line__body">
+                <div class="aa-line__info">
+                  <h2 class="aa-line__name"><a href="{{ item.url }}">{{ item.product.title }}</a></h2>
+                  <ul class="aa-line__opts">
+                    {%- unless is_custom or item.product.has_only_default_variant -%}
+                      {%- for o in item.options_with_values -%}<li><span>{{ o.name }}</span> &nbsp;{{ o.value }}</li>{%- endfor -%}
+                    {%- endunless -%}
+                    {%- for pr in item.properties -%}
+                      {%- assign pv = pr.last -%}{%- assign fc = pr.first | slice: 0 -%}
+                      {%- unless pv == blank or fc == '_' -%}<li><span>{{ pr.first }}</span> &nbsp;{{ pv }}</li>{%- endunless -%}
+                    {%- endfor -%}
+                  </ul>
+                  {%- if is_custom -%}<div class="aa-line__mto"><i class="ph ph-ruler"></i> Made to your measure</div>{%- endif -%}
+                </div>
+                <div class="aa-line__actions">
+                  {%- if is_custom -%}
+                    <input type="hidden" name="updates[]" value="{{ item.quantity }}">
+                  {%- else -%}
+                    <div class="aa-qty" data-aa-qty>
+                      <button type="button" aria-label="Decrease quantity" data-step="-1"><i class="ph ph-minus"></i></button>
+                      <input class="num" type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric" aria-label="Quantity for {{ item.product.title | escape }}">
+                      <button type="button" aria-label="Increase quantity" data-step="1"><i class="ph ph-plus"></i></button>
+                    </div>
+                  {%- endif -%}
+                  <a class="aa-line__remove" href="{{ item.url_to_remove }}">Remove</a>
+                </div>
+              </div>
+              <div class="aa-line__price num">
+                <b>{{ item.final_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b>
+                {%- if item.quantity > 1 -%}<small>{{ item.final_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }} each</small>{%- endif -%}
+                {%- if item.original_line_price > item.final_line_price -%}<small><s>{{ item.original_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</s></small>{%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+          <noscript><button class="btn btn--secondary" type="submit" name="update" style="margin-top:20px">Update cart</button></noscript>
+          <a class="aa-cart__continue" href="/collections/furniture"><i class="ph ph-arrow-left"></i> Continue browsing</a>
+        </div>
+
+        <aside class="aa-sum" aria-label="Order summary">
+          <p class="aa-sum__h">Order Summary</p>
+          <div class="aa-sum__row"><span>Subtotal</span><span class="num">{{ cart.items_subtotal_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
+          {%- for d in cart.cart_level_discount_applications -%}
+            <div class="aa-sum__row"><span>{{ d.title }}</span><span class="num">−{{ d.total_allocated_amount | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
+          {%- endfor -%}
+          <div class="aa-sum__row"><span>Delivery</span><em>Calculated at checkout</em></div>
+          <div class="aa-sum__total"><span>Total</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
+          <p class="aa-sum__tax">{% if cart.taxes_included %}Inclusive of all taxes{% else %}Taxes calculated at checkout{% endif %}</p>
+
+          <details class="aa-sum__note"{% if cart.note != blank %} open{% endif %}>
+            <summary>Add a note to your order <i class="ph ph-plus"></i></summary>
+            <textarea name="note" placeholder="Fabric preferences, delivery access, timing…">{{ cart.note }}</textarea>
+          </details>
+
+          <button class="aa-sum__cta" type="submit" name="checkout">Proceed to Checkout <i class="ph ph-arrow-right"></i></button>
+
+          <ul class="aa-sum__trust">
+            <li><i class="ph-light ph-hand"></i><span>Handcrafted to order in our atelier</span></li>
+            <li><i class="ph-light ph-lock-simple"></i><span>Secure checkout</span></li>
+            <li><i class="ph-light ph-chat-circle-text"></i><span>Questions before you order? <a href="https://wa.me/{{ aa_wa }}" target="_blank" rel="noopener">Speak to our studio</a></span></li>
+          </ul>
+        </aside>
+      </div>
+
+      <div class="aa-cart__bar" id="aaCartBar">
+        <div><span>Total</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
+        <button type="submit" name="checkout">Checkout</button>
       </div>
     </form>
+
+    <script>
+      (function(){
+        var form=document.getElementById('aaCartForm'); if(!form) return;
+        var t;
+        form.querySelectorAll('[data-aa-qty]').forEach(function(q){
+          var input=q.querySelector('input');
+          q.querySelectorAll('button').forEach(function(b){
+            b.addEventListener('click',function(){
+              var v=Math.max(0,(parseInt(input.value,10)||0)+parseInt(b.dataset.step,10));
+              input.value=v; clearTimeout(t); t=setTimeout(function(){ form.submit(); },450);
+            });
+          });
+          input.addEventListener('change',function(){ clearTimeout(t); t=setTimeout(function(){ form.submit(); },300); });
+        });
+        var bar=document.getElementById('aaCartBar'), cta=form.querySelector('.aa-sum__cta');
+        if(bar&&cta&&'IntersectionObserver' in window){
+          new IntersectionObserver(function(e){ bar.classList.toggle('is-on',!e[0].isIntersecting && e[0].boundingClientRect.top>0); }).observe(cta);
+        }
+      })();
+    </script>
   {%- endif -%}
 </div></section>
 {% schema %}{ "name": "Cart", "settings": [] }{% endschema %}
