@@ -91,9 +91,9 @@
       "text": "We are not a furniture store. We are a design house — making the handcrafted, the considered and the made-to-last, so your home can hold its stories for generations."}},
     "archive": {"type": "aa-archive-link", "settings": {
       "eyebrow": "The Archive",
-      "text": "Looking for our cushions, bags and textiles?",
+      "text": "Looking for our block-printed rugs, runners, cushions and décor?",
       "link_label": "Visit the Art Avenue Archive",
-      "url": "https://artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_home"}}
+      "url": "https://www.artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_home"}}
   },
   "order": ["hero", "categories", "kilim", "edit", "rugs", "rug_edit", "rooms", "process", "showroom", "trade", "statement", "archive"]
 }
