@@ -99,3 +99,14 @@
   }
   .aa-czm__note{margin-top:14px;}
 }
+
+/* Sticky add-to-cart bar: the title is a flex item and would not shrink (min-width:auto),
+   so long names ("… — 120 cm") ran under the Consult button. Truncate instead,
+   and give Consult + Add to cart one shared height. */
+.aa-stickybar__name{overflow:hidden;}
+.aa-stickybar__name b{min-width:0;max-width:100%;}
+@media (max-width:600px){
+  .aa-stickybar__in{align-items:center;}
+  .aa-stickybar__consult{width:44px;height:44px;}
+  .aa-stickybar form .btn{height:44px;}
+}
