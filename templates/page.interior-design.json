@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "aa-design-services",
+      "settings": {
+        "product": "narlai-kilim-leather-storage-bed"
+      }
+    }
+  },
+  "order": ["main"]
+}
