@@ -92,12 +92,13 @@
   {%- capture aa_dw -%}{{ settings.wa_number | default: '919828080095' }}{%- endcapture -%}
   {%- capture aa_dq -%}Hello Art Avenue, I would like a shipping quote for the {{ product.title }} delivered outside India. {{ canonical_url }} Delivery country & city: {%- endcapture -%}
   {%- capture aa_ship_info -%}
-  <ul style="padding:0 0 20px 18px;margin:0;font-size:15px;line-height:1.72;color:var(--text-secondary);max-width:62ch">
+  <ul style="padding:0 0 14px 18px;margin:0;font-size:15px;line-height:1.72;color:var(--text-secondary);max-width:62ch">
     <li><strong style="color:var(--text-primary);font-weight:500">Prices include GST.</strong> Delivery within India is complimentary &mdash; there is nothing more to pay at checkout.</li>
     <li><strong style="color:var(--text-primary);font-weight:500">GST invoice.</strong> Ordering for a business? Add your GSTIN in the cart and we will issue a GST invoice in your business name.</li>
     <li><strong style="color:var(--text-primary);font-weight:500">Remote locations.</strong> Complimentary delivery covers serviceable pin codes across India. For a few remote locations, our team will be in touch to confirm delivery arrangements.</li>
     <li><strong style="color:var(--text-primary);font-weight:500">Outside India.</strong> We deliver worldwide on request. <a href="https://wa.me/{{ aa_dw }}?text={{ aa_dq | url_encode }}" target="_blank" rel="noopener" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Request a shipping quote</a> and we will price insured freight to your city.</li>
   </ul>
+  <p style="margin:0;padding:0 0 20px;font-size:14px;line-height:1.72;color:var(--text-secondary);max-width:62ch">Lead times, packaging, floor access and what to expect on delivery day are all set out in our <a href="{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Shipping &amp; Delivery Policy&nbsp;&rarr;</a></p>
   {%- endcapture -%}
 
   {%- if is_rug -%}
