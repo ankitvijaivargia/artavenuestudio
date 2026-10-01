@@ -103,7 +103,7 @@
         {%- if link.links.size > 0 -%}
           {%- capture aa_rail -%}{%- for child in link.links -%}{{ child.title }}^{{ child.url }}^{%- if child.links.size > 0 -%}{%- for g in child.links -%}{{ g.title }}|{{ g.url }}{%- unless forloop.last -%};{%- endunless -%}{%- endfor -%}{%- else -%}link{%- endif -%}{%- unless forloop.last -%}~{%- endunless -%}{%- endfor -%}{%- endcapture -%}
           <div class="aa-nav__item">
-            <a class="aa-nav__top" href="{{ link.url }}"{% if link.url contains 'artavenue.in' %} target="_blank" rel="noopener"{% endif %}>{{ link.title }}{% if link.url contains 'artavenue.in' %}<span class="aa-ext" aria-hidden="true">&#8599;</span>{% endif %} <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+            <a class="aa-nav__top" href="{{ link.url }}"{% if link.url contains 'artavenue.in' %} target="_blank" rel="noopener"{% endif %}>{{ link.title }} <i class="ph ph-caret-down" style="font-size:9px"></i></a>
             <div class="aa-mega">
               {%- if forloop.first and aa_feat != blank and aa_feat.featured_image -%}
                 {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'New In', feat_title: aa_feat.title, feat_url: aa_feat.url, feat_img: aa_feat.featured_image %}
