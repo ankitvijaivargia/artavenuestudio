@@ -1,0 +1,154 @@
+{%- comment -%} Art Avenue — Interior Design & Consultation page. Template: page.interior-design {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign hero_img = s.image
+  if hero_img == blank and s.product != blank
+    assign hero_img = s.product.featured_image
+  endif
+  assign wa = settings.wa_number | default: '919828080095'
+  assign wa_text = 'Hello Art Avenue, I would like to book an interior design consultation. My city: '
+-%}
+<style>
+  .aads-hero{position:relative;min-height:560px;display:flex;align-items:center}
+  .aads-hero__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.82),rgba(34,31,27,.45) 62%,rgba(34,31,27,.15))}
+  .aads-hero__ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+  .aads-intro{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,6vw,96px);align-items:start}
+  .aads-intro p{margin:0 0 16px;font-size:16px;line-height:1.78;color:var(--text-secondary);max-width:60ch}
+  .aads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:52px;background:var(--border-hairline);border:1px solid var(--border-hairline)}
+  .aads-grid > div{background:var(--surface-page);padding:38px 34px}
+  .aads-grid i{font-size:32px;color:var(--accent-deep)}
+  .aads-grid h3{font-size:24px;margin:20px 0 12px}
+  .aads-grid p{font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0}
+  .aads-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,3vw,40px);margin-top:52px;counter-reset:aads}
+  .aads-step{border-top:1px solid var(--accent-soft);padding-top:22px}
+  .aads-step__n{font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent)}
+  .aads-step h3{font-size:22px;margin:12px 0 10px}
+  .aads-step p{font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0}
+  .aads-who{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:44px;background:var(--border-on-dark);border:1px solid var(--border-on-dark)}
+  .aads-who > div{background:var(--surface-dark);padding:30px 26px}
+  .aads-who h3{font-size:21px;margin:0 0 10px;color:var(--text-on-dark)}
+  .aads-who p{font-size:14px;line-height:1.65;color:var(--text-on-dark-muted);margin:0}
+  .aads-form{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(40px,6vw,96px);align-items:start}
+  .aads-form__aside p{font-size:15px;line-height:1.75;color:var(--text-secondary);margin:0 0 14px;max-width:44ch}
+  .aads-form__aside a{color:var(--text-primary);text-decoration:underline;text-underline-offset:3px}
+  .aads-ok{padding:18px 20px;border:1px solid var(--accent-soft);background:var(--surface-accent-tint);border-radius:var(--radius-sm);color:var(--text-primary);margin-bottom:20px}
+  .aads-faq{max-width:820px;margin-top:40px}
+  .aads-faq details p{padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary);margin:0}
+  @media (max-width:989px){
+    .aads-grid{grid-template-columns:repeat(2,1fr)}
+    .aads-steps,.aads-who{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:749px){
+    .aads-hero{min-height:500px}
+    .aads-intro,.aads-form{grid-template-columns:1fr}
+    .aads-grid,.aads-steps,.aads-who{grid-template-columns:1fr}
+    .aads-grid > div{padding:30px 24px}
+  }
+</style>
+
+<section class="aads-hero">
+  {%- if hero_img -%}
+    <div class="aa-fig aa-full-bg">{{ hero_img | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '800, 1200, 1600, 2000, 2400', sizes: '100vw', alt: hero_img.alt }}</div>
+  {%- else -%}
+    {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
+  {%- endif -%}
+  <div class="aads-hero__shade"></div>
+  <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:600px">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Interior Design &amp; Consultation</span>
+    <h1 class="aa-display-1" style="color:var(--text-on-dark);margin-top:22px">Rooms designed around <em class="accent">the way you live.</em></h1>
+    <p class="aa-lead" style="color:rgba(250,246,239,.86);max-width:500px;margin-top:22px">From a single room to a whole home, our design team helps you plan the space, choose the pieces and make each one to the measure of your room.</p>
+    <div class="aads-hero__ctas">
+      <a class="btn btn--primary" href="#design-enquiry">Book a Consultation</a>
+      <a class="btn btn--ghost" style="color:var(--text-on-dark)" href="https://wa.me/{{ wa }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">Chat on WhatsApp <i class="ph ph-arrow-right"></i></a>
+    </div>
+  </div></div>
+</section>
+
+<section class="aa-section"><div class="aa-wrap aads-intro">
+  <div>
+    <span class="aa-eyebrow aa-eyebrow--rule">Our Approach</span>
+    <h2 class="aa-display-2" style="margin-top:18px">A design house, not a showroom floor.</h2>
+  </div>
+  <div>
+    <p>Most furniture is chosen piece by piece and hoped to work together. We start the other way round &mdash; with the room. How it is used, how light falls into it, how you move through it, and what you already own and love.</p>
+    <p>Because every Art Avenue piece is made to order in our workshops, we are not limited to what happens to be in stock. A sofa can be drawn a little longer, a sideboard a little lower, a bed sized to an awkward wall. The design follows the room, not the other way round.</p>
+  </div>
+</div></section>
+
+<section class="aa-section" style="background:var(--surface-alt,#efe8dc)"><div class="aa-wrap">
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">What We Offer</span><h2 class="aa-display-2" style="margin-top:18px">Everything a well-made room needs.</h2></div>
+  <div class="aads-grid">
+    <div><i class="ph-light ph-chats-circle"></i><h3 class="serif">Design Consultation</h3><p>Sit down with a member of our design team at our MG Road showroom or over a video call. Bring photographs, floor plans and a sense of budget &mdash; we talk through layout, scale, materials and mood.</p></div>
+    <div><i class="ph-light ph-ruler"></i><h3 class="serif">Space Planning</h3><p>We work from your measurements or your architect&rsquo;s drawings to plan the room &mdash; what goes where, how much space it needs, and how it reaches the room through doors and stairwells.</p></div>
+    <div><i class="ph-light ph-pencil-ruler"></i><h3 class="serif">Made-to-Measure Furniture</h3><p>Adjust the proportions of our designs to your space &mdash; length, depth, height &mdash; and choose the leather, fabric, wood and metal finish that belong in your home.</p></div>
+    <div><i class="ph-light ph-swatches"></i><h3 class="serif">Material &amp; Finish Curation</h3><p>We put together a considered palette of leathers, fabrics, wood finishes and vintage kilims, and send swatches so you can judge them in your own light before anything is made.</p></div>
+    <div><i class="ph-light ph-squares-four"></i><h3 class="serif">Rugs &amp; Layering</h3><p>The right rug size anchors a room. We advise on scale and placement, and can make any of our hand-tufted designs to the exact dimensions your layout calls for.</p></div>
+    <div><i class="ph-light ph-house-line"></i><h3 class="serif">Whole-Home Projects</h3><p>For new homes, renovations and second homes, we plan furniture across several rooms together so the house reads as one &mdash; with a single point of contact from first sketch to delivery.</p></div>
+  </div>
+</div></section>
+
+<section class="aa-section"><div class="aa-wrap">
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">How It Works</span><h2 class="aa-display-2" style="margin-top:18px">From first conversation to finished room.</h2></div>
+  <div class="aads-steps">
+    <div class="aads-step"><span class="aads-step__n">01</span><h3 class="serif">Tell us about your space</h3><p>Share a few details below or on WhatsApp &mdash; the rooms, rough measurements, photographs and what you have in mind.</p></div>
+    <div class="aads-step"><span class="aads-step__n">02</span><h3 class="serif">Consultation</h3><p>We meet at the showroom or by video call to understand how you live, then shortlist pieces, sizes and materials together.</p></div>
+    <div class="aads-step"><span class="aads-step__n">03</span><h3 class="serif">Your proposal</h3><p>You receive a furniture plan for the room with the pieces, dimensions, finishes and a clear quotation. Swatches follow so you can decide at home.</p></div>
+    <div class="aads-step"><span class="aads-step__n">04</span><h3 class="serif">Made &amp; delivered</h3><p>Once you approve, each piece is crafted to order and delivered across India, with complimentary delivery and our team in touch at every stage.</p></div>
+  </div>
+</div></section>
+
+<section class="aa-section aa-dark"><div class="aa-wrap">
+  <div class="grid-2" style="align-items:end">
+    <div><span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Who We Work With</span><h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Homeowners, and the people who design for them.</h2></div>
+    <p class="aa-lead" style="color:var(--text-on-dark-muted)">Whether you are furnishing a single room yourself or working with an architect on a new build, we fit into the way your project is already running.</p>
+  </div>
+  <div class="aads-who">
+    <div><h3 class="serif">A single room</h3><p>A living room that needs pulling together, or a bedroom built around one statement bed.</p></div>
+    <div><h3 class="serif">A new home</h3><p>Furnishing an apartment, villa or farmhouse from the floor plan up.</p></div>
+    <div><h3 class="serif">A renovation</h3><p>Working around pieces you already own and want to keep.</p></div>
+    <div><h3 class="serif">Designers &amp; architects</h3><p>Specification, custom sizing and samples for your clients &mdash; see our <a href="/pages/trade" style="color:var(--text-on-dark);text-decoration:underline;text-underline-offset:3px">Trade Program</a>.</p></div>
+  </div>
+</div></section>
+
+<section id="design-enquiry" class="aa-section"><div class="aa-wrap aads-form">
+  <div class="aads-form__aside">
+    <span class="aa-eyebrow aa-eyebrow--rule">Book a Consultation</span>
+    <h2 class="aa-h1" style="margin:18px 0 18px">Tell us about your space.</h2>
+    <p>A few details help us prepare. A member of our design team will call you within one working day to arrange a time.</p>
+    <p>Prefer to talk now? <a href="https://wa.me/{{ wa }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">Message us on WhatsApp</a> or write to <a href="mailto:shop@artavenue.com">shop@artavenue.com</a>.</p>
+    <p><strong style="color:var(--text-primary);font-weight:500">Showroom</strong><br>2nd Floor, Plot No. 844, Opp. Metro Pillar 113, MG Road, Ghitorni, New Delhi 110030<br>Open every day, 11 am to 8 pm</p>
+  </div>
+  <div>
+    {% form 'contact', id: 'aads-form' %}
+      {%- if form.posted_successfully? -%}<div class="aads-ok">Thank you. A member of our design team will be in touch within one working day.</div>{%- endif -%}
+      {%- if form.errors -%}<div class="aads-ok">{{ form.errors | default_errors }}</div>{%- endif -%}
+      <div class="aa-form">
+        <input type="hidden" name="contact[lead_type]" value="interior_design">
+        <div class="grid-2"><div><label for="aads-fn">First name</label><input id="aads-fn" name="contact[first_name]" required autocomplete="given-name"></div><div><label for="aads-ln">Last name</label><input id="aads-ln" name="contact[last_name]" autocomplete="family-name"></div></div>
+        <div class="grid-2"><div><label for="aads-em">Email</label><input id="aads-em" type="email" name="contact[email]" required autocomplete="email"></div><div><label for="aads-ph">Phone / WhatsApp</label><input id="aads-ph" type="tel" name="contact[phone]" required autocomplete="tel"></div></div>
+        <div class="grid-2"><div><label for="aads-city">City</label><input id="aads-city" name="contact[city]" autocomplete="address-level2"></div><div><label for="aads-pt">Project</label><select id="aads-pt" name="contact[project]"><option>A single room</option><option>Several rooms</option><option>A whole home</option><option>Villa or farmhouse</option><option>Office, hotel or restaurant</option></select></div></div>
+        <div class="grid-2"><div><label for="aads-cm">Consultation</label><select id="aads-cm" name="contact[consultation]"><option>At the showroom, New Delhi</option><option>Video call</option><option>Not sure yet</option></select></div><div><label for="aads-tl">Timeline</label><select id="aads-tl" name="contact[timeline]"><option>As soon as possible</option><option>Within 3 months</option><option>3 to 6 months</option><option>Just exploring</option></select></div></div>
+        <div><label for="aads-msg">Tell us about the space</label><textarea id="aads-msg" name="contact[body]" placeholder="Rooms, approximate sizes, the feel you're after, pieces you'd like to keep…"></textarea></div>
+        <button class="btn btn--primary btn--block" type="submit">Request a Consultation</button>
+      </div>
+    {% endform %}
+  </div>
+</div></section>
+
+<section class="aa-section" style="background:var(--surface-alt,#efe8dc)"><div class="aa-wrap">
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">Questions</span><h2 class="aa-display-2" style="margin-top:18px">Before you book.</h2></div>
+  <div class="aa-accordion aads-faq">
+    <details><summary>What should I bring to a consultation? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Photographs of the room, rough measurements or a floor plan if you have one, and anything you are keeping. Pictures of rooms you love help too &mdash; they tell us more than any description.</p></details>
+    <details><summary>Do you work outside Delhi? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Yes. Consultations can be held over a video call wherever you are, and we deliver across India. Swatches are posted to you so you can see materials in your own light.</p></details>
+    <details><summary>Can you work with my architect or interior designer? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Gladly. We regularly work alongside design professionals &mdash; supplying specifications, custom sizes and samples. Designers and architects can also apply to our <a href="/pages/trade" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Trade Program</a>.</p></details>
+    <details><summary>How long does it take? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Once you approve your selection, smaller pieces are crafted in 2&ndash;3 weeks and larger pieces in 6&ndash;8 weeks, then delivered. Exact timings are confirmed in your proposal.</p></details>
+    <details><summary>Can my furniture be made to a different size? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most of our designs can be built longer, shorter, lower or deeper to suit your space. We confirm every dimension with you in writing before anything is made. See <a href="/pages/custom" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Made to Your Measure</a>.</p></details>
+  </div>
+</div></section>
+
+{% schema %}
+{ "name":"AA Interior Design","settings":[
+  {"type":"image_picker","id":"image","label":"Hero image (overrides product)"},
+  {"type":"product","id":"product","label":"Hero image from product"}
+] }
+{% endschema %}
