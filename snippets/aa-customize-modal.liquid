@@ -5,6 +5,8 @@
   A registered group may set orderSwatch:false to hide the “Order a swatch” action
   (e.g. wood finish, where a physical sample isn't meaningful).
   An item may carry meta (a short description) shown in the detail panel.
+  v2 (Oct 2026): scrim behind the mobile sheet (tap = back), CTA uses the short label
+  (text before ' — '), sheet and grid scroll reset on open. Styles: assets/aa-czm-mobile.css.
   MOBILE: the detail panel is a bottom sheet (class is-detail) that opens only when a
   swatch is tapped; the “← All options” button (data-cz-back) collapses it back to the
   grid without closing the picker. Desktop keeps the always-visible side panel.
@@ -20,6 +22,7 @@
       <h3 class="serif aa-czm__title" id="aaCzTitle">Choose your fabric</h3>
       <div class="aa-czm__cats" id="aaCzCats"></div>
     </div>
+    <div class="aa-czm__scrim" data-cz-back aria-hidden="true"></div>
     <div class="aa-czm__body">
       <div class="aa-czm__grid" id="aaCzGrid"></div>
       <aside class="aa-czm__panel" id="aaCzPanel">
@@ -84,13 +87,15 @@
     state.group = group; state.items = d.items || []; state.filter = 'All';
     groupEl.textContent = d.label;
     titleEl.textContent = 'Choose your ' + d.label.toLowerCase();
-    chooseBtn.textContent = 'Choose this ' + d.label.toLowerCase();
+    var shortLbl = String(d.label).split(/\s+[\u2014\u2013-]\s+/)[0];
+    chooseBtn.textContent = 'Choose this ' + shortLbl.toLowerCase();
     var allowOrder = (d.orderSwatch !== false);
     if(orderBtn){ orderBtn.style.display = allowOrder ? '' : 'none'; }
     if(noteEl){ noteEl.style.display = allowOrder ? '' : 'none'; }
     buildCats(); renderGrid();
     var cur = state.selected[group];
     closeDetail();
+    var bodyEl = modal.querySelector('.aa-czm__body'); if(bodyEl) bodyEl.scrollTop = 0;
     if(isMobile()){
       // Mobile: show the grid first; the detail sheet opens only when a swatch is tapped.
       state.preview = cur ? findByName(cur.name) : null;
@@ -133,7 +138,7 @@
       cell.innerHTML = '<span class="aa-czm__cell-sw" style="background:'+swBg(it)+'"></span>'+
         '<span class="aa-czm__cell-nm">'+it.name+'</span>'+
         '<span class="aa-czm__cell-pr">'+ (Number(it.surcharge)>0 ? '+'+money(it.surcharge) : 'No upcharge') +'</span>';
-      cell.addEventListener('click', function(){ setPreview(it); openDetail(); });
+      cell.addEventListener('click', function(){ setPreview(it); var pn = document.getElementById('aaCzPanel'); if(pn) pn.scrollTop = 0; openDetail(); });
       grid.appendChild(cell);
     });
   }
