@@ -1,41 +1,101 @@
-/* Art Avenue — Customization modal mobile bottom-sheet detail.
-   Loaded after aa.css so these rules win where they overlap the base mobile block. */
-.aa-czm__back{display:none;}
+/* Art Avenue — Customization modal (material selector) refinements, v2 — Oct 2026.
+   Loaded after aa.css so these rules win where they overlap.
+   Fixes: system font on tabs/cells, unbounded CTA text, shifting selection outline,
+   mis-sized mobile scroller, oversized detail sheet with the CTA pushed off-screen. */
+
+.aa-czm__back,.aa-czm__scrim{display:none;}
+
+/* typography: buttons don't inherit the theme font by default */
+.aa-czm__cat,.aa-czm__cell,.aa-czm__order,.aa-czm__back,.aa-czm__choose{font-family:var(--font-sans);}
+.aa-czm__eyebrow{padding-right:44px;line-height:1.5;}
+.aa-czm__panel-desc{font-size:14px;line-height:1.6;color:var(--text-secondary);margin-top:10px;}
+
+/* grid cells: identical geometry selected or not — selection is a ring on the swatch */
+.aa-czm__grid{align-content:start;}
+.aa-czm__cell{padding:0;border:0;gap:8px;min-width:0;background:none;}
+.aa-czm__cell:hover{border-color:transparent;}
+.aa-czm__cell.is-active{background:none;border-color:transparent;}
+.aa-czm__cell-sw{display:block;transition:box-shadow var(--dur-fast) var(--ease-luxe),border-color var(--dur-fast);}
+.aa-czm__cell:hover .aa-czm__cell-sw{border-color:var(--border-strong);}
+.aa-czm__cell.is-active .aa-czm__cell-sw{border-color:transparent;box-shadow:0 0 0 2px var(--surface-page,#FAF6EF),0 0 0 3px var(--accent);}
+.aa-czm__cell.is-active .aa-czm__cell-nm{font-weight:500;}
+.aa-czm__cell-nm,.aa-czm__cell-pr{display:block;overflow-wrap:anywhere;}
+
+/* CTA: long finish names must wrap, never overflow */
+.aa-czm__choose{white-space:normal;line-height:1.35;text-align:center;}
+
+/* PDP: breathing room between the trust list and the first option label */
+.aa-buybox .aa-trust{margin-bottom:12px;}
+
 @media (max-width:782px){
-  /* Dialog fills the screen; we do NOT rely on flex to bound the scroll area. */
+  /* Full-screen sheet: header fixed height, body takes the rest and scrolls */
   .aa-czm.is-open .aa-czm__dialog{
-    display:block;position:fixed;left:0;top:0;right:0;
-    width:100vw;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
-    overflow:hidden;transform:none;border-radius:0;
+    position:fixed;left:0;top:0;right:0;bottom:0;
+    width:100%;height:100vh;height:100dvh;max-height:none;
+    display:flex;flex-direction:column;overflow:hidden;transform:none;border-radius:0;
   }
-  /* Head sits at the top, fixed size. */
-  .aa-czm.is-open .aa-czm__head{position:relative;z-index:1;}
-  /* Body is irrelevant for sizing now; let it be a plain block. */
-  .aa-czm.is-open .aa-czm__body{display:block !important;overflow:visible !important;min-height:0;}
-  /* THE SCROLLER: the grid gets an explicit height cap (viewport minus the header)
-     and scrolls on its own. This does not depend on any flex height resolution,
-     which is what kept failing. ~150px reserves space for the eyebrow + title + tabs. */
-  .aa-czm.is-open .aa-czm__grid{
-    display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:12px !important;
-    max-height:calc(100dvh - 150px) !important;
+  .aa-czm__x{top:8px;right:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
+  .aa-czm.is-open .aa-czm__head{flex:0 0 auto;position:relative;z-index:1;padding:18px 20px 14px;}
+  .aa-czm__eyebrow{font-size:10.5px;}
+  .aa-czm__title{font-size:23px;line-height:1.15;padding-right:24px;}
+  .aa-czm__cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:14px -20px 0;padding:0 20px;gap:8px;}
+  .aa-czm__cats::-webkit-scrollbar{display:none;}
+  .aa-czm__cat{flex:0 0 auto;white-space:nowrap;padding:8px 14px;}
+
+  .aa-czm.is-open .aa-czm__body{
+    display:block !important;flex:1 1 0;min-height:0;
     overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
-    padding:18px 18px 40px !important;
   }
-  /* Detail panel: fixed bottom sheet that slides up over the grid. */
+  .aa-czm.is-open .aa-czm__grid{
+    display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:20px 14px !important;
+    max-height:none !important;overflow:visible !important;
+    padding:20px 20px calc(36px + env(safe-area-inset-bottom)) !important;
+  }
+  .aa-czm__cell-sw{aspect-ratio:4/3;}
+  .aa-czm__cell-nm{font-size:13.5px;}
+
+  /* Dim the grid while the detail sheet is up; tapping it returns to the grid */
+  .aa-czm__scrim{
+    display:block;position:fixed;inset:0;z-index:4;background:rgba(28,24,20,.42);
+    opacity:0;pointer-events:none;transition:opacity var(--dur-base) var(--ease-luxe);
+  }
+  .aa-czm.is-detail .aa-czm__scrim{opacity:1;pointer-events:auto;}
+
+  /* Detail: compact bottom sheet, CTA always reachable */
   .aa-czm__panel{
     position:fixed;left:0;right:0;bottom:0;z-index:5;
-    border-left:none;border-top:1px solid var(--border-hairline);
-    background:var(--surface-page,#f5f0e6);
-    box-shadow:0 -18px 48px -24px rgba(43,40,36,.5);
-    max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    transform:translateY(100%);transition:transform var(--dur-base) var(--ease-luxe);
-    padding:18px 20px calc(18px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;
+    max-height:82vh;max-height:min(82dvh,640px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    border:0;border-top:1px solid var(--border-hairline);
+    background:var(--surface-page,#FAF6EF);
+    box-shadow:0 -12px 40px -20px rgba(43,40,36,.45);
+    padding:0 20px calc(16px + env(safe-area-inset-bottom));
+    transform:translateY(105%);visibility:hidden;
+    transition:transform var(--dur-base) var(--ease-luxe),visibility 0s linear var(--dur-base);
+    will-change:transform;
   }
-  .aa-czm.is-detail .aa-czm__panel{transform:translateY(0);}
+  .aa-czm.is-detail .aa-czm__panel{
+    transform:translateY(0);visibility:visible;
+    transition:transform var(--dur-base) var(--ease-luxe),visibility 0s;
+  }
   .aa-czm__back{
-    display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
-    background:none;border:none;padding:4px 0 12px;cursor:pointer;
-    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--text-accent);
+    display:flex;align-items:center;gap:8px;flex:0 0 auto;
+    position:sticky;top:0;z-index:2;
+    margin:0 -20px;padding:16px 20px 12px;width:calc(100% + 40px);
+    background:var(--surface-page,#FAF6EF);border:0;cursor:pointer;text-align:left;
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-accent);
   }
+  .aa-czm__panel-sw{flex:0 0 auto;width:100%;aspect-ratio:auto;height:clamp(96px,20vh,170px);}
+  .aa-czm__panel-name{font-size:21px;line-height:1.2;margin-top:14px;}
+  .aa-czm__panel-desc{font-size:14px;}
+  .aa-czm__panel-sur{font-size:13px;margin-top:10px;}
+  .aa-czm__panel-craft{font-size:12.5px;margin-top:10px;padding-top:10px;}
+  .aa-czm__order{margin-top:16px;padding:13px;}
+  .aa-czm__choose{
+    position:sticky;bottom:0;z-index:2;margin-top:10px;
+    --_py:16px;--_px:16px;--_fs:11.5px;letter-spacing:.12em;
+    box-shadow:0 -12px 14px -6px var(--surface-page,#FAF6EF);
+  }
+  .aa-czm__note{margin-top:14px;}
 }
