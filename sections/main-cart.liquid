@@ -54,6 +54,13 @@
   .aa-sum__trust i{font-size:17px;color:var(--text-accent);flex:none;margin-top:1px;}
   .aa-sum__trust a{color:var(--text-primary);border-bottom:1px solid var(--border-strong);}
 
+  .aa-sum__free{color:var(--text-primary);font-size:14px;}
+  .aa-sum__gst{display:grid;gap:10px;margin-top:12px;}
+  .aa-sum__gst input{width:100%;height:44px;padding:0 12px;border:1px solid var(--border-strong);background:var(--surface-page);font:inherit;font-size:14px;color:var(--text-primary);}
+  .aa-sum__gst input[name="attributes[GSTIN]"]{text-transform:uppercase;letter-spacing:.06em;}
+  .aa-sum__gst p{margin:2px 0 0;font-size:12px;color:var(--text-muted);line-height:1.5;}
+  .aa-sum__note + .aa-sum__note{margin-top:16px;padding-top:16px;border-top:1px solid var(--border-hairline);}
+  .aa-sum__fine{margin:18px 0 0;font-size:11.5px;line-height:1.55;color:var(--text-muted);}
   .aa-cart__empty{text-align:center;padding:40px 0 20px;}
   .aa-cart__empty p{color:var(--text-secondary);max-width:440px;margin:14px auto 30px;}
 
@@ -155,13 +162,22 @@
           {%- for d in cart.cart_level_discount_applications -%}
             <div class="aa-sum__row"><span>{{ d.title }}</span><span class="num">−{{ d.total_allocated_amount | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
           {%- endfor -%}
-          <div class="aa-sum__row"><span>Delivery</span><em>Calculated at checkout</em></div>
+          <div class="aa-sum__row"><span>Delivery within India</span><span class="aa-sum__free">Complimentary</span></div>
           <div class="aa-sum__total"><span>Total</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
-          <p class="aa-sum__tax">{% if cart.taxes_included %}Inclusive of all taxes{% else %}Taxes calculated at checkout{% endif %}</p>
+          <p class="aa-sum__tax">Inclusive of GST</p>
 
           <details class="aa-sum__note"{% if cart.note != blank %} open{% endif %}>
             <summary>Add a note to your order <i class="ph ph-plus"></i></summary>
             <textarea name="note" placeholder="Fabric preferences, delivery access, timing…">{{ cart.note }}</textarea>
+          </details>
+
+          <details class="aa-sum__note"{% if cart.attributes.GSTIN != blank %} open{% endif %}>
+            <summary>Need a GST invoice? <i class="ph ph-plus"></i></summary>
+            <div class="aa-sum__gst">
+              <input type="text" name="attributes[GSTIN]" value="{{ cart.attributes.GSTIN }}" placeholder="GSTIN (15 characters)" maxlength="15" autocomplete="off" autocapitalize="characters" spellcheck="false">
+              <input type="text" name="attributes[Business name]" value="{{ cart.attributes['Business name'] }}" placeholder="Registered business name" autocomplete="organization">
+              <p>Share your GST number and we will issue a GST invoice in your business name.</p>
+            </div>
           </details>
 
           <button class="aa-sum__cta" type="submit" name="checkout">Proceed to Checkout <i class="ph ph-arrow-right"></i></button>
@@ -171,11 +187,12 @@
             <li><i class="ph-light ph-lock-simple"></i><span>Secure checkout</span></li>
             <li><i class="ph-light ph-chat-circle-text"></i><span>Questions before you order? <a href="https://wa.me/{{ aa_wa }}" target="_blank" rel="noopener">Speak to our studio</a></span></li>
           </ul>
+          <p class="aa-sum__fine">Complimentary delivery applies to serviceable pin codes across India. For a few remote locations, our team will be in touch to confirm delivery arrangements.</p>
         </aside>
       </div>
 
       <div class="aa-cart__bar" id="aaCartBar">
-        <div><span>Total</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
+        <div><span>Total · incl. GST</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
         <button type="submit" name="checkout">Checkout</button>
       </div>
     </form>
@@ -194,6 +211,8 @@
           });
           input.addEventListener('change',function(){ clearTimeout(t); t=setTimeout(function(){ form.submit(); },300); });
         });
+        var gst=form.querySelector('input[name="attributes[GSTIN]"]');
+        if(gst){ gst.addEventListener('input',function(){ var p=gst.selectionStart; gst.value=gst.value.toUpperCase().replace(/\s/g,''); gst.setSelectionRange(p,p); }); }
         var bar=document.getElementById('aaCartBar'), cta=form.querySelector('.aa-sum__cta');
         if(bar&&cta&&'IntersectionObserver' in window){
           new IntersectionObserver(function(e){ bar.classList.toggle('is-on',!e[0].isIntersecting && e[0].boundingClientRect.top>0); }).observe(cta);
