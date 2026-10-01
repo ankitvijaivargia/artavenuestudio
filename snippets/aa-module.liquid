@@ -69,12 +69,16 @@
 </div></section>
 
 {%- when 'faq' -%}
+{%- assign f_lead = p.metafields.aav.lead_time.value | default: '' -%}{%- assign f_weeks = '3&ndash;4 weeks' -%}{%- if f_lead contains ' in ' -%}{%- assign f_weeks = f_lead | split: ' in ' | last | strip | remove: '.' -%}{%- endif -%}
+{%- capture f_wa -%}{{ settings.wa_number | default: '919828080095' }}{%- endcapture -%}
+{%- capture f_q -%}Hello Art Avenue, I would like a shipping quote for the {{ p.title }} delivered outside India. {{ canonical_url }} Delivery country & city: {%- endcapture -%}
 <section class="aa-section"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(40px,6vw,96px);align-items:start">
   <div><span class="aa-eyebrow aa-eyebrow--rule">Good to Know</span><h2 class="aa-h2" style="margin-top:16px">Questions, answered.</h2><p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-top:16px">Still unsure? A design consultant is a tap away.</p><a class="btn btn--ghost" href="{{ consult_href | strip }}" target="_blank" rel="noopener" style="margin-top:8px">Speak with a Consultant <i class="ph ph-arrow-right"></i></a></div>
   <div class="aa-accordion" style="margin-top:0;border-top:1px solid var(--border-hairline)">
-    <details><summary>How long does a made-to-order piece take?</summary><p>Most pieces are crafted and delivered within 3–4 weeks domestically. Your consultant confirms a precise timeline at order.</p></details>
+    <details><summary>How long does a made-to-order piece take?</summary><p>This piece is crafted in {{ f_weeks }}, then dispatched with complimentary, insured delivery across India. Your consultant confirms a precise timeline at order.</p></details>
+    <details><summary>Is delivery included in the price?</summary><p>Yes. Prices are inclusive of GST, and delivery within India is complimentary to serviceable pin codes &mdash; there is nothing more to pay at checkout. For a few remote locations, our team will be in touch to confirm arrangements. Ordering for a business? Add your GSTIN in the cart and we will issue a GST invoice in your business name.</p></details>
     <details><summary>Can I customise the size, finish or fabric?</summary><p>Yes — bespoke dimensions, finishes and customer-own-material (COM) upholstery are available. Speak with a consultant to begin.</p></details>
-    <details><summary>Do you ship internationally?</summary><p>We ship worldwide with insured freight; a quote is provided at checkout or by your consultant.</p></details>
+    <details><summary>Do you ship internationally?</summary><p>Yes, on request. Online checkout is for delivery within India. For an address abroad, <a href="https://wa.me/{{ f_wa }}?text={{ f_q | url_encode }}" target="_blank" rel="noopener" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">request a shipping quote</a> and we will price insured freight to your city and arrange the order with you directly.</p></details>
     <details><summary>What is your returns policy?</summary><p>Stocked pieces may be returned within 14 days. Made-to-order and customised pieces are final sale — which is why we encourage a material sample first.</p></details>
   </div>
 </div></section>
@@ -127,7 +131,7 @@
 <section class="aa-section aa-dark"><div class="aa-wrap aa-modwrap" style="display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(40px,6vw,96px);align-items:center">
   <div><span class="aa-eyebrow aa-eyebrow--on-dark">Personal Service</span><h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Need help choosing the <em class="accent">right piece?</em></h2><p class="aa-lead" style="color:var(--text-on-dark-muted);margin-top:20px;max-width:48ch">A design consultant can guide you through size, material, placement, custom sizing, care and styling — before you spend a rupee. Complimentary, and unhurried.</p><div style="margin-top:24px"><a class="btn btn--primary" href="{{ consult_href | strip }}" target="_blank" rel="noopener"><i class="ph ph-chat-teardrop-dots"></i> Speak with a Design Consultant</a></div></div>
   <ul style="list-style:none;margin:0;padding:0;border-top:1px solid var(--border-on-dark)">
-    {%- assign cf = "Handcrafted by skilled artisans~Made using premium, natural materials~Secure, insured delivery across India~International shipping available~Custom sizes available on select designs~Design consultation available before you buy" | split: "~" -%}
+    {%- assign cf = "Handcrafted by skilled artisans~Made using premium, natural materials~Complimentary, insured delivery across India~Delivery worldwide, quoted on request~Custom sizes available on select designs~Design consultation available before you buy" | split: "~" -%}
     {%- for c in cf -%}<li style="display:flex;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--border-on-dark);font-size:15.5px;color:var(--text-on-dark)"><i class="ph ph-check" style="color:var(--accent-soft)"></i>{{ c }}</li>{%- endfor -%}
   </ul>
 </div></section>
