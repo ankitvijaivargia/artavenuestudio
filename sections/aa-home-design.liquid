@@ -1,0 +1,56 @@
+{%- comment -%} Art Avenue — compact homepage band introducing interior design services. {%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign img = s.image
+  if img == blank and s.product != blank
+    assign img = s.product.featured_image
+  endif
+-%}
+<style>
+  #aahd-{{ section.id }}{background:var(--surface-alt,#efe8dc)}
+  #aahd-{{ section.id }} .aahd{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,5vw,80px);align-items:center}
+  #aahd-{{ section.id }} .aahd__img{position:relative;aspect-ratio:4/5;overflow:hidden;display:block;max-height:560px}
+  #aahd-{{ section.id }} .aahd__img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease-luxe)}
+  #aahd-{{ section.id }} .aahd__img:hover img{transform:scale(1.03)}
+  #aahd-{{ section.id }} .aahd__list{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+  #aahd-{{ section.id }} .aahd__list li{padding:16px 0;border-top:1px solid var(--accent-soft)}
+  #aahd-{{ section.id }} .aahd__list strong{display:block;font-weight:500;color:var(--text-primary);font-size:15px}
+  #aahd-{{ section.id }} .aahd__list span{display:block;font-size:14px;line-height:1.6;color:var(--text-secondary);margin-top:4px}
+  #aahd-{{ section.id }} .aahd__ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}
+  @media (max-width:899px){
+    #aahd-{{ section.id }} .aahd{grid-template-columns:1fr}
+    #aahd-{{ section.id }} .aahd__img{aspect-ratio:3/2;max-height:none}
+  }
+  @media (max-width:599px){ #aahd-{{ section.id }} .aahd__list{grid-template-columns:1fr} }
+</style>
+<section id="aahd-{{ section.id }}" class="aa-section"><div class="aa-wrap aahd">
+  <a class="aahd__img" href="{{ s.cta_link | default: '/pages/interior-design' }}" aria-label="{{ s.heading | escape }}">
+    {%- if img -%}{{ img | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '500, 800, 1200', sizes: '(min-width: 900px) 40vw, 100vw', alt: img.alt }}{%- else -%}{% render 'aa-figure', tone: 'espresso', class: 'aa-full-bg' %}{%- endif -%}
+  </a>
+  <div>
+    {%- if s.eyebrow != blank -%}<span class="aa-eyebrow aa-eyebrow--rule">{{ s.eyebrow }}</span>{%- endif -%}
+    <h2 class="aa-display-2" style="margin-top:18px">{{ s.heading }}</h2>
+    {%- if s.intro != blank -%}<p class="aa-lead" style="margin-top:18px;max-width:54ch">{{ s.intro }}</p>{%- endif -%}
+    <ul class="aahd__list">
+      {%- for block in section.blocks -%}<li {{ block.shopify_attributes }}><strong>{{ block.settings.title }}</strong><span>{{ block.settings.text }}</span></li>{%- endfor -%}
+    </ul>
+    <div class="aahd__ctas">
+      {%- if s.cta_label != blank -%}<a class="btn btn--primary" href="{{ s.cta_link | default: '/pages/interior-design' }}">{{ s.cta_label }}</a>{%- endif -%}
+      {%- if s.cta2_label != blank -%}<a class="btn btn--ghost" href="{{ s.cta2_link | default: '#' }}">{{ s.cta2_label }} <i class="ph ph-arrow-right"></i></a>{%- endif -%}
+    </div>
+  </div>
+</div></section>
+{% schema %}
+{ "name":"AA Design Services Band","max_blocks":6,"settings":[
+  {"type":"image_picker","id":"image","label":"Image (overrides product)"},
+  {"type":"product","id":"product","label":"Image from product"},
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Interior Design & Consultation"},
+  {"type":"text","id":"heading","label":"Heading","default":"Let us design the room around you."},
+  {"type":"textarea","id":"intro","label":"Intro"},
+  {"type":"text","id":"cta_label","label":"Primary button","default":"Explore Design Services"},
+  {"type":"url","id":"cta_link","label":"Primary link"},
+  {"type":"text","id":"cta2_label","label":"Secondary button"},
+  {"type":"url","id":"cta2_link","label":"Secondary link"}
+],"blocks":[{"type":"service","name":"Service","settings":[{"type":"text","id":"title","label":"Title"},{"type":"textarea","id":"text","label":"Text"}]}],
+"presets":[{"name":"AA Design Services Band"}]}
+{% endschema %}
