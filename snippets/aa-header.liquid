@@ -63,6 +63,14 @@
   .aa-dacc__links{display:grid;gap:11px;padding-left:2px;}
   .aa-dacc__links a{font-family:var(--font-serif);font-size:17px;color:var(--text-secondary);}
   .aa-drawer__wa{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:28px;padding:15px;border:1px solid var(--border-strong);font-size:13px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-primary);}
+  /* Sister store (artavenue.in — The Archive): external cue + distinct indigo treatment */
+  .aa-ext{font-size:.85em;opacity:.7;margin-left:1px;}
+  .aa-mega__panel ul a[href*="artavenue.in"]::after,.aa-dacc__links a[href*="artavenue.in"]::after{content:" \2197";font-size:.72em;opacity:.55;}
+  .aa-mega__feature[href*="artavenue.in"]{background:linear-gradient(160deg,#4a5568,#262c36);}
+  .aa-drawer__archive{display:block;margin-top:26px;padding:20px 20px 18px;background:#2c3440;color:#fff;border-radius:var(--radius-sm);}
+  .aa-drawer__archive small{display:block;font-size:10px;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;opacity:.75;}
+  .aa-drawer__archive b{display:block;font-family:var(--font-serif);font-weight:500;font-size:20px;line-height:1.25;margin:8px 0 12px;color:#fff;}
+  .aa-drawer__archive span{font-size:11px;letter-spacing:var(--tracking-caps);text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:2px;}
   @media (max-width:1180px){ .aa-mega__feature{display:none;} .aa-mega__panel{right:var(--gutter);} }
   @media (max-width:1000px){
     .aa-header__bar{grid-template-columns:auto 1fr auto;}
@@ -95,12 +103,19 @@
         {%- if link.links.size > 0 -%}
           {%- capture aa_rail -%}{%- for child in link.links -%}{{ child.title }}^{{ child.url }}^{%- if child.links.size > 0 -%}{%- for g in child.links -%}{{ g.title }}|{{ g.url }}{%- unless forloop.last -%};{%- endunless -%}{%- endfor -%}{%- else -%}link{%- endif -%}{%- unless forloop.last -%}~{%- endunless -%}{%- endfor -%}{%- endcapture -%}
           <div class="aa-nav__item">
-            <a class="aa-nav__top" href="{{ link.url }}">{{ link.title }} <i class="ph ph-caret-down" style="font-size:9px"></i></a>
+            <a class="aa-nav__top" href="{{ link.url }}"{% if link.url contains 'artavenue.in' %} target="_blank" rel="noopener"{% endif %}>{{ link.title }}{% if link.url contains 'artavenue.in' %}<span class="aa-ext" aria-hidden="true">&#8599;</span>{% endif %} <i class="ph ph-caret-down" style="font-size:9px"></i></a>
             <div class="aa-mega">
               {%- if forloop.first and aa_feat != blank and aa_feat.featured_image -%}
                 {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'New In', feat_title: aa_feat.title, feat_url: aa_feat.url, feat_img: aa_feat.featured_image %}
+              {%- elsif link.url contains 'artavenue.in' -%}
+                {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'Our sister store · artavenue.in', feat_title: 'Block-printed rugs, runners, cushions &amp; décor', feat_url: link.url %}
               {%- else -%}
-                {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'Explore', feat_title: link.title, feat_url: link.url %}
+                {%- assign aa_lt = link.title | downcase -%}
+                {%- if aa_lt contains 'rug' -%}
+                  {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'Block-printed rugs &amp; runners', feat_title: 'Our block-printed rugs &amp; runners live in The Archive', feat_url: 'https://www.artavenue.in/collections/rugs?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_nav' %}
+                {%- else -%}
+                  {% render 'aa-mega-rail', rail: aa_rail, feat_eyebrow: 'Explore', feat_title: link.title, feat_url: link.url %}
+                {%- endif -%}
               {%- endif -%}
             </div>
           </div>
@@ -139,6 +154,11 @@
       <a class="aa-drawer__top-link" href="{{ link.url }}">{{ link.title }}</a>
     {%- endif -%}
   {%- endfor -%}
+  <a class="aa-drawer__archive" href="https://www.artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_nav" target="_blank" rel="noopener">
+    <small>The Archive · artavenue.in</small>
+    <b>Shopping for block-printed rugs, runners, cushions or décor?</b>
+    <span>Visit The Archive &#8599;</span>
+  </a>
   <a class="aa-drawer__top-link aa-drawer__top-link--sm" href="/pages/custom">Bespoke &amp; Made to Measure</a>
   <a class="aa-drawer__top-link aa-drawer__top-link--sm" href="/pages/trade">Trade &amp; Projects</a>
   <a class="aa-drawer__top-link aa-drawer__top-link--sm" href="/pages/contact">Visit the Showroom</a>
@@ -147,3 +167,6 @@
     <a href="{{ routes.search_url }}">Search</a><a href="{{ routes.account_url }}">Account</a><a href="{{ routes.cart_url }}">Cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</a>
   </div>
 </div>
+<script>
+  document.querySelectorAll('.aa-header a[href*="artavenue.in"], #aaDrawer a[href*="artavenue.in"]').forEach(function(a){ a.target = '_blank'; a.rel = 'noopener'; });
+</script>
