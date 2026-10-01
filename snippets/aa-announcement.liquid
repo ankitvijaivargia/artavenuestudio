@@ -1,15 +1,28 @@
 {%- comment -%}
-  Homepage: a single static line pointing returning customers to the Archive (artavenue.in).
+  Homepage: a single static line pointing customers to The Archive (artavenue.in) —
+  block-printed rugs & runners, cushions, textiles and décor.
+  Until 15 Nov 2026 it runs Diwali copy, then switches back to the evergreen line automatically.
   All other pages: the usual brand messages.
 {%- endcomment -%}
 {%- if request.page_type == 'index' -%}
-  {%- assign aa_archive_url = 'https://artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_announcement' -%}
+  {%- assign aa_today = 'now' | date: '%Y%m%d' | plus: 0 -%}
+  {%- if aa_today <= 20261115 -%}
+    {%- assign aa_archive_url = 'https://www.artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_announcement_diwali' -%}
+    {%- assign aa_lead = 'Dress your home for Diwali' -%}
+    {%- assign aa_ask = 'Block-printed rugs, runners, cushions &amp; d&eacute;cor for gifting and hosting' -%}
+    {%- assign aa_cta = 'Shop The Archive' -%}
+  {%- else -%}
+    {%- assign aa_archive_url = 'https://www.artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_announcement' -%}
+    {%- assign aa_lead = 'Art Avenue is now a design house for handcrafted furniture &amp; hand-tufted rugs' -%}
+    {%- assign aa_ask = 'Looking for our block-printed rugs, runners, cushions &amp; d&eacute;cor?' -%}
+    {%- assign aa_cta = 'Visit The Archive' -%}
+  {%- endif -%}
   <div class="aa-announce aa-announce--archive">
     <p class="aa-announce-archive">
-      <span class="aa-announce-archive__lead">Art Avenue is now a design house for handcrafted furniture &amp; rugs</span>
+      <span class="aa-announce-archive__lead">{{ aa_lead }}</span>
       <span class="aa-announce-archive__sep" aria-hidden="true">&middot;</span>
-      <span class="aa-announce-archive__ask">Looking for our original cushions, textiles &amp; d&eacute;cor?</span>
-      <a href="{{ aa_archive_url }}" target="_blank" rel="noopener" class="aa-announce-archive__link">Visit The Archive&nbsp;&rarr;</a>
+      <span class="aa-announce-archive__ask">{{ aa_ask }}</span>
+      <a href="{{ aa_archive_url }}" target="_blank" rel="noopener" class="aa-announce-archive__link">{{ aa_cta }}&nbsp;&rarr;</a>
     </p>
   </div>
   <style>
