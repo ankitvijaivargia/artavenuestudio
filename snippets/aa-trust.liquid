@@ -1,7 +1,10 @@
+{%- capture aa_tw -%}{{ settings.wa_number | default: '919828080095' }}{%- endcapture -%}
+{%- capture aa_tq -%}Hello Art Avenue, I would like a shipping quote for delivery outside India for this piece: {{ canonical_url }} Delivery country & city: {%- endcapture -%}
 <ul class="aa-trust">
   <li><i class="ph ph-check"></i><span>Handcrafted in India</span></li>
   <li><i class="ph ph-check"></i><span>Crafted by master artisans</span></li>
   <li><i class="ph ph-check"></i><span>Customization available — size, finish &amp; fabric</span></li>
-  <li><i class="ph ph-check"></i><span>Secure, insured delivery across India</span></li>
-  <li><i class="ph ph-check"></i><span>International shipping available</span></li>
+  <li><i class="ph ph-check"></i><span>Prices inclusive of GST</span></li>
+  <li><i class="ph ph-check"></i><span>Complimentary, insured delivery across India</span></li>
+  <li><i class="ph ph-check"></i><span>Delivering outside India? <a href="https://wa.me/{{ aa_tw }}?text={{ aa_tq | url_encode }}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Request a shipping quote</a></span></li>
 </ul>
