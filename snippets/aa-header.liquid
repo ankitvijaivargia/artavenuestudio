@@ -93,6 +93,14 @@
     .aa-nav__top{letter-spacing:.1em;}
     .aa-nav__icons .aa-nav__item:nth-child(2){display:none;}
   }
+  /* Laptop widths (1001–1440): tighter tracking and gaps so 4 nav items + service links clear the wordmark */
+  @media (min-width:1001px) and (max-width:1440px){
+    .aa-nav{gap:clamp(16px,1.6vw,24px);}
+    .aa-nav__top{letter-spacing:.1em;}
+    .aa-nav__icons{gap:clamp(12px,1.4vw,20px);}
+  }
+  /* Wide screens: let the bar breathe beyond 1320px so side columns have room */
+  @media (min-width:1441px){ .aa-header__bar{max-width:1520px;} }
 </style>
 
 <header class="aa-header">
