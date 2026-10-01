@@ -89,6 +89,7 @@
   }
 </style>
 
+{%- assign aa_ship_url = shop.shipping_policy.url | default: '/policies/shipping-policy' -%}
 {%- capture aa_wa -%}{{ settings.wa_number | default: '919828080095' }}{%- endcapture -%}
 
 <section class="aa-cart"><div class="aa-wrap" style="max-width:1240px">
@@ -185,11 +186,12 @@
           <ul class="aa-sum__trust">
             <li><i class="ph-light ph-hand"></i><span>Handcrafted to order in our atelier</span></li>
             <li><i class="ph-light ph-lock-simple"></i><span>Secure checkout</span></li>
+            <li><i class="ph-light ph-truck"></i><span>Complimentary, insured delivery across India. <a href="{{ aa_ship_url }}">Shipping &amp; delivery</a></span></li>
             <li><i class="ph-light ph-chat-circle-text"></i><span>Questions before you order? <a href="https://wa.me/{{ aa_wa }}" target="_blank" rel="noopener">Speak to our studio</a></span></li>
             {%- capture aa_intl -%}Hello Art Avenue, I would like a shipping quote for delivery outside India.{% for item in cart.items %} {{ item.product.title }} ({{ item.variant.title }}) x{{ item.quantity }}.{% endfor %} Delivery country & city: {%- endcapture -%}
             <li><i class="ph-light ph-globe-hemisphere-west"></i><span>Delivering outside India? <a href="https://wa.me/{{ aa_wa }}?text={{ aa_intl | url_encode }}" target="_blank" rel="noopener">Request a shipping quote</a></span></li>
           </ul>
-          <p class="aa-sum__fine">Complimentary delivery applies to serviceable pin codes across India. For a few remote locations, our team will be in touch to confirm delivery arrangements.</p>
+          <p class="aa-sum__fine">Complimentary delivery applies to serviceable pin codes across India. For a few remote locations, our team will be in touch to confirm delivery arrangements. <a href="{{ aa_ship_url }}" style="color:var(--text-secondary);border-bottom:1px solid var(--border-strong)">Read our shipping &amp; delivery policy</a>.</p>
         </aside>
       </div>
 
