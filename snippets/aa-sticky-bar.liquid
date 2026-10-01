@@ -42,3 +42,31 @@
   if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', bind); } else { bind(); }
 })();
 </script>
+<script>
+/* Sticky-bar property mirror (Oct 2026). Configurators (chair/sofa/customize/picker-links) write
+   properties[...] and the variant id only into the main buy form (.aa-buyrow form). The sticky
+   bar is its own <form>, so adding from it dropped every chosen finish. Right before the sticky
+   form submits, mirror the main form's id + non-empty properties[...] into it (stale copies
+   removed first). Runs on click (fires before submit and before any capture-phase submit
+   handlers such as aa-addon) and again on submit as a fallback. */
+(function(){
+  if(window.aaStickyPropsInit) return; window.aaStickyPropsInit = true;
+  function mainForm(){ return document.querySelector('.aa-buyrow form') || document.querySelector('.aa-buybox form[action*="/cart/add"]'); }
+  function mirror(sf){
+    var mf = mainForm(); if(!mf || mf === sf) return;
+    sf.querySelectorAll('[data-aa-mirror]').forEach(function(n){ n.remove(); });
+    var mid = mf.querySelector('input[name="id"], select[name="id"]');
+    var sid = sf.querySelector('input[name="id"]');
+    if(mid && mid.value && sid){ sid.value = mid.value; }
+    mf.querySelectorAll('[name^="properties["]').forEach(function(src){
+      if(src.disabled || !src.value) return;
+      if((src.type==='radio'||src.type==='checkbox') && !src.checked) return;
+      var i = document.createElement('input'); i.type='hidden'; i.name=src.name; i.value=src.value;
+      i.setAttribute('data-aa-mirror',''); sf.appendChild(i);
+    });
+  }
+  function stickyForm(el){ var f = el && el.closest && el.closest('.aa-stickybar form'); return f || null; }
+  document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.aa-stickybar [type="submit"]'); if(b){ var f=stickyForm(b); if(f) mirror(f); } }, true);
+  document.addEventListener('submit', function(e){ var f = e.target; if(f && f.closest && f.closest('.aa-stickybar')) mirror(f); }, true);
+})();
+</script>
