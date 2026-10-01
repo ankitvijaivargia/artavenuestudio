@@ -1,4 +1,4 @@
-{%- comment -%} Art Avenue — Interior Design & Consultation page. Template: page.interior-design {%- endcomment -%}
+{%- comment -%} Art Avenue — Interior Design (end-to-end) lead page. Template: page.interior-design {%- endcomment -%}
 {%- liquid
   assign s = section.settings
   assign hero_img = s.image
@@ -6,12 +6,17 @@
     assign hero_img = s.product.featured_image
   endif
   assign wa = settings.wa_number | default: '919828080095'
-  assign wa_text = 'Hello Art Avenue, I would like to book an interior design consultation. My city: '
+  assign wa_text = 'Hello Art Avenue, I would like to discuss an interior design project. City: '
 -%}
 <style>
-  .aads-hero{position:relative;min-height:560px;display:flex;align-items:center}
-  .aads-hero__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.82),rgba(34,31,27,.45) 62%,rgba(34,31,27,.15))}
+  .aads-hero{position:relative;min-height:600px;display:flex;align-items:center}
+  .aads-hero__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,31,27,.86),rgba(34,31,27,.5) 62%,rgba(34,31,27,.18))}
   .aads-hero__ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+  .aads-pillars{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border-hairline)}
+  .aads-pillars > div{padding:30px 28px;border-right:1px solid var(--border-hairline)}
+  .aads-pillars > div:last-child{border-right:0}
+  .aads-pillars strong{display:block;font-weight:500;font-size:15px;color:var(--text-primary)}
+  .aads-pillars span{display:block;font-size:14px;line-height:1.6;color:var(--text-secondary);margin-top:6px}
   .aads-intro{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,6vw,96px);align-items:start}
   .aads-intro p{margin:0 0 16px;font-size:16px;line-height:1.78;color:var(--text-secondary);max-width:60ch}
   .aads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:52px;background:var(--border-hairline);border:1px solid var(--border-hairline)}
@@ -19,29 +24,42 @@
   .aads-grid i{font-size:32px;color:var(--accent-deep)}
   .aads-grid h3{font-size:24px;margin:20px 0 12px}
   .aads-grid p{font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0}
-  .aads-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,3vw,40px);margin-top:52px;counter-reset:aads}
+  .aads-mat{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,6vw,96px);align-items:start}
+  .aads-mat p{font-size:16px;line-height:1.78;color:var(--text-on-dark-muted);margin:18px 0 0;max-width:46ch}
+  .aads-chips{display:flex;flex-wrap:wrap;gap:10px}
+  .aads-chips span{border:1px solid var(--border-on-dark);color:var(--text-on-dark);padding:10px 16px;font-size:14px;letter-spacing:.02em;border-radius:999px}
+  .aads-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,3vw,40px);margin-top:52px}
   .aads-step{border-top:1px solid var(--accent-soft);padding-top:22px}
   .aads-step__n{font-size:12px;letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-accent)}
   .aads-step h3{font-size:22px;margin:12px 0 10px}
   .aads-step p{font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0}
-  .aads-who{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:44px;background:var(--border-on-dark);border:1px solid var(--border-on-dark)}
-  .aads-who > div{background:var(--surface-dark);padding:30px 26px}
-  .aads-who h3{font-size:21px;margin:0 0 10px;color:var(--text-on-dark)}
-  .aads-who p{font-size:14px;line-height:1.65;color:var(--text-on-dark-muted);margin:0}
+  .aads-who{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:44px;background:var(--border-hairline);border:1px solid var(--border-hairline)}
+  .aads-who > div{background:var(--surface-page);padding:30px 26px}
+  .aads-who h3{font-size:21px;margin:0 0 10px}
+  .aads-who p{font-size:14px;line-height:1.65;color:var(--text-secondary);margin:0}
+  .aads-trade{margin-top:26px;font-size:15px;color:var(--text-secondary)}
+  .aads-trade a,.aads-form__aside a{color:var(--text-primary);text-decoration:underline;text-underline-offset:3px}
   .aads-form{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(40px,6vw,96px);align-items:start}
   .aads-form__aside p{font-size:15px;line-height:1.75;color:var(--text-secondary);margin:0 0 14px;max-width:44ch}
-  .aads-form__aside a{color:var(--text-primary);text-decoration:underline;text-underline-offset:3px}
+  .aads-form__aside ul{list-style:none;margin:22px 0 26px;padding:0}
+  .aads-form__aside li{padding:12px 0;border-top:1px solid var(--accent-soft);font-size:15px;color:var(--text-primary)}
+  .aads-form__aside li:last-child{border-bottom:1px solid var(--accent-soft)}
+  .aads-form__aside li i{color:var(--accent-deep);margin-right:10px}
   .aads-ok{padding:18px 20px;border:1px solid var(--accent-soft);background:var(--surface-accent-tint);border-radius:var(--radius-sm);color:var(--text-primary);margin-bottom:20px}
+  .aads-fine{font-size:13px;color:var(--text-secondary);margin:12px 0 0;text-align:center}
   .aads-faq{max-width:820px;margin-top:40px}
   .aads-faq details p{padding-bottom:20px;font-size:15px;line-height:1.72;color:var(--text-secondary);margin:0}
   @media (max-width:989px){
-    .aads-grid{grid-template-columns:repeat(2,1fr)}
+    .aads-grid,.aads-pillars{grid-template-columns:repeat(2,1fr)}
+    .aads-pillars > div:nth-child(2){border-right:0}
+    .aads-pillars > div:nth-child(-n+2){border-bottom:1px solid var(--border-hairline)}
     .aads-steps,.aads-who{grid-template-columns:repeat(2,1fr)}
   }
   @media (max-width:749px){
-    .aads-hero{min-height:500px}
-    .aads-intro,.aads-form{grid-template-columns:1fr}
+    .aads-hero{min-height:540px}
+    .aads-intro,.aads-form,.aads-mat{grid-template-columns:1fr}
     .aads-grid,.aads-steps,.aads-who{grid-template-columns:1fr}
+    .aads-pillars > div{padding:22px 18px}
     .aads-grid > div{padding:30px 24px}
   }
 </style>
@@ -53,98 +71,139 @@
     {% render 'aa-figure', tone:'espresso', class:'aa-full-bg' %}
   {%- endif -%}
   <div class="aads-hero__shade"></div>
-  <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:600px">
-    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Interior Design &amp; Consultation</span>
-    <h1 class="aa-display-1" style="color:var(--text-on-dark);margin-top:22px">Rooms designed around <em class="accent">the way you live.</em></h1>
-    <p class="aa-lead" style="color:rgba(250,246,239,.86);max-width:500px;margin-top:22px">From a single room to a whole home, our design team helps you plan the space, choose the pieces and make each one to the measure of your room.</p>
+  <div class="aa-wrap" style="position:relative;width:100%"><div style="max-width:640px">
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Interior Design &middot; Turnkey Interiors</span>
+    <h1 class="aa-display-1" style="color:var(--text-on-dark);margin-top:22px">Interiors, designed and built <em class="accent">end to end.</em></h1>
+    <p class="aa-lead" style="color:rgba(250,246,239,.86);max-width:540px;margin-top:22px">One studio for the whole of it &mdash; floor plans, ceilings and lighting, panelled walls, fitted wardrobes and furniture made to measure in marble, veneer, leather and solid wood. Tell us about your project and our design team will take it from there.</p>
     <div class="aads-hero__ctas">
-      <a class="btn btn--primary" href="#design-enquiry">Book a Consultation</a>
+      <a class="btn btn--primary" href="#design-enquiry">Start Your Project</a>
       <a class="btn btn--ghost" style="color:var(--text-on-dark)" href="https://wa.me/{{ wa }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">Chat on WhatsApp <i class="ph ph-arrow-right"></i></a>
     </div>
   </div></div>
 </section>
 
+<div class="aa-wrap"><div class="aads-pillars">
+  <div><strong>Design &amp; execution, one team</strong><span>From the first drawing to the final fitting.</span></div>
+  <div><strong>Bespoke, never off the shelf</strong><span>Every element drawn for your space.</span></div>
+  <div><strong>Materials chosen with you</strong><span>Judged from real samples, in your own light.</span></div>
+  <div><strong>One point of contact</strong><span>One person accountable, start to handover.</span></div>
+</div></div>
+
 <section class="aa-section"><div class="aa-wrap aads-intro">
   <div>
     <span class="aa-eyebrow aa-eyebrow--rule">Our Approach</span>
-    <h2 class="aa-display-2" style="margin-top:18px">A design house, not a showroom floor.</h2>
+    <h2 class="aa-display-2" style="margin-top:18px">One team, from the first drawing to the final fitting.</h2>
   </div>
   <div>
-    <p>Most furniture is chosen piece by piece and hoped to work together. We start the other way round &mdash; with the room. How it is used, how light falls into it, how you move through it, and what you already own and love.</p>
-    <p>Because every Art Avenue piece is made to order in our workshops, we are not limited to what happens to be in stock. A sofa can be drawn a little longer, a sideboard a little lower, a bed sized to an awkward wall. The design follows the room, not the other way round.</p>
+    <p>Most homes are put together by a chain of separate people &mdash; an architect, a carpenter, a lighting vendor, a painter, a furniture shop &mdash; each solving their own part. The house ends up as a sum of decisions nobody made together.</p>
+    <p>We work the other way round. Our design team plans the space as a whole &mdash; layout, ceiling, light, walls, storage and furniture &mdash; and then sees it built. One drawing set, one material palette, and one team accountable for how it all comes together.</p>
   </div>
 </div></section>
 
 <section class="aa-section" style="background:var(--surface-alt,#efe8dc)"><div class="aa-wrap">
-  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">What We Offer</span><h2 class="aa-display-2" style="margin-top:18px">Everything a well-made room needs.</h2></div>
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">What We Do</span><h2 class="aa-display-2" style="margin-top:18px">The whole interior, not just the furniture.</h2></div>
   <div class="aads-grid">
-    <div><i class="ph-light ph-chats-circle"></i><h3 class="serif">Design Consultation</h3><p>Sit down with a member of our design team at our MG Road showroom or over a video call. Bring photographs, floor plans and a sense of budget &mdash; we talk through layout, scale, materials and mood.</p></div>
-    <div><i class="ph-light ph-ruler"></i><h3 class="serif">Space Planning</h3><p>We work from your measurements or your architect&rsquo;s drawings to plan the room &mdash; what goes where, how much space it needs, and how it reaches the room through doors and stairwells.</p></div>
-    <div><i class="ph-light ph-pencil-ruler"></i><h3 class="serif">Made-to-Measure Furniture</h3><p>Adjust the proportions of our designs to your space &mdash; length, depth, height &mdash; and choose the leather, fabric, wood and metal finish that belong in your home.</p></div>
-    <div><i class="ph-light ph-swatches"></i><h3 class="serif">Material &amp; Finish Curation</h3><p>We put together a considered palette of leathers, fabrics, wood finishes and vintage kilims, and send swatches so you can judge them in your own light before anything is made.</p></div>
-    <div><i class="ph-light ph-squares-four"></i><h3 class="serif">Rugs &amp; Layering</h3><p>The right rug size anchors a room. We advise on scale and placement, and can make any of our hand-tufted designs to the exact dimensions your layout calls for.</p></div>
-    <div><i class="ph-light ph-house-line"></i><h3 class="serif">Whole-Home Projects</h3><p>For new homes, renovations and second homes, we plan furniture across several rooms together so the house reads as one &mdash; with a single point of contact from first sketch to delivery.</p></div>
+    <div><i class="ph-light ph-ruler"></i><h3 class="serif">Space &amp; Floor Planning</h3><p>Layouts drawn from your floor plan or our own site measurements &mdash; how each room is used, where furniture sits, how you move through the house, and where storage, power and light need to go.</p></div>
+    <div><i class="ph-light ph-frame-corners"></i><h3 class="serif">Ceilings</h3><p>False ceilings, coves, coffers and cornices, designed together with the lighting rather than around it &mdash; in gypsum, wood slats, veneer or plaster mouldings.</p></div>
+    <div><i class="ph-light ph-lightbulb"></i><h3 class="serif">Lighting Layout</h3><p>A lighting plan for every room &mdash; ambient, task and accent layers, cove and profile lighting, decorative fixtures, and switching that is simple to live with.</p></div>
+    <div><i class="ph-light ph-columns"></i><h3 class="serif">Wall Panelling</h3><p>Fluted and ribbed panels, veneer and stone cladding, upholstered and fabric walls, wainscoting, and feature walls behind beds, sofas and televisions.</p></div>
+    <div><i class="ph-light ph-squares-four"></i><h3 class="serif">Fluted Glass &amp; Partitions</h3><p>Fluted, reeded and tinted glass for shutters, partitions and doors, framed in metal or wood &mdash; dividing a space while keeping its light.</p></div>
+    <div><i class="ph-light ph-coat-hanger"></i><h3 class="serif">Wardrobes &amp; Fitted Joinery</h3><p>Fitted wardrobes and walk-in dressing rooms planned around what you actually own, along with TV walls, vanities, bars, study units and storage built into the architecture.</p></div>
+    <div><i class="ph-light ph-armchair"></i><h3 class="serif">Bespoke Furniture</h3><p>Dining, console and centre tables in marble, onyx and travertine; veneer and lacquer case goods; upholstered pieces in leather and fabric &mdash; each one designed for the room and made to order.</p></div>
+    <div><i class="ph-light ph-paint-roller"></i><h3 class="serif">Paint, Wallpaper &amp; Finishes</h3><p>Colour schemes, textured and limewash paints, designer wallpapers and wall coverings &mdash; tested on your own walls before anything is applied.</p></div>
+    <div><i class="ph-light ph-swatches"></i><h3 class="serif">Material &amp; D&eacute;cor Selection</h3><p>Marble, veneers, laminates, hardware, fabrics, rugs, lighting and art, brought together into one considered palette that runs through the whole home.</p></div>
+  </div>
+</div></section>
+
+<section class="aa-section aa-dark"><div class="aa-wrap aads-mat">
+  <div>
+    <span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Materials</span>
+    <h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Chosen with you, sample in hand.</h2>
+    <p>A material that looks right on a screen can look quite different on your wall. Every surface in your home is chosen from physical samples, judged in the light it will live in.</p>
+  </div>
+  <div class="aads-chips">
+    <span>Italian &amp; Indian marble</span><span>Onyx &amp; travertine</span><span>Natural wood veneer</span><span>Solid wood</span><span>Fluted &amp; reeded glass</span><span>Lacquer &amp; PU finishes</span><span>Natural stone</span><span>Leather</span><span>Linen &amp; velvet</span><span>Woven cane</span><span>Brass &amp; metal</span><span>Wallpaper &amp; wall coverings</span><span>Textured &amp; limewash paint</span><span>Hand-tufted rugs</span>
   </div>
 </div></section>
 
 <section class="aa-section"><div class="aa-wrap">
-  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">How It Works</span><h2 class="aa-display-2" style="margin-top:18px">From first conversation to finished room.</h2></div>
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">How It Works</span><h2 class="aa-display-2" style="margin-top:18px">From first conversation to handover.</h2></div>
   <div class="aads-steps">
-    <div class="aads-step"><span class="aads-step__n">01</span><h3 class="serif">Tell us about your space</h3><p>Share a few details below or on WhatsApp &mdash; the rooms, rough measurements, photographs and what you have in mind.</p></div>
-    <div class="aads-step"><span class="aads-step__n">02</span><h3 class="serif">Consultation</h3><p>We meet at the showroom or by video call to understand how you live, then shortlist pieces, sizes and materials together.</p></div>
-    <div class="aads-step"><span class="aads-step__n">03</span><h3 class="serif">Your proposal</h3><p>You receive a furniture plan for the room with the pieces, dimensions, finishes and a clear quotation. Swatches follow so you can decide at home.</p></div>
-    <div class="aads-step"><span class="aads-step__n">04</span><h3 class="serif">Made &amp; delivered</h3><p>Once you approve, each piece is crafted to order and delivered across India, with complimentary delivery and our team in touch at every stage.</p></div>
+    <div class="aads-step"><span class="aads-step__n">01</span><h3 class="serif">Tell us about your project</h3><p>Share a few details below &mdash; the city, the area, the kind of project and what you have in mind. Our design team calls you within one working day.</p></div>
+    <div class="aads-step"><span class="aads-step__n">02</span><h3 class="serif">Consultation &amp; site visit</h3><p>We meet at our New Delhi studio, on site or by video call to understand how you live, your timeline and your budget, and to measure the space.</p></div>
+    <div class="aads-step"><span class="aads-step__n">03</span><h3 class="serif">Design &amp; proposal</h3><p>Layouts, ceiling and lighting plans, elevations and a material palette, with a clear, itemised quotation before any work begins.</p></div>
+    <div class="aads-step"><span class="aads-step__n">04</span><h3 class="serif">Execution &amp; handover</h3><p>We manage the work on site, coordinate every trade, make the bespoke pieces and style the finished rooms &mdash; with one point of contact throughout.</p></div>
   </div>
 </div></section>
 
-<section class="aa-section aa-dark"><div class="aa-wrap">
+<section class="aa-section" style="background:var(--surface-alt,#efe8dc)"><div class="aa-wrap">
   <div class="grid-2" style="align-items:end">
-    <div><span class="aa-eyebrow aa-eyebrow--on-dark aa-eyebrow--rule">Who We Work With</span><h2 class="aa-display-2" style="color:var(--text-on-dark);margin-top:18px">Homeowners, and the people who design for them.</h2></div>
-    <p class="aa-lead" style="color:var(--text-on-dark-muted)">Whether you are furnishing a single room yourself or working with an architect on a new build, we fit into the way your project is already running.</p>
+    <div><span class="aa-eyebrow aa-eyebrow--rule">Projects We Take On</span><h2 class="aa-display-2" style="margin-top:18px">Homes first. Spaces of every kind.</h2></div>
+    <p class="aa-lead">Whether it is a new home from bare walls, a renovation around pieces you love, or a space for guests and clients, the brief is the same: a place that feels considered in every corner.</p>
   </div>
   <div class="aads-who">
-    <div><h3 class="serif">A single room</h3><p>A living room that needs pulling together, or a bedroom built around one statement bed.</p></div>
-    <div><h3 class="serif">A new home</h3><p>Furnishing an apartment, villa or farmhouse from the floor plan up.</p></div>
-    <div><h3 class="serif">A renovation</h3><p>Working around pieces you already own and want to keep.</p></div>
-    <div><h3 class="serif">Designers &amp; architects</h3><p>Specification, custom sizing and samples for your clients &mdash; see our <a href="/pages/trade" style="color:var(--text-on-dark);text-decoration:underline;text-underline-offset:3px">Trade Program</a>.</p></div>
+    <div><h3 class="serif">Apartments &amp; penthouses</h3><p>Complete interiors for new possessions and resale homes, from bare shell to styled rooms.</p></div>
+    <div><h3 class="serif">Villas &amp; farmhouses</h3><p>Larger homes planned room by room so the whole house reads as one.</p></div>
+    <div><h3 class="serif">Renovations</h3><p>A single room or a full home, reworked around the architecture and the pieces you are keeping.</p></div>
+    <div><h3 class="serif">Offices &amp; hospitality</h3><p>Workspaces, boutique stays, restaurants and retail &mdash; designed to be lived in, not just looked at.</p></div>
   </div>
+  <p class="aads-trade">Architects and interior designers &mdash; specify our bespoke furniture for your own projects through our <a href="/pages/trade">Trade Program</a>.</p>
 </div></section>
 
 <section id="design-enquiry" class="aa-section"><div class="aa-wrap aads-form">
   <div class="aads-form__aside">
-    <span class="aa-eyebrow aa-eyebrow--rule">Book a Consultation</span>
-    <h2 class="aa-h1" style="margin:18px 0 18px">Tell us about your space.</h2>
-    <p>A few details help us prepare. A member of our design team will call you within one working day to arrange a time.</p>
+    <span class="aa-eyebrow aa-eyebrow--rule">Start Your Project</span>
+    <h2 class="aa-h1" style="margin:18px 0 18px">Tell us about your project.</h2>
+    <p>A few details are all we need to begin. A member of our design team will call you within one working day to understand the brief and arrange a consultation.</p>
+    <ul>
+      <li><i class="ph ph-phone"></i>A call from our design team within one working day</li>
+      <li><i class="ph ph-map-pin"></i>Consultation at our studio, on site or by video</li>
+      <li><i class="ph ph-file-text"></i>A clear proposal and quotation before any work begins</li>
+    </ul>
     <p>Prefer to talk now? <a href="https://wa.me/{{ wa }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">Message us on WhatsApp</a> or write to <a href="mailto:shop@artavenue.com">shop@artavenue.com</a>.</p>
-    <p><strong style="color:var(--text-primary);font-weight:500">Showroom</strong><br>2nd Floor, Plot No. 844, Opp. Metro Pillar 113, MG Road, Ghitorni, New Delhi 110030<br>Open every day, 11 am to 8 pm</p>
+    <p><strong style="color:var(--text-primary);font-weight:500">Studio &amp; Showroom</strong><br>2nd Floor, Plot No. 844, Opp. Metro Pillar 113, MG Road, Ghitorni, New Delhi 110030<br>Open every day, 11 am to 8 pm</p>
   </div>
   <div>
     {% form 'contact', id: 'aads-form' %}
-      {%- if form.posted_successfully? -%}<div class="aads-ok">Thank you. A member of our design team will be in touch within one working day.</div>{%- endif -%}
+      {%- if form.posted_successfully? -%}<div class="aads-ok">Thank you &mdash; we have your project details. A member of our design team will call you within one working day.</div>{%- endif -%}
       {%- if form.errors -%}<div class="aads-ok">{{ form.errors | default_errors }}</div>{%- endif -%}
       <div class="aa-form">
         <input type="hidden" name="contact[lead_type]" value="interior_design">
-        <div class="grid-2"><div><label for="aads-fn">First name</label><input id="aads-fn" name="contact[first_name]" required autocomplete="given-name"></div><div><label for="aads-ln">Last name</label><input id="aads-ln" name="contact[last_name]" autocomplete="family-name"></div></div>
-        <div class="grid-2"><div><label for="aads-em">Email</label><input id="aads-em" type="email" name="contact[email]" required autocomplete="email"></div><div><label for="aads-ph">Phone / WhatsApp</label><input id="aads-ph" type="tel" name="contact[phone]" required autocomplete="tel"></div></div>
-        <div class="grid-2"><div><label for="aads-city">City</label><input id="aads-city" name="contact[city]" autocomplete="address-level2"></div><div><label for="aads-pt">Project</label><select id="aads-pt" name="contact[project]"><option>A single room</option><option>Several rooms</option><option>A whole home</option><option>Villa or farmhouse</option><option>Office, hotel or restaurant</option></select></div></div>
-        <div class="grid-2"><div><label for="aads-cm">Consultation</label><select id="aads-cm" name="contact[consultation]"><option>At the showroom, New Delhi</option><option>Video call</option><option>Not sure yet</option></select></div><div><label for="aads-tl">Timeline</label><select id="aads-tl" name="contact[timeline]"><option>As soon as possible</option><option>Within 3 months</option><option>3 to 6 months</option><option>Just exploring</option></select></div></div>
-        <div><label for="aads-msg">Tell us about the space</label><textarea id="aads-msg" name="contact[body]" placeholder="Rooms, approximate sizes, the feel you're after, pieces you'd like to keep…"></textarea></div>
-        <button class="btn btn--primary btn--block" type="submit">Request a Consultation</button>
+        <div><label for="aads-name">Full name</label><input id="aads-name" name="contact[name]" required autocomplete="name"></div>
+        <div class="grid-2"><div><label for="aads-ph">Phone / WhatsApp</label><input id="aads-ph" type="tel" name="contact[phone]" required autocomplete="tel" inputmode="tel" placeholder="+91"></div><div><label for="aads-em">Email <span style="opacity:.6;font-weight:400">(we send your proposal here)</span></label><input id="aads-em" type="email" name="contact[email]" required autocomplete="email"></div></div>
+        <div class="grid-2"><div><label for="aads-city">City</label><input id="aads-city" name="contact[city]" required autocomplete="address-level2" placeholder="e.g. Gurugram"></div><div><label for="aads-area">Project area</label><select id="aads-area" name="contact[project_area]" required><option value="" disabled selected>Select area</option><option>Under 1,000 sq ft</option><option>1,000 &ndash; 2,000 sq ft</option><option>2,000 &ndash; 3,500 sq ft</option><option>3,500 &ndash; 5,000 sq ft</option><option>Above 5,000 sq ft</option><option>Not sure yet</option></select></div></div>
+        <div><label for="aads-pt">Type of project</label><select id="aads-pt" name="contact[project_type]" required><option value="" disabled selected>Select project type</option><option>Apartment / flat</option><option>Penthouse</option><option>Independent house / villa</option><option>Farmhouse</option><option>Renovation of a few rooms</option><option>Office / commercial</option><option>Hotel, restaurant or retail</option><option>Something else</option></select></div>
+        <div><label for="aads-msg">Tell us a little about it</label><textarea id="aads-msg" name="contact[body]" rows="5" placeholder="e.g. 4BHK in Gurugram, possession in March. Looking for complete interiors — false ceiling, lighting, wardrobes, wall panelling and furniture for the living and dining room."></textarea></div>
+        <button class="btn btn--primary btn--block" type="submit">Request a Design Consultation</button>
+        <p class="aads-fine">Your details are used only to contact you about your project.</p>
       </div>
     {% endform %}
   </div>
 </div></section>
 
 <section class="aa-section" style="background:var(--surface-alt,#efe8dc)"><div class="aa-wrap">
-  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">Questions</span><h2 class="aa-display-2" style="margin-top:18px">Before you book.</h2></div>
+  <div style="max-width:660px"><span class="aa-eyebrow aa-eyebrow--rule">Questions</span><h2 class="aa-display-2" style="margin-top:18px">Before you begin.</h2></div>
   <div class="aa-accordion aads-faq">
-    <details><summary>What should I bring to a consultation? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Photographs of the room, rough measurements or a floor plan if you have one, and anything you are keeping. Pictures of rooms you love help too &mdash; they tell us more than any description.</p></details>
-    <details><summary>Do you work outside Delhi? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Yes. Consultations can be held over a video call wherever you are, and we deliver across India. Swatches are posted to you so you can see materials in your own light.</p></details>
-    <details><summary>Can you work with my architect or interior designer? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Gladly. We regularly work alongside design professionals &mdash; supplying specifications, custom sizes and samples. Designers and architects can also apply to our <a href="/pages/trade" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Trade Program</a>.</p></details>
-    <details><summary>How long does it take? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Once you approve your selection, smaller pieces are crafted in 2&ndash;3 weeks and larger pieces in 6&ndash;8 weeks, then delivered. Exact timings are confirmed in your proposal.</p></details>
-    <details><summary>Can my furniture be made to a different size? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Most of our designs can be built longer, shorter, lower or deeper to suit your space. We confirm every dimension with you in writing before anything is made. See <a href="/pages/custom" style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px">Made to Your Measure</a>.</p></details>
+    <details><summary>Do you only design, or do you carry out the work as well? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Both. We can take a project from the first drawing to handover &mdash; ceilings, electrical and lighting, panelling, glass, joinery, painting, wallpaper and furniture &mdash; with one team accountable for the result. If you already have a contractor, we can also provide the design and drawings for them to execute.</p></details>
+    <details><summary>Is it only Art Avenue furniture? <i class="ph ph-plus aa-acc-pm"></i></summary><p>No. We design whatever the space needs &mdash; marble and stone tables, veneer and lacquer joinery, fitted wardrobes, upholstered pieces and more, each made for your project. Our own collection is one source among many, used only where it belongs.</p></details>
+    <details><summary>Which cities do you work in? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Our studio is in New Delhi and much of our work is across Delhi NCR. For projects in other cities, tell us where you are in the form &mdash; we take on select projects elsewhere in India, and consultations can always begin by video call.</p></details>
+    <details><summary>How are design fees worked out? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Fees depend on the size and scope of the project, and are set out clearly in your proposal before any work begins. The first call with our design team carries no charge and no obligation.</p></details>
+    <details><summary>Can you work with my architect? <i class="ph ph-plus aa-acc-pm"></i></summary><p>Gladly. We regularly work alongside architects and consultants &mdash; taking on the interiors while they lead the building, or supplying specifications and bespoke pieces for their designs.</p></details>
+    <details><summary>How long does a project take? <i class="ph ph-plus aa-acc-pm"></i></summary><p>It depends on the scope &mdash; a few rooms move far faster than a whole villa. Once we understand the brief, your proposal sets out a timeline for design, execution and delivery, and we keep you updated at every stage.</p></details>
   </div>
 </div></section>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"Service","name":"Interior Design and Turnkey Interiors","serviceType":"Interior design","provider":{"@type":"HomeAndConstructionBusiness","name":"Art Avenue","url":{{ shop.url | json }},"telephone":"+919828080095","address":{"@type":"PostalAddress","streetAddress":"2nd Floor, Plot No. 844, MG Road, Ghitorni","addressLocality":"New Delhi","postalCode":"110030","addressCountry":"IN"}},"areaServed":["Delhi","Gurugram","Noida","India"],"description":"End-to-end interior design: space and floor planning, ceilings, lighting layout, wall panelling, fluted glass, fitted wardrobes, bespoke furniture in marble and veneer, paint, wallpaper and material selection."},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Do you only design, or do you carry out the work as well?","acceptedAnswer":{"@type":"Answer","text":"Both. We can take a project from the first drawing to handover, with one team accountable for the result. If you already have a contractor, we can also provide the design and drawings for them to execute."}},
+{"@type":"Question","name":"Is it only Art Avenue furniture?","acceptedAnswer":{"@type":"Answer","text":"No. We design whatever the space needs, including marble and stone tables, veneer joinery, fitted wardrobes and upholstered pieces, each made for your project."}},
+{"@type":"Question","name":"Which cities do you work in?","acceptedAnswer":{"@type":"Answer","text":"Our studio is in New Delhi and much of our work is across Delhi NCR. We take on select projects elsewhere in India, and consultations can begin by video call."}},
+{"@type":"Question","name":"How are design fees worked out?","acceptedAnswer":{"@type":"Answer","text":"Fees depend on the size and scope of the project and are set out in your proposal before any work begins. The first call with our design team carries no charge."}}
+]}
+]}
+</script>
 
 {% schema %}
 { "name":"AA Interior Design","settings":[
