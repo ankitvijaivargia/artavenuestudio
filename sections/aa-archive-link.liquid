@@ -1,0 +1,21 @@
+{%- if section.settings.url != blank -%}
+<section class="aa-archive-link" style="text-align:center;padding:24px 20px 44px">
+  <div class="aa-wrap" style="max-width:720px">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="aa-eyebrow aa-eyebrow--center">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+    <p style="margin:12px 0 0;font-size:14px;letter-spacing:.02em;opacity:.75">
+      {{ section.settings.text }}
+      <a href="{{ section.settings.url }}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;white-space:nowrap">{{ section.settings.link_label }}&nbsp;&rarr;</a>
+    </p>
+  </div>
+</section>
+{%- endif -%}
+{% schema %}
+{ "name":"AA Archive Link","settings":[
+  {"type":"text","id":"eyebrow","label":"Eyebrow","default":"The Archive"},
+  {"type":"text","id":"text","label":"Line","default":"Looking for our cushions, bags and textiles?"},
+  {"type":"text","id":"link_label","label":"Link label","default":"Visit the Art Avenue Archive"},
+  {"type":"url","id":"url","label":"Link","info":"Leave blank to hide the section."}
+],"presets":[{"name":"AA Archive Link"}]}
+{% endschema %}
