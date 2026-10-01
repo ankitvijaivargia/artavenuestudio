@@ -1,3 +1,30 @@
+{%- comment -%}
+  Homepage: a single static line pointing returning customers to the Archive (artavenue.in).
+  All other pages: the usual brand messages.
+{%- endcomment -%}
+{%- if request.page_type == 'index' -%}
+  {%- assign aa_archive_url = 'https://artavenue.in/?utm_source=artavenue.com&utm_medium=referral&utm_campaign=archive_announcement' -%}
+  <div class="aa-announce aa-announce--archive">
+    <p class="aa-announce-archive">
+      <span class="aa-announce-archive__lead">Art Avenue is now a design house for handcrafted furniture &amp; rugs</span>
+      <span class="aa-announce-archive__sep" aria-hidden="true">&middot;</span>
+      <span class="aa-announce-archive__ask">Looking for our original cushions, textiles &amp; d&eacute;cor?</span>
+      <a href="{{ aa_archive_url }}" target="_blank" rel="noopener" class="aa-announce-archive__link">Visit The Archive&nbsp;&rarr;</a>
+    </p>
+  </div>
+  <style>
+    .aa-announce--archive{display:flex;align-items:center;justify-content:center;min-height:35px;padding:8px 16px;box-sizing:border-box}
+    .aa-announce-archive{margin:0;text-align:center;font-family:Jost,ui-sans-serif,system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;line-height:1.6;color:inherit}
+    .aa-announce-archive__sep{opacity:.4;margin:0 14px}
+    .aa-announce-archive__ask{opacity:.75}
+    .aa-announce-archive__link{color:inherit;margin-left:6px;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;white-space:nowrap}
+    .aa-announce-archive__link:hover{opacity:.75}
+    @media (max-width:899px){
+      .aa-announce-archive__lead,.aa-announce-archive__sep{display:none}
+      .aa-announce-archive{font-size:10px;letter-spacing:.1em}
+    }
+  </style>
+{%- else -%}
 {%- capture aa_msgs -%}
   <span>Complimentary design consultation</span>
   <span><span style="opacity:.4">&middot;</span> Handcrafted in India, made to order</span>
@@ -9,3 +36,4 @@
     <div class="aa-announce__set aa-announce__set--dup" aria-hidden="true">{{ aa_msgs }}</div>
   </div>
 </div>
+{%- endif -%}
