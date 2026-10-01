@@ -25,6 +25,7 @@
     <span class="aa-price" style="margin-top:0" data-aa-price-display>{{ price_prefix }}{% render 'aa-money', cents: disp_price %}</span>
     {%- if caption != blank -%}<span class="aa-price-cap" style="margin-top:0">{{ caption }}</span>{%- endif -%}
   </div>
+  <div class="aa-price-note" style="font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);margin-top:6px">Inclusive of GST &middot; Complimentary delivery across India</div>
 {%- elsif visibility == 'project-only' -%}
   <div class="aa-price aa-price--enquire">Project pricing <span>Quoted per project</span></div>
 {%- else -%}
