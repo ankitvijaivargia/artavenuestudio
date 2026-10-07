@@ -1,0 +1,65 @@
+{%- comment -%}
+  Art Avenue — "Styled with" card.
+  Renders ONLY when the product carries aav.styled_with (list.product_reference): the pieces
+  that appear with this product in its photographs. Each becomes a small card (thumbnail,
+  name, price, link). Rendered via a hook at the top of aa-mattress-fit.liquid (already inside
+  the buybox), then moved by the script below to sit directly after the CTA, above the
+  details accordion — so it never competes with Add to Cart. Fails open: if the anchor
+  isn't found it stays where it rendered. Unpublished/missing products are skipped.
+{%- endcomment -%}
+{%- assign sw = product.metafields.aav.styled_with.value -%}
+{%- if sw and sw.size > 0 -%}
+{%- assign sw_count = 0 -%}
+{%- capture sw_items -%}
+  {%- for sp in sw -%}
+    {%- if sp and sp.id and sp.url != blank -%}
+    {%- assign sw_count = sw_count | plus: 1 -%}
+    <a class="aa-styled__item" href="{{ sp.url }}">
+      <span class="aa-styled__img">{%- if sp.featured_image -%}<img src="{{ sp.featured_image | image_url: width: 240 }}" alt="{{ sp.featured_image.alt | default: sp.title | escape }}" loading="lazy">{%- endif -%}</span>
+      <span class="aa-styled__body">
+        <span class="aa-styled__name">{{ sp.title }}</span>
+        <span class="aa-styled__price">{% if sp.price_varies %}From {% endif %}{% render 'aa-money', cents: sp.price_min %}</span>
+        <span class="aa-styled__go">View the piece <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+      </span>
+    </a>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- if sw_count > 0 -%}
+<div class="aa-styled" data-aa-styled>
+  <div class="aa-styled__cap">Styled with</div>
+  <p class="aa-styled__sub">Shown with this {{ product.type | default: 'piece' | downcase }} in our photographs</p>
+  <div class="aa-styled__list">{{ sw_items }}</div>
+</div>
+<style>
+  .aa-styled{margin:18px 0 0;padding:16px;border:1px solid var(--border-subtle,rgba(0,0,0,.12));border-radius:10px;background:var(--surface-raised)}
+  .aa-styled__cap{font-size:11px;letter-spacing:var(--tracking-eyebrow,.14em);text-transform:uppercase;color:var(--text-accent)}
+  .aa-styled__sub{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--text-secondary)}
+  .aa-styled__list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .aa-styled__item{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;border-radius:8px;transition:background .2s ease}
+  .aa-styled__item:hover{background:var(--surface-accent-tint,rgba(0,0,0,.03))}
+  .aa-styled__img{flex:none;width:72px;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:var(--surface-alt,#f3eee6)}
+  .aa-styled__img img{width:100%;height:100%;object-fit:cover;display:block}
+  .aa-styled__body{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .aa-styled__name{font-size:14px;font-weight:500;color:var(--text-primary,inherit)}
+  .aa-styled__price{font-size:13px;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+  .aa-styled__go{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+  .aa-styled__go i{transition:transform .2s ease}
+  .aa-styled__item:hover .aa-styled__go i{transform:translateX(2px)}
+</style>
+<script>
+(function(){
+  function place(){
+    var el=document.querySelector('[data-aa-styled]');
+    if(!el || el.dataset.aaPlaced) return;
+    var box=el.closest('.aa-buybox');
+    var det=box && box.querySelector('#aaPdpDetails');
+    if(!det) return;
+    det.parentNode.insertBefore(el, det);
+    el.dataset.aaPlaced='1';
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', place); } else { place(); }
+})();
+</script>
+{%- endif -%}
+{%- endif -%}
