@@ -1,0 +1,17 @@
+/* Art Avenue — product card media ratio.
+   Loaded after aa.css so these rules win where they overlap.
+   Supersedes the aspect-ratio:2/3 declarations on .aa-pcard__media in aa.css
+   (the desktop rule in the product card block, and the mobile !important
+   override inside the max-width:782px block).
+   Cards render 3:4 to match 1080x1440 product photography. */
+.aa-pcard__media{aspect-ratio:3/4;}
+@media (max-width:782px){
+  .aa-pcard__media{aspect-ratio:3/4 !important;}
+}
+
+/* Links inside product descriptions (PDP accordion + short description).
+   The theme otherwise renders them identical to body text. */
+.aa-product .rte a,
+.aa-accordion .rte a{color:var(--text-accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;transition:color .2s ease}
+.aa-product .rte a:hover,
+.aa-accordion .rte a:hover{color:var(--text-primary,inherit)}
