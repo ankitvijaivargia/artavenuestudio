@@ -12,7 +12,7 @@ Free, local tooling for www.artavenue.com. No paid APIs, no API keys.
 
 ## Weekly procedure (≈20 minutes)
 
-1. **Crawl.** The workflow runs every Monday 06:47 IST, or trigger it from *Actions → SEO crawl → Run workflow*. Download the `seo-crawl-N` artifact. Open `sitemap-report.html`, `links-report.html` and, from the second run on, `regressions.html`.
+1. **Crawl.** The workflow runs every Monday 06:47 IST (also on any change to the workflow or crawler config, or manually from *Actions → SEO crawl → Run workflow*). Each run posts its counts — issues by rule, new and resolved since last run — as a comment on the **SEO crawl reports** issue. For detail, download the `seo-crawl-N` artifact: `sitemap-report.html`, `links-report.html`, `regressions.html`.
    - Run locally instead: `npx seo-crawl-audit@0.15.1 scan https://www.artavenue.com/ --all --config seo/seo-audit.config.json` and a second pass with `--no-sitemap --pages 1500`.
 2. **Export the catalogue.** Run the two queries in `seo/queries/` against the Shopify Admin API (Claude's Shopify connector does this), merge the pages into `products.json` and `collections.json`.
 3. **Audit and compare.**
