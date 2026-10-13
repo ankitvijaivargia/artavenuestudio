@@ -37,4 +37,6 @@ Score each finding 1–3 on **business impact**, **SEO impact**, **confidence**,
 - `productUpdate` with `seo: { title }` alone **clears** an existing SEO description. Always send both fields.
 - Theme changes reach the live store only when merged into `theme-deploy` (Shopify GitHub sync). Admin API writes to the MAIN theme are blocked by design.
 - Crawler limitation (verified on a test site): with a sitemap present it fetches only sitemap URLs, so broken links need the second `--no-sitemap` pass. It flags redirect chains only above 3 hops; shorter chains appear in the redirect evidence.
+- Crawler bug (0.15.1, verified on the live site 13 Oct 2026): an empty child sitemap — Shopify's `sitemap_metaobject_pages_1.xml` — made it discard the whole sitemap. `seo/scripts/patch-crawler.sh` fixes this at install time and fails the run if the crawler version changes; delete it once fixed upstream.
+- Shopify returns HTTP 429 to fast crawlers. Keep `concurrency: 1` and `delay: 800` in the config; 429s in a report mean rate limiting, not broken pages.
 - Shopify session counts on artavenue.com are dominated by non-Indian desktop "direct" traffic that never adds to cart (≈90% in Oct 2026). Report conversion on India sessions, or the rate is meaningless.
