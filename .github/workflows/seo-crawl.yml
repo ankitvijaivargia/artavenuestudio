@@ -114,6 +114,15 @@ jobs:
             echo "| --- | --- | --- |"
             jq -r "$ALL | group_by(.ruleId) | map({r:.[0].ruleId,s:.[0].severity,n:length}) | sort_by(.s,-.n)[] | \"| \(.s) | \(.r) | \(.n) |\"" $J
             echo
+            echo "**Affected URLs for actionable rules (first 20 each):**"
+            for rule in noindex-in-sitemap missing-title missing-description missing-h1 missing-canonical orphan-sitemap-page broken-internal-link redirect-in-sitemap http-error canonical-target-error malformed-json-ld duplicate-title duplicate-description; do
+              n=$(jq --arg r "$rule" "[$ALL[] | select(.ruleId==\$r)] | length" $J)
+              if [ "$n" -gt 0 ]; then
+                echo "- **$rule** ($n):"
+                jq -r --arg r "$rule" "[$ALL[] | select(.ruleId==\$r)] | .[:20][] | \"  - \\(.url)\"" $J
+              fi
+            done
+            echo
             echo "**Sitemap:** $(jq -r '.sitemap | "\(.url // "none") · child sitemaps read: \(.sitemapCount // 0) · URLs: \((.urls // [])|length) · error: \(.error // "none")"' out/sitemap.json)"
             echo
             echo "**Sitemap probe (raw HTTP from the runner):**"
