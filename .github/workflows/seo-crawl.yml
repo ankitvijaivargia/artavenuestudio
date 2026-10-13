@@ -1,0 +1,63 @@
+# Weekly technical SEO crawl of www.artavenue.com using seo-crawl-audit (MIT, no API keys).
+# Runs on GitHub's runners (the site is crawled from GitHub, not from any Art Avenue machine).
+# Two passes, because the crawler only fetches sitemap URLs when a sitemap exists:
+#   1. sitemap pass  — indexability, canonicals, titles/descriptions, sitemap hygiene, schema JSON validity
+#   2. link pass     — follows internal links, so it finds broken links and non-sitemap pages
+# Reports are uploaded as workflow artifacts (kept 90 days). Nothing is committed back to the repo.
+# NOTE: this repository is public — do not add analytics exports, customer data or API keys here.
+name: SEO crawl (artavenue.com)
+
+on:
+  schedule:
+    - cron: "17 1 * * 1"   # Mondays 06:47 IST
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install crawler (pinned)
+        run: npm install --global seo-crawl-audit@0.15.1
+      - name: Restore previous baseline
+        uses: actions/cache/restore@v4
+        with:
+          path: .seo-baseline
+          key: seo-baseline-${{ github.run_id }}
+          restore-keys: seo-baseline-
+      - name: Sitemap pass
+        run: |
+          mkdir -p out .seo-baseline
+          seo-audit scan https://www.artavenue.com/ --all --config seo/seo-audit.config.json \
+            --output out/sitemap.json --report out/sitemap-report.html --no-history --no-cache || true
+      - name: Link pass
+        run: |
+          seo-audit scan https://www.artavenue.com/ --no-sitemap --pages 1500 --config seo/seo-audit.config.json \
+            --output out/links.json --report out/links-report.html --no-history --no-cache || true
+      - name: Compare with last week
+        run: |
+          if [ -f .seo-baseline/sitemap.json ]; then
+            seo-audit check https://www.artavenue.com/ --all --config seo/seo-audit.config.json \
+              --baseline .seo-baseline/sitemap.json --report out/regressions.html --no-history --no-cache --json \
+              > out/regressions.json || echo "::warning::Regressions detected — see out/regressions.html"
+          else
+            echo "No previous baseline yet; this run becomes the baseline."
+          fi
+          cp out/sitemap.json .seo-baseline/sitemap.json
+      - name: Save baseline for next run
+        uses: actions/cache/save@v4
+        with:
+          path: .seo-baseline
+          key: seo-baseline-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seo-crawl-${{ github.run_number }}
+          path: out/
+          retention-days: 90
