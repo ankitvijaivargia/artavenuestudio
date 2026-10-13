@@ -1,0 +1,19 @@
+# Shopify Admin GraphQL — collection export for catalog_audit.py.
+# Publication 199677050927 is the Online Store channel on artavenue.com.
+# Merge pages: jq -s '[.[].data.collections.nodes[]]' c*.json > collections.json
+query($after: String) {
+  collections(first: 50, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      id title handle updatedAt
+      seo { title description }
+      descriptionHtml
+      productsCount { count }
+      ruleSet { appliedDisjunctively rules { column relation condition } }
+      image { altText }
+      sortOrder templateSuffix
+      pub: publishedOnPublication(publicationId: "gid://shopify/Publication/199677050927")
+      products(first: 100) { nodes { handle status onlineStoreUrl } }
+    }
+  }
+}

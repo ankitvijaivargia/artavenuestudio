@@ -1,0 +1,21 @@
+# Shopify Admin GraphQL — product export for catalog_audit.py.
+# Run page by page (first:50, pass endCursor as $after) until hasNextPage is false,
+# then merge: jq -s '[.[].data.products.nodes[]]' p*.json > products.json
+query($after: String) {
+  products(first: 50, after: $after, sortKey: ID) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      id title handle status productType vendor tags onlineStoreUrl createdAt updatedAt
+      seo { title description }
+      descriptionHtml
+      variantsCount { count }
+      priceRangeV2 { minVariantPrice { amount } maxVariantPrice { amount } }
+      mediaCount { count }
+      media(first: 60) { nodes { alt mediaContentType ... on MediaImage { image { width height url } } } }
+      sd: metafield(namespace: "aav", key: "short_description") { value }
+      lt: metafield(namespace: "aav", key: "lead_time") { value }
+      dims: metafield(namespace: "aav", key: "size_dimensions") { value }
+      collections(first: 20) { nodes { handle } }
+    }
+  }
+}

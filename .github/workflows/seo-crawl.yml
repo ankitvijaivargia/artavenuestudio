@@ -1,0 +1,112 @@
+# Weekly technical SEO crawl of www.artavenue.com using seo-crawl-audit (MIT, no API keys).
+# Runs on GitHub's runners. Two passes, because the crawler only fetches sitemap URLs when a sitemap exists:
+#   1. sitemap pass  — indexability, canonicals, titles/descriptions, sitemap hygiene, JSON-LD validity
+#   2. link pass     — follows internal links, so it finds broken links and pages missing from the sitemap
+# Each run: HTML/JSON reports as an artifact (90 days), counts in the job summary, and a short
+# comment on the "SEO crawl reports" issue so results can be read without opening Actions.
+# NOTE: this repository is public — never add analytics exports, customer data or API keys here.
+name: SEO crawl (artavenue.com)
+
+on:
+  schedule:
+    - cron: "17 1 * * 1"   # Mondays 06:47 IST
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/seo-crawl.yml"
+      - "seo/seo-audit.config.json"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: seo-crawl
+  cancel-in-progress: false
+
+env:
+  SITE: https://www.artavenue.com/
+  CRAWLER: seo-crawl-audit@0.15.1
+  REPORT_ISSUE_TITLE: SEO crawl reports
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install crawler (pinned)
+        run: npm install --global "$CRAWLER"
+      - name: Restore previous baseline
+        uses: actions/cache/restore@v4
+        with:
+          path: .seo-baseline
+          key: seo-baseline-${{ github.run_id }}
+          restore-keys: seo-baseline-
+      - name: Sitemap pass
+        run: |
+          mkdir -p out .seo-baseline
+          seo-audit scan "$SITE" --all --config seo/seo-audit.config.json \
+            --output out/sitemap.json --report out/sitemap-report.html --no-history --no-cache
+      - name: Link pass
+        run: |
+          seo-audit scan "$SITE" --no-sitemap --pages 1500 --config seo/seo-audit.config.json \
+            --output out/links.json --report out/links-report.html --no-history --no-cache || true
+      - name: Compare with previous run
+        run: |
+          if [ -f .seo-baseline/sitemap.json ]; then BASE=.seo-baseline/sitemap.json; echo "COMPARED=previous run" >> "$GITHUB_ENV";
+          else BASE=out/sitemap.json; echo "COMPARED=none (first run — this run is the baseline)" >> "$GITHUB_ENV"; fi
+          set +e
+          seo-audit check "$SITE" --all --config seo/seo-audit.config.json --baseline "$BASE" \
+            --report out/regressions.html --no-history --no-cache --json > out/regressions.json
+          echo "CHECK_EXIT=$?" >> "$GITHUB_ENV"
+          cp out/sitemap.json .seo-baseline/sitemap.json
+      - name: Summarise
+        run: |
+          J=out/regressions.json
+          ALL='[.lifecycle.newIssues[], .lifecycle.ongoingIssues[], .lifecycle.unchangedIssues[]]'
+          {
+            echo "## SEO crawl — $(date -u +%Y-%m-%d)"
+            echo
+            echo "- Sitemap pass pages: $(jq '.pages|length' out/sitemap.json) · link pass pages: $(jq '.pages|length' out/links.json 2>/dev/null || echo n/a)"
+            echo "- Compared with: $COMPARED · regression check exit code: $CHECK_EXIT (0 = no blocking regressions)"
+            echo "- Current issues: $(jq -r "$ALL | group_by(.severity) | map(\"\(.[0].severity) \(length)\") | join(\" · \")" $J)"
+            echo "- New: $(jq '.lifecycle.newIssues|length' $J) · Resolved: $(jq '.lifecycle.resolvedIssues|length' $J)"
+            echo "- Unavailable pages found by the link pass (status 400+): $(jq '[.pages[] | select((.status // 0) >= 400)] | length' out/links.json 2>/dev/null || echo n/a)"
+            echo
+            echo "| Severity | Rule | Count |"
+            echo "| --- | --- | --- |"
+            jq -r "$ALL | group_by(.ruleId) | map({r:.[0].ruleId,s:.[0].severity,n:length}) | sort_by(.s,-.n)[] | \"| \(.s) | \(.r) | \(.n) |\"" $J
+            echo
+            echo "New this run (first 20):"
+            jq -r '.lifecycle.newIssues[:20][] | "- \(.severity) · \(.ruleId) · \(.url)"' $J
+            echo
+            echo "Full reports: artifact \`seo-crawl-${{ github.run_number }}\` on ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > out/summary.md
+          cat out/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Post summary to tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          N=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$REPORT_ISSUE_TITLE\" in:title" --json number --jq '.[0].number // empty')
+          if [ -z "$N" ]; then
+            N=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "$REPORT_ISSUE_TITLE" \
+              --body "Automated weekly crawl summaries for www.artavenue.com (workflow: seo-crawl.yml)." | grep -o '[0-9]*$')
+          fi
+          gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file out/summary.md
+      - name: Save baseline for next run
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .seo-baseline
+          key: seo-baseline-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-crawl-${{ github.run_number }}
+          path: out/
+          retention-days: 90
