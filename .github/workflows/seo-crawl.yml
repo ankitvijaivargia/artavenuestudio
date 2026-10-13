@@ -59,9 +59,10 @@ jobs:
             done
             curl -sS -A 'Mozilla/5.0 (compatible; seo-crawl-audit)' "${SITE}sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed -e 's#</\?loc>##g' -e 's#&amp;#\&#g' | while read -r c; do
               body=$(curl -sS -A 'Mozilla/5.0 (compatible; seo-crawl-audit)' -w '\n%{http_code} %{content_type}' "$c")
-              meta=$(printf '%s' "$body" | tail -1)
-              root=$(printf '%s' "$body" | head -c 400 | grep -o '<\(urlset\|sitemapindex\|[a-zA-Z:]*\)[ >]' | grep -v '?xml' | head -1)
-              locs=$(printf '%s' "$body" | grep -o '<loc>' | wc -l)
+              meta="${body##*$'\n'}"
+              head400="${body:0:400}"
+              root=$(grep -o '<\(urlset\|sitemapindex\)[ >]' <<< "$head400" | head -1)
+              locs=$(grep -o '<loc>' <<< "$body" | wc -l)
               echo "  - $meta · root ${root:-none} · $locs locs · $c"
             done
           } > out/sitemap-probe.txt 2>&1 || true
@@ -75,26 +76,38 @@ jobs:
         run: |
           seo-audit scan "$SITE" --no-sitemap --pages 900 --config seo/seo-audit.config.json \
             --output out/links.json --report out/links-report.html --no-history --no-cache || true
+      - name: Current issues (this run's own snapshot)
+        run: |
+          set +e
+          seo-audit check "$SITE" --all --config seo/seo-audit.config.json --baseline out/sitemap.json \
+            --report out/current.html --no-history --no-cache --json > out/current.json
+          echo "CURRENT_EXIT=$?" >> "$GITHUB_ENV"
       - name: Compare with previous run
         run: |
-          if [ -f .seo-baseline/sitemap.json ]; then BASE=.seo-baseline/sitemap.json; echo "COMPARED=previous run" >> "$GITHUB_ENV";
-          else BASE=out/sitemap.json; echo "COMPARED=none (first run — this run is the baseline)" >> "$GITHUB_ENV"; fi
           set +e
-          seo-audit check "$SITE" --all --config seo/seo-audit.config.json --baseline "$BASE" \
-            --report out/regressions.html --no-history --no-cache --json > out/regressions.json
-          echo "CHECK_EXIT=$?" >> "$GITHUB_ENV"
+          if [ -f .seo-baseline/sitemap.json ]; then
+            echo "COMPARED=previous run" >> "$GITHUB_ENV"
+            seo-audit check "$SITE" --all --config seo/seo-audit.config.json --baseline .seo-baseline/sitemap.json \
+              --report out/regressions.html --no-history --no-cache --json > out/regressions.json
+            echo "CHECK_EXIT=$?" >> "$GITHUB_ENV"
+          else
+            echo "COMPARED=none (first run — this run is the baseline)" >> "$GITHUB_ENV"
+            echo "CHECK_EXIT=n/a" >> "$GITHUB_ENV"
+            echo '{"lifecycle":{"newIssues":[],"resolvedIssues":[]}}' > out/regressions.json
+          fi
           cp out/sitemap.json .seo-baseline/sitemap.json
       - name: Summarise
         run: |
-          J=out/regressions.json
+          J=out/current.json
+          R=out/regressions.json
           ALL='[.lifecycle.newIssues[], .lifecycle.ongoingIssues[], .lifecycle.unchangedIssues[]]'
           {
             echo "## SEO crawl — $(date -u +%Y-%m-%d)"
             echo
             echo "- Sitemap pass pages: $(jq '.pages|length' out/sitemap.json) · link pass pages: $(jq '.pages|length' out/links.json 2>/dev/null || echo n/a)"
-            echo "- Compared with: $COMPARED · regression check exit code: $CHECK_EXIT (0 = no blocking regressions)"
+            echo "- Compared with: $COMPARED · regression check exit code: $CHECK_EXIT (0 = no blocking regressions, 1 = regressions)"
             echo "- Current issues: $(jq -r "$ALL | group_by(.severity) | map(\"\(.[0].severity) \(length)\") | join(\" · \")" $J)"
-            echo "- New: $(jq '.lifecycle.newIssues|length' $J) · Resolved: $(jq '.lifecycle.resolvedIssues|length' $J)"
+            echo "- Since previous run — new: $(jq '.lifecycle.newIssues|length' $R) · resolved: $(jq '.lifecycle.resolvedIssues|length' $R)"
             echo "- Unavailable pages found by the link pass (status 400+): $(jq '[.pages[] | select((.status // 0) >= 400)] | length' out/links.json 2>/dev/null || echo n/a)"
             echo
             echo "| Severity | Rule | Count |"
@@ -110,7 +123,10 @@ jobs:
             jq -r '. as $s | [.pages[] | select((.status // 0) >= 400 or .error != null)] | .[:40][] | . as $p | ($s.pages | map(select((.internalLinks // []) | index($p.url)))) as $refs | "- \($p.status // $p.error) · \($p.url) · linked from \($refs|length) page(s), e.g. \($refs[0].url // "—")"' out/links.json 2>/dev/null || echo "- n/a"
             echo
             echo "New this run (first 20):"
-            jq -r '.lifecycle.newIssues[:20][] | "- \(.severity) · \(.ruleId) · \(.url)"' $J
+            jq -r '.lifecycle.newIssues[:20][] | "- \(.severity) · \(.ruleId) · \(.url)"' $R
+            echo
+            echo "Resolved since previous run (first 20):"
+            jq -r '.lifecycle.resolvedIssues[:20][] | "- \(.severity) · \(.ruleId) · \(.url)"' $R
             echo
             echo "Full reports: artifact \`seo-crawl-${{ github.run_number }}\` on ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           } > out/summary.md
