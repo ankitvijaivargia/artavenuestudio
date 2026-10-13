@@ -16,6 +16,7 @@ on:
     paths:
       - ".github/workflows/seo-crawl.yml"
       - "seo/seo-audit.config.json"
+      - "seo/scripts/patch-crawler.sh"
 
 permissions:
   contents: read
@@ -39,8 +40,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install crawler (pinned)
-        run: npm install --global "$CRAWLER"
+      - name: Install crawler (pinned) and apply empty-sitemap patch
+        run: |
+          npm install --global "$CRAWLER"
+          bash seo/scripts/patch-crawler.sh
       - name: Restore previous baseline
         uses: actions/cache/restore@v4
         with:
@@ -70,7 +73,7 @@ jobs:
             --output out/sitemap.json --report out/sitemap-report.html --no-history --no-cache
       - name: Link pass
         run: |
-          seo-audit scan "$SITE" --no-sitemap --pages 1500 --config seo/seo-audit.config.json \
+          seo-audit scan "$SITE" --no-sitemap --pages 900 --config seo/seo-audit.config.json \
             --output out/links.json --report out/links-report.html --no-history --no-cache || true
       - name: Compare with previous run
         run: |

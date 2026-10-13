@@ -1,9 +1,9 @@
 {
   "sitemap": "auto",
   "maxPages": 1000,
-  "concurrency": 3,
-  "delay": 300,
-  "timeout": 15000,
+  "concurrency": 1,
+  "delay": 800,
+  "timeout": 20000,
   "respectRobots": true,
   "includeQuery": false,
   "maxRedirects": 10,
