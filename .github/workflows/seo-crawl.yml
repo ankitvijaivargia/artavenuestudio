@@ -47,6 +47,22 @@ jobs:
           path: .seo-baseline
           key: seo-baseline-${{ github.run_id }}
           restore-keys: seo-baseline-
+      - name: Sitemap probe
+        run: |
+          mkdir -p out
+          {
+            for u in "${SITE}robots.txt" "${SITE}sitemap.xml"; do
+              echo "- $(curl -sS -o /dev/null -w '%{http_code} %{content_type} %{size_download}B' -A 'Mozilla/5.0 (compatible; seo-crawl-audit)' "$u") · $u"
+            done
+            curl -sS -A 'Mozilla/5.0 (compatible; seo-crawl-audit)' "${SITE}sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed -e 's#</\?loc>##g' -e 's#&amp;#\&#g' | while read -r c; do
+              body=$(curl -sS -A 'Mozilla/5.0 (compatible; seo-crawl-audit)' -w '\n%{http_code} %{content_type}' "$c")
+              meta=$(printf '%s' "$body" | tail -1)
+              root=$(printf '%s' "$body" | head -c 400 | grep -o '<\(urlset\|sitemapindex\|[a-zA-Z:]*\)[ >]' | grep -v '?xml' | head -1)
+              locs=$(printf '%s' "$body" | grep -o '<loc>' | wc -l)
+              echo "  - $meta · root ${root:-none} · $locs locs · $c"
+            done
+          } > out/sitemap-probe.txt 2>&1 || true
+          cat out/sitemap-probe.txt
       - name: Sitemap pass
         run: |
           mkdir -p out .seo-baseline
@@ -81,6 +97,14 @@ jobs:
             echo "| Severity | Rule | Count |"
             echo "| --- | --- | --- |"
             jq -r "$ALL | group_by(.ruleId) | map({r:.[0].ruleId,s:.[0].severity,n:length}) | sort_by(.s,-.n)[] | \"| \(.s) | \(.r) | \(.n) |\"" $J
+            echo
+            echo "**Sitemap:** $(jq -r '.sitemap | "\(.url // "none") · child sitemaps read: \(.sitemapCount // 0) · URLs: \((.urls // [])|length) · error: \(.error // "none")"' out/sitemap.json)"
+            echo
+            echo "**Sitemap probe (raw HTTP from the runner):**"
+            cat out/sitemap-probe.txt 2>/dev/null || echo "- not run"
+            echo
+            echo "**Unavailable URLs found by the link pass (first 40):**"
+            jq -r '. as $s | [.pages[] | select((.status // 0) >= 400 or .error != null)] | .[:40][] | . as $p | ($s.pages | map(select((.internalLinks // []) | index($p.url)))) as $refs | "- \($p.status // $p.error) · \($p.url) · linked from \($refs|length) page(s), e.g. \($refs[0].url // "—")"' out/links.json 2>/dev/null || echo "- n/a"
             echo
             echo "New this run (first 20):"
             jq -r '.lifecycle.newIssues[:20][] | "- \(.severity) · \(.ruleId) · \(.url)"' $J
