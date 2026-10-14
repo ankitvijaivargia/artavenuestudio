@@ -36,34 +36,49 @@
 </div></section>
 
 {%- when 'completeRoom' -%}
-{%- assign rail = p.collections.first.products | default: collections.all.products -%}
+{%- comment -%}Related rail: use the product's most specific collection (fewest products, 5+) and show products that follow this one in it, wrapping round ("You may also like" = next 1-4; "Complete the room" = next 5-8). Every product then gets links from its neighbours, instead of every page linking to the same first 4 products.{%- endcomment -%}
+{%- assign rail_col = p.collections.first -%}{%- assign rail_best = 9999 -%}
+{%- for rc in p.collections -%}{%- unless rc.handle == 'new-arrivals' or rc.handle == 'designer-favourites' or rc.handle == 'frontpage' or rc.handle == 'all' -%}{%- if rc.all_products_count > 4 and rc.all_products_count <= 50 and rc.all_products_count < rail_best -%}{%- assign rail_col = rc -%}{%- assign rail_best = rc.all_products_count -%}{%- endif -%}{%- endunless -%}{%- endfor -%}
+{%- assign rail = rail_col.products | default: collections.all.products -%}
+{%- assign rail_idx = -1 -%}{%- for rp in rail -%}{%- if rp.id == p.id -%}{%- assign rail_idx = forloop.index0 -%}{%- endif -%}{%- endfor -%}
+{%- assign rail_size = rail.size -%}
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Complete the Room</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Pieces our stylists pair with this</h2>
   <div class="grid-4 aa-modrail" style="margin-top:40px">
-    {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
+    {%- assign n = 0 -%}{%- if rail_size > 0 -%}{%- for k in (1..rail_size) -%}{%- if n >= 4 -%}{%- break -%}{%- endif -%}{%- assign rj = rail_idx | plus: k | plus: 4 | modulo: rail_size -%}{%- assign rp = rail[rj] -%}{%- if rp.id != p.id -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}{%- endif -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Lighting', ph_name:'Brass Meridian Pendant', ph_price:'₹ 64,000', ph_tone:'bronze' %}{% render 'aa-product-card', ph_cat:'Rugs', ph_name:'Aravalli Rug', ph_price:'₹ 2,20,000', ph_tone:'olive' %}{% render 'aa-product-card', ph_cat:'Tables', ph_name:'Udai Side Table', ph_price:'₹ 48,000', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Decor', ph_name:'Stone Vessel', ph_price:'₹ 12,000', ph_tone:'clay' %}{%- endif -%}
   </div>
 </div></section>
 
 {%- when 'pairs' -%}
-{%- assign rail = p.collections.first.products | default: collections.all.products -%}
+{%- comment -%}Related rail: use the product's most specific collection (fewest products, 5+) and show products that follow this one in it, wrapping round ("You may also like" = next 1-4; "Complete the room" = next 5-8). Every product then gets links from its neighbours, instead of every page linking to the same first 4 products.{%- endcomment -%}
+{%- assign rail_col = p.collections.first -%}{%- assign rail_best = 9999 -%}
+{%- for rc in p.collections -%}{%- unless rc.handle == 'new-arrivals' or rc.handle == 'designer-favourites' or rc.handle == 'frontpage' or rc.handle == 'all' -%}{%- if rc.all_products_count > 4 and rc.all_products_count <= 50 and rc.all_products_count < rail_best -%}{%- assign rail_col = rc -%}{%- assign rail_best = rc.all_products_count -%}{%- endif -%}{%- endunless -%}{%- endfor -%}
+{%- assign rail = rail_col.products | default: collections.all.products -%}
+{%- assign rail_idx = -1 -%}{%- for rp in rail -%}{%- if rp.id == p.id -%}{%- assign rail_idx = forloop.index0 -%}{%- endif -%}{%- endfor -%}
+{%- assign rail_size = rail.size -%}
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Frequently Styled Together</span>
   <h2 class="aa-h1" style="margin:16px 0 0">Complete the room</h2>
   <div class="grid-4 aa-modrail" style="margin-top:40px">
-    {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
+    {%- assign n = 0 -%}{%- if rail_size > 0 -%}{%- for k in (1..rail_size) -%}{%- if n >= 4 -%}{%- break -%}{%- endif -%}{%- assign rj = rail_idx | plus: k | plus: 4 | modulo: rail_size -%}{%- assign rp = rail[rj] -%}{%- if rp.id != p.id -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}{%- endif -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Textiles', ph_name:'Handwoven Wool Throw', ph_price:'₹ 8,400', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Seating', ph_name:'Kashi Linen Sofa', ph_price:'₹ 3,20,000', ph_tone:'clay' %}{% render 'aa-product-card', ph_cat:'Decor', ph_name:'Stone Vessel', ph_price:'₹ 12,000', ph_tone:'bronze' %}{% render 'aa-product-card', ph_cat:'Rugs', ph_name:'Aravalli Rug', ph_price:'₹ 2,20,000', ph_tone:'olive' %}{%- endif -%}
   </div>
 </div></section>
 
 {%- when 'related' -%}
-{%- assign rail = p.collections.first.products | default: collections.all.products -%}
+{%- comment -%}Related rail: use the product's most specific collection (fewest products, 5+) and show products that follow this one in it, wrapping round ("You may also like" = next 1-4; "Complete the room" = next 5-8). Every product then gets links from its neighbours, instead of every page linking to the same first 4 products.{%- endcomment -%}
+{%- assign rail_col = p.collections.first -%}{%- assign rail_best = 9999 -%}
+{%- for rc in p.collections -%}{%- unless rc.handle == 'new-arrivals' or rc.handle == 'designer-favourites' or rc.handle == 'frontpage' or rc.handle == 'all' -%}{%- if rc.all_products_count > 4 and rc.all_products_count <= 50 and rc.all_products_count < rail_best -%}{%- assign rail_col = rc -%}{%- assign rail_best = rc.all_products_count -%}{%- endif -%}{%- endunless -%}{%- endfor -%}
+{%- assign rail = rail_col.products | default: collections.all.products -%}
+{%- assign rail_idx = -1 -%}{%- for rp in rail -%}{%- if rp.id == p.id -%}{%- assign rail_idx = forloop.index0 -%}{%- endif -%}{%- endfor -%}
+{%- assign rail_size = rail.size -%}
 <section class="aa-section aa-alt"><div class="aa-wrap">
   <span class="aa-eyebrow aa-eyebrow--rule">Continue Exploring</span>
   <h2 class="aa-h1" style="margin:16px 0 0">You may also like</h2>
   <div class="grid-4 aa-modrail" style="margin-top:40px">
-    {%- assign n = 0 -%}{%- for rp in rail -%}{%- if rp.id != p.id and n < 4 -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}
+    {%- assign n = 0 -%}{%- if rail_size > 0 -%}{%- for k in (1..rail_size) -%}{%- if n >= 4 -%}{%- break -%}{%- endif -%}{%- assign rj = rail_idx | plus: k | modulo: rail_size -%}{%- assign rp = rail[rj] -%}{%- if rp.id != p.id -%}{% render 'aa-product-card', product: rp %}{%- assign n = n | plus: 1 -%}{%- endif -%}{%- endfor -%}{%- endif -%}
     {%- if n == 0 -%}{% render 'aa-product-card', ph_cat:'Seating', ph_name:'Kashi Linen Sofa', ph_price:'₹ 3,20,000', ph_tone:'stone' %}{% render 'aa-product-card', ph_cat:'Tables', ph_name:'Amer Marble Table', ph_price:'₹ 4,10,000', ph_tone:'clay' %}{% render 'aa-product-card', ph_cat:'Storage', ph_name:'Jodha Sideboard', ph_price:'₹ 2,60,000', ph_tone:'espresso' %}{% render 'aa-product-card', ph_cat:'Lighting', ph_name:'Brass Meridian Pendant', ph_price:'₹ 64,000', ph_tone:'bronze' %}{%- endif -%}
   </div>
 </div></section>
