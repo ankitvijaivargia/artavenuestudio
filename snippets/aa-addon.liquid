@@ -66,7 +66,7 @@
           <label class="aa-addon__opt">
             <input type="radio" name="aa-addon-v" value="{{ v.id }}" data-price="{{ v.price }}" data-label="{{ lbl | escape }}" data-with="{{ wth | escape }}"{% if v.option1 == def %} checked{% endif %}>
             <span class="aa-addon__optname">{{ lbl }}</span>
-            <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price %}</span>
+            <span class="aa-addon__optprice">+ {% render 'aa-money', cents: v.price, exgst: true %}</span>
           </label>
           {%- endfor -%}
         </div>
@@ -151,7 +151,9 @@
     if(el.textContent!==want) el.textContent=want;
   }
   var bOv=null, sOv=null, ptl=[];
-  var GSTSUF = {{ cart.taxes_included | json }} ? '' : ' + GST';
+  var EXG = {{ settings.aa_price_before_gst | json }};
+  function fmtx(c){ return fmt(EXG ? Math.round((+c||0)*100/118) : c); }
+  var GSTSUF = EXG ? ' + GST' : '';
 
   function render(){
     var r=box.querySelector('input[name="aa-addon-v"]:checked');
@@ -164,14 +166,14 @@
     }
     var q=qty(), bp=pv.p*q, addP=+r.getAttribute('data-price')||0, tot=bp+addP;
     txt('[data-sum-pl]', ptype + (pv.l ? ' '+MID+' '+pv.l : '') + (q>1 ? ' \u00d7 '+q : ''));
-    txt('[data-sum-pp]', fmt(bp));
+    txt('[data-sum-pp]', fmtx(bp));
     txt('[data-sum-al]', r.getAttribute('data-label')||'');
-    txt('[data-sum-ap]', fmt(addP));
-    txt('[data-sum-tot]', fmt(tot));
+    txt('[data-sum-ap]', fmtx(addP));
+    txt('[data-sum-tot]', fmtx(tot)+GSTSUF);
     if(sum) sum.classList.add('is-shown');
     var wth=' with '+(r.getAttribute('data-with')||'side tables');
     ptl.forEach(function(d){
-      var b=d.firstChild, s=d.lastChild, tv=fmt(tot)+GSTSUF;
+      var b=d.firstChild, s=d.lastChild, tv=fmtx(tot)+GSTSUF;
       if(b.textContent!==tv) b.textContent=tv;
       if(s.textContent!==wth) s.textContent=wth;
       d.classList.add('is-shown');
@@ -182,8 +184,8 @@
   function setup(){
     var f=buyForm();
     var btn=f && f.querySelector('[type="submit"]');
-    bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmt(t)+GSTSUF; });
-    sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmt(t)+GSTSUF; });
+    bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmtx(t)+GSTSUF; });
+    sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmtx(t)+GSTSUF; });
     /* Secondary total line under each headline price (mobile head + desktop buybox). The
        headline price element itself is left alone. Sticky bar is outside .aa-product. */
     document.querySelectorAll('.aa-product [data-aa-price-display]').forEach(function(el){

@@ -2,8 +2,12 @@
   aa-money — format a price (in cents) as ₹ with Indian lakh grouping, no decimals.
   e.g. 14800000 -> ₹ 1,48,000   |   190000 -> ₹ 1,900
   param: cents (integer, the Shopify price in cents)
+  param: exgst (optional) — when the theme setting "Show prices before GST" is on,
+         show the price before GST (stored price ÷ 1.18).
 {%- endcomment -%}
-{%- assign rupees = cents | divided_by: 100 -%}
+{%- assign aa_c = cents -%}
+{%- if exgst and settings.aa_price_before_gst -%}{%- assign aa_c = cents | divided_by: 118.0 | round | times: 100 -%}{%- endif -%}
+{%- assign rupees = aa_c | divided_by: 100 -%}
 {%- assign s = rupees | append: '' -%}
 {%- assign n = s | size -%}
 {%- if n <= 3 -%}&#8377;&nbsp;{{ s }}
