@@ -7,12 +7,11 @@
   Tracking is done by watching the cart form's variant input, so this works with
   the grid engine and the rug engine alike without knowing either one's markup.
 
-  GST (29 Oct 2026): prices are entered before GST; 18% is added at checkout.
-  Main figure shows "+ GST"; the line below shows the GST-inclusive total.
-  If the store's "Include tax in prices" setting is ever switched back on,
-  this snippet falls back to the old "Inclusive of GST" display automatically.
+  GST (29 Oct 2026): Shopify prices are stored INCLUDING 18% GST (Razorpay Magic
+  Checkout charges the stored price as-is). With the theme setting
+  "Show prices before GST" on, the headline shows stored price / 1.18 with "+ GST",
+  and the line below shows the stored GST-inclusive price.
 {%- endcomment -%}
-{%- assign gst_rate = 18 -%}
 {%- assign disp_price = product.price -%}
 {%- assign price_prefix = '' -%}
 {%- assign lowest = 0 -%}{%- assign std_count = 0 -%}
@@ -26,16 +25,16 @@
   {%- assign disp_price = lowest -%}
   {%- if std_count > 1 -%}{%- assign price_prefix = 'From ' -%}{%- endif -%}
 {%- endif -%}
-{%- assign incl_price = disp_price | times: gst_rate | divided_by: 100 | plus: disp_price -%}
+{%- assign exg = settings.aa_price_before_gst -%}
 {%- if show_price -%}
   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:16px">
-    <span class="aa-price" style="margin-top:0" data-aa-price-display>{{ price_prefix }}{% render 'aa-money', cents: disp_price %}{% unless cart.taxes_included %}<span class="aa-price-gst" style="font-size:.6em;letter-spacing:.04em;margin-left:6px">+ GST</span>{% endunless %}</span>
+    <span class="aa-price" style="margin-top:0" data-aa-price-display>{{ price_prefix }}{% render 'aa-money', cents: disp_price, exgst: true %}{% if exg %}<span class="aa-price-gst" style="font-size:.6em;letter-spacing:.04em;margin-left:6px">+ GST</span>{% endif %}</span>
     {%- if caption != blank -%}<span class="aa-price-cap" style="margin-top:0">{{ caption }}</span>{%- endif -%}
   </div>
-  {%- if cart.taxes_included -%}
-    <div class="aa-price-note" style="font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);margin-top:6px">Inclusive of GST &middot; Complimentary delivery across India</div>
+  {%- if exg -%}
+    <div class="aa-price-note" style="font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);margin-top:6px"><span data-aa-price-incl>{{ price_prefix }}{% render 'aa-money', cents: disp_price %}</span> incl. 18% GST &middot; Complimentary delivery across India</div>
   {%- else -%}
-    <div class="aa-price-note" style="font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);margin-top:6px"><span data-aa-price-incl>{{ price_prefix }}{% render 'aa-money', cents: incl_price %}</span> incl. {{ gst_rate }}% GST &middot; Complimentary delivery across India</div>
+    <div class="aa-price-note" style="font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);margin-top:6px">Inclusive of GST &middot; Complimentary delivery across India</div>
   {%- endif -%}
 {%- elsif visibility == 'project-only' -%}
   <div class="aa-price aa-price--enquire">Project pricing <span>Quoted per project</span></div>
@@ -50,8 +49,7 @@
   if(window.aaPriceSyncInit) return;
   window.aaPriceSyncInit = true;
 
-  var TAX_INCLUDED = {{ cart.taxes_included | json }};
-  var GST = {{ gst_rate }} / 100;
+  var EXG = {{ settings.aa_price_before_gst | json }};
   var PRICES = {
     {%- for v in product.variants -%}"{{ v.id }}": {{ v.price }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}
   };
@@ -60,20 +58,8 @@
     try{ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(rupees); }
     catch(e){ return '\\u20b9' + Math.round(rupees).toLocaleString('en-IN'); }
   }
-  function paint(txt, incl){
-    document.querySelectorAll('[data-aa-price-display]').forEach(function(el){
-      if(TAX_INCLUDED || incl == null){ el.textContent = txt; return; }
-      el.innerHTML = '';
-      el.appendChild(document.createTextNode(txt));
-      var g = document.createElement('span');
-      g.className = 'aa-price-gst';
-      g.style.cssText = 'font-size:.6em;letter-spacing:.04em;margin-left:6px';
-      g.textContent = '+ GST';
-      el.appendChild(g);
-    });
-    document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){
-      el.textContent = incl == null ? '' : incl;
-    });
+  function paint(txt){
+    document.querySelectorAll('[data-aa-price-display]').forEach(function(el){ el.textContent = txt; });
   }
 
   function start(){
@@ -86,7 +72,7 @@
 
     function apply(id){
       var p = PRICES[id];
-      if(typeof p === 'number') paint(money(p/100), money(Math.round(p * (1 + GST))/100));
+      if(typeof p === 'number') paint(money(p/100));
     }
 
     var rug = document.querySelector('[data-aa-rug]');
@@ -94,7 +80,7 @@
       rug.addEventListener('click', function(e){
         var b = e.target.closest('[data-rug-size]');
         if(!b) return;
-        if(b.dataset.custom){ paint('Priced on enquiry', null); }
+        if(b.dataset.custom){ paint('Priced on enquiry'); }
         else if(b.dataset.vid){ last = String(b.dataset.vid); apply(last); }
       });
     }
@@ -109,34 +95,40 @@
 
   if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
 
-  /* GST watcher: configurators (sofa, chair, rug, add-on) rewrite prices and the
-     Add to Cart label with plain text. Re-add "+ GST" and keep the incl.-GST line
-     in step with whatever the headline price now shows. */
-  if(TAX_INCLUDED) return;
-  var SEL = '.aa-price:not(.aa-price--enquire), [data-sticky-price], form[action*="/cart/add"] [type="submit"], .aa-addon__ptot b';
-  function amount(t){ var m = String(t).match(/₹\s?([\d,]+)/); return m ? +m[1].replace(/,/g,'') : 0; }
+  /* GST watcher. Every script (this one, sofa/chair/rug configurators, add-on) writes
+     the STORED GST-inclusive price as plain text. Convert any such price to the
+     before-GST figure (÷ 1.18) and add "+ GST"; a price already carrying "GST" was
+     written by the theme and is left alone. The incl.-GST note shows the stored price. */
+  if(!EXG) return;
+  var SEL = '.aa-price:not(.aa-price--enquire), [data-sticky-price], form[action*="/cart/add"] [type="submit"]';
+  var RX = /₹[\s ]?([\d,]+)/;
   function decorate(){
+    var inclText = null;
     document.querySelectorAll(SEL).forEach(function(el){
       var t = el.textContent || '';
-      if(!/₹/.test(t) || /GST/.test(t)) return;
+      var m = t.match(RX);
+      if(!m || /GST/.test(t)) return;
+      var incl = +m[1].replace(/,/g,'');
+      if(el.hasAttribute('data-aa-price-display') && inclText === null) inclText = (/From/.test(t) ? 'From ' : '') + money(incl);
+      var ex = money(Math.round(incl * 100 / 118));
+      var out = t.replace(RX, ex);
       if(el.classList.contains('aa-price')){
+        el.textContent = out;
         var g = document.createElement('span');
         g.className = 'aa-price-gst';
         g.style.cssText = 'font-size:.6em;letter-spacing:.04em;margin-left:6px';
         g.textContent = '+ GST';
         el.appendChild(g);
       } else {
-        el.appendChild(document.createTextNode(' + GST'));
+        el.textContent = out + ' + GST';
       }
     });
-    var head = document.querySelector('.aa-product [data-aa-price-display]') || document.querySelector('[data-aa-price-display]');
-    var a = head ? amount(head.textContent) : 0;
-    document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){
-      var want = a ? ((/From/.test(head.textContent) ? 'From ' : '') + money(Math.round(a * (1 + GST)))) : '';
-      if(el.textContent !== want) el.textContent = want;
-      var note = el.closest('.aa-price-note');
-      if(note) note.style.visibility = a ? '' : 'hidden';
-    });
+    if(inclText !== null){
+      document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){ if(el.textContent !== inclText) el.textContent = inclText; });
+    }
+    var head = document.querySelector('[data-aa-price-display]');
+    var priced = head && RX.test(head.textContent || '');
+    document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){ var n = el.closest('.aa-price-note'); if(n) n.style.visibility = priced ? '' : 'hidden'; });
   }
   var queued = false;
   function queue(){ if(queued) return; queued = true; requestAnimationFrame(function(){ queued = false; decorate(); }); }

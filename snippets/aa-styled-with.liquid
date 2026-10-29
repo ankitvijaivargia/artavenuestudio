@@ -18,7 +18,7 @@
       <span class="aa-styled__img">{%- if sp.featured_image -%}<img src="{{ sp.featured_image | image_url: width: 240 }}" alt="{{ sp.featured_image.alt | default: sp.title | escape }}" loading="lazy">{%- endif -%}</span>
       <span class="aa-styled__body">
         <span class="aa-styled__name">{{ sp.title }}</span>
-        <span class="aa-styled__price">{% if sp.price_varies %}From {% endif %}{% render 'aa-money', cents: sp.price_min %}{% unless cart.taxes_included %}<span class="aa-gst" style="font-size:.78em;letter-spacing:.03em;margin-left:4px;color:var(--text-muted)">+ GST</span>{% endunless %}</span>
+        <span class="aa-styled__price">{% if sp.price_varies %}From {% endif %}{% render 'aa-money', cents: sp.price_min, exgst: true %}{% if settings.aa_price_before_gst %}<span class="aa-gst" style="font-size:.78em;letter-spacing:.03em;margin-left:4px;color:var(--text-muted)">+ GST</span>{% endif %}</span>
         <span class="aa-styled__go">View the piece <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
       </span>
     </a>

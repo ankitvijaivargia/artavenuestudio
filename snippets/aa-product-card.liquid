@@ -42,7 +42,7 @@
       <div class="aa-pcard__body">
         {%- if product.type != blank -%}<div class="aa-pcard__cat">{{ product.type }}</div>{%- endif -%}
         <div class="aa-pcard__name">{{ product.title }}</div>
-        <div class="aa-pcard__price">{% if card_price > 0 %}{{ card_prefix }}{% render 'aa-money', cents: card_price %}{% unless cart.taxes_included %}<span class="aa-gst" style="font-size:.78em;letter-spacing:.03em;margin-left:4px;color:var(--text-muted)">+ GST</span>{% endunless %}{% else %}Price on request{% endif %}</div>
+        <div class="aa-pcard__price">{% if card_price > 0 %}{{ card_prefix }}{% render 'aa-money', cents: card_price, exgst: true %}{% if settings.aa_price_before_gst %}<span class="aa-gst" style="font-size:.78em;letter-spacing:.03em;margin-left:4px;color:var(--text-muted)">+ GST</span>{% endif %}{% else %}Price on request{% endif %}</div>
         {%- if ful_label != blank -%}<div class="aa-pcard__ful">{{ ful_label }}</div>{%- endif -%}
       </div>
     </a>
