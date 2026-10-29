@@ -164,8 +164,16 @@
             <div class="aa-sum__row"><span>{{ d.title }}</span><span class="num">−{{ d.total_allocated_amount | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
           {%- endfor -%}
           <div class="aa-sum__row"><span>Delivery within India</span><span class="aa-sum__free">Complimentary</span></div>
+          {%- if cart.taxes_included -%}
           <div class="aa-sum__total"><span>Total</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
           <p class="aa-sum__tax">Inclusive of GST</p>
+          {%- else -%}
+          {%- assign aa_gst = cart.total_price | times: 18 | divided_by: 100 -%}
+          {%- assign aa_total_incl = cart.total_price | plus: aa_gst -%}
+          <div class="aa-sum__row"><span>GST (18%)</span><span class="num">{{ aa_gst | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
+          <div class="aa-sum__total"><span>Total</span><b class="num">{{ aa_total_incl | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
+          <p class="aa-sum__tax">Inclusive of 18% GST &middot; final GST confirmed at checkout</p>
+          {%- endif -%}
 
           <details class="aa-sum__note"{% if cart.note != blank %} open{% endif %}>
             <summary>Add a note to your order <i class="ph ph-plus"></i></summary>
@@ -196,7 +204,7 @@
       </div>
 
       <div class="aa-cart__bar" id="aaCartBar">
-        <div><span>Total · incl. GST</span><b class="num">{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b></div>
+        <div><span>Total · incl. GST</span><b class="num">{% if cart.taxes_included %}{{ cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ cart.total_price | times: 18 | divided_by: 100 | plus: cart.total_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</b></div>
         <button type="submit" name="checkout">Checkout</button>
       </div>
     </form>
