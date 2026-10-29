@@ -5,6 +5,6 @@
     { "type": "checkbox", "id": "show_announcement", "label": "Show announcement bar", "default": true }
   ]},
   { "name": "Pricing", "settings": [
-    { "type": "checkbox", "id": "aa_price_before_gst", "label": "Show prices before GST (\"+ GST\")", "info": "Shopify prices are stored including 18% GST. When ticked, the site shows each price divided by 1.18 with \"+ GST\", plus the GST-inclusive total. Untick to show the stored GST-inclusive prices.", "default": true }
+    { "type": "checkbox", "id": "aa_price_before_gst", "label": "Show prices before GST (\"+ GST\")", "info": "Shopify prices are stored including 18% GST. Off (default): product pages show the GST-inclusive price. On: product pages show the price divided by 1.18 with \"+ GST\". The cart always shows the GST split.", "default": false }
   ]}
 ]
