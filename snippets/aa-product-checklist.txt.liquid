@@ -106,8 +106,8 @@ inventoryPolicy DENY is INERT on untracked variants - Shopify treats
 untracked as infinitely available. Set inventoryItem.tracked = true too,
 if you ever actually need DENY.
 
-Prices are GST-INCLUSIVE (shop.taxesIncluded = true). A quoted ex-GST cost
-MUST be grossed up before entry. Check the number against sibling products -
+Prices are entered BEFORE GST (shop.taxesIncluded = false, since 29 Oct 2026).
+18% GST is added at checkout. Enter the ex-GST price; do NOT gross it up. Check the number against sibling products -
 an odd figure beside round ones is usually an un-grossed cost price.
 
 Check for cannibalisation: a product must not undercut a sibling that offers
@@ -143,7 +143,7 @@ the upload sequence.
 [ ] Size hint (top right) shows a value - "One Size" included.
 [ ] Blurb under the price is a complete sentence, no ellipsis.
 [ ] Description body is not empty.
-[ ] Price is GST-inclusive and consistent with its family.
+[ ] Price is entered before GST and consistent with its family.
 [ ] Product appears in every intended collection (check counts, not rules).
 [ ] Product and collections are published to Online Store.
 [ ] First image is a clean 3/4 of the object, not a room shot.
