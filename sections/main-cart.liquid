@@ -147,9 +147,9 @@
                 </div>
               </div>
               <div class="aa-line__price num">
-                <b>{% if settings.aa_price_before_gst %}{{ item.final_line_price | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</b>
-                {%- if item.quantity > 1 -%}<small>{% if settings.aa_price_before_gst %}{{ item.final_price | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %} each</small>{%- endif -%}
-                {%- if item.original_line_price > item.final_line_price -%}<small><s>{% if settings.aa_price_before_gst %}{{ item.original_line_price | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.original_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</s></small>{%- endif -%}
+                <b>{% if settings.aa_price_before_gst %}{{ item.final_line_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</b>
+                {%- if item.quantity > 1 -%}<small>{% if settings.aa_price_before_gst %}{{ item.final_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %} each</small>{%- endif -%}
+                {%- if item.original_line_price > item.final_line_price -%}<small><s>{% if settings.aa_price_before_gst %}{{ item.original_line_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.original_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</s></small>{%- endif -%}
               </div>
             </div>
           {%- endfor -%}
@@ -160,12 +160,12 @@
         <aside class="aa-sum" aria-label="Order summary">
           <p class="aa-sum__h">Order Summary</p>
           {%- if settings.aa_price_before_gst -%}
-          {%- assign aa_ex_sub = cart.items_subtotal_price | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 -%}
-          {%- assign aa_ex_tot = cart.total_price | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 -%}
+          {%- assign aa_ex_sub = cart.items_subtotal_price | divided_by: 118.0 | round | times: 100 -%}
+          {%- assign aa_ex_tot = cart.total_price | divided_by: 118.0 | round | times: 100 -%}
           {%- assign aa_gst = cart.total_price | minus: aa_ex_tot -%}
           <div class="aa-sum__row"><span>Subtotal (before GST)</span><span class="num">{{ aa_ex_sub | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
           {%- for d in cart.cart_level_discount_applications -%}
-            <div class="aa-sum__row"><span>{{ d.title }}</span><span class="num">−{{ d.total_allocated_amount | times: 100 | divided_by: 118 | divided_by: 100 | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
+            <div class="aa-sum__row"><span>{{ d.title }}</span><span class="num">−{{ d.total_allocated_amount | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>
           {%- endfor -%}
           <div class="aa-sum__row"><span>Delivery within India</span><span class="aa-sum__free">Complimentary</span></div>
           <div class="aa-sum__row"><span>GST (18%)</span><span class="num">{{ aa_gst | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span></div>

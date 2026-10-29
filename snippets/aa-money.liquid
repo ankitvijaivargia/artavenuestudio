@@ -6,7 +6,7 @@
          show the price before GST (stored price ÷ 1.18).
 {%- endcomment -%}
 {%- assign aa_c = cents -%}
-{%- if exgst and settings.aa_price_before_gst -%}{%- assign aa_c = cents | times: 100 | divided_by: 118 -%}{%- endif -%}
+{%- if exgst and settings.aa_price_before_gst -%}{%- assign aa_c = cents | divided_by: 118.0 | round | times: 100 -%}{%- endif -%}
 {%- assign rupees = aa_c | divided_by: 100 -%}
 {%- assign s = rupees | append: '' -%}
 {%- assign n = s | size -%}
