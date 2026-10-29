@@ -108,5 +108,39 @@
   }
 
   if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+
+  /* GST watcher: configurators (sofa, chair, rug, add-on) rewrite prices and the
+     Add to Cart label with plain text. Re-add "+ GST" and keep the incl.-GST line
+     in step with whatever the headline price now shows. */
+  if(TAX_INCLUDED) return;
+  var SEL = '.aa-price:not(.aa-price--enquire), [data-sticky-price], form[action*="/cart/add"] [type="submit"], .aa-addon__ptot b';
+  function amount(t){ var m = String(t).match(/₹\s?([\d,]+)/); return m ? +m[1].replace(/,/g,'') : 0; }
+  function decorate(){
+    document.querySelectorAll(SEL).forEach(function(el){
+      var t = el.textContent || '';
+      if(!/₹/.test(t) || /GST/.test(t)) return;
+      if(el.classList.contains('aa-price')){
+        var g = document.createElement('span');
+        g.className = 'aa-price-gst';
+        g.style.cssText = 'font-size:.6em;letter-spacing:.04em;margin-left:6px';
+        g.textContent = '+ GST';
+        el.appendChild(g);
+      } else {
+        el.appendChild(document.createTextNode(' + GST'));
+      }
+    });
+    var head = document.querySelector('.aa-product [data-aa-price-display]') || document.querySelector('[data-aa-price-display]');
+    var a = head ? amount(head.textContent) : 0;
+    document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){
+      var want = a ? ((/From/.test(head.textContent) ? 'From ' : '') + money(Math.round(a * (1 + GST)))) : '';
+      if(el.textContent !== want) el.textContent = want;
+      var note = el.closest('.aa-price-note');
+      if(note) note.style.visibility = a ? '' : 'hidden';
+    });
+  }
+  var queued = false;
+  function queue(){ if(queued) return; queued = true; requestAnimationFrame(function(){ queued = false; decorate(); }); }
+  function watch(){ decorate(); new MutationObserver(queue).observe(document.body, {subtree:true, childList:true, characterData:true}); }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', watch); } else { watch(); }
 })();
 </script>
