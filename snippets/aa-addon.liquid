@@ -151,6 +151,7 @@
     if(el.textContent!==want) el.textContent=want;
   }
   var bOv=null, sOv=null, ptl=[];
+  var GSTSUF = {{ cart.taxes_included | json }} ? '' : ' + GST';
 
   function render(){
     var r=box.querySelector('input[name="aa-addon-v"]:checked');
@@ -170,7 +171,7 @@
     if(sum) sum.classList.add('is-shown');
     var wth=' with '+(r.getAttribute('data-with')||'side tables');
     ptl.forEach(function(d){
-      var b=d.firstChild, s=d.lastChild, tv=fmt(tot);
+      var b=d.firstChild, s=d.lastChild, tv=fmt(tot)+GSTSUF;
       if(b.textContent!==tv) b.textContent=tv;
       if(s.textContent!==wth) s.textContent=wth;
       d.classList.add('is-shown');
@@ -181,8 +182,8 @@
   function setup(){
     var f=buyForm();
     var btn=f && f.querySelector('[type="submit"]');
-    bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmt(t); });
-    sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmt(t); });
+    bOv=ov(btn, function(orig, t){ var lbl=(orig.split(MID)[0]||'').trim() || 'Add to Cart'; return lbl+' '+MID+' '+fmt(t)+GSTSUF; });
+    sOv=ov(document.querySelector('[data-sticky-price]'), function(orig, t){ return fmt(t)+GSTSUF; });
     /* Secondary total line under each headline price (mobile head + desktop buybox). The
        headline price element itself is left alone. Sticky bar is outside .aa-product. */
     document.querySelectorAll('.aa-product [data-aa-price-display]').forEach(function(el){
