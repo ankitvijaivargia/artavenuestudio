@@ -131,7 +131,7 @@
     document.querySelectorAll('[data-aa-price-incl]').forEach(function(el){ var n = el.closest('.aa-price-note'); if(n) n.style.visibility = priced ? '' : 'hidden'; });
   }
   var queued = false;
-  function queue(){ if(queued) return; queued = true; requestAnimationFrame(function(){ queued = false; decorate(); }); }
+  function queue(){ if(queued) return; queued = true; setTimeout(function(){ queued = false; decorate(); }, 30); }
   function watch(){ decorate(); new MutationObserver(queue).observe(document.body, {subtree:true, childList:true, characterData:true}); }
   if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', watch); } else { watch(); }
 })();
