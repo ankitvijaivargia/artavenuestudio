@@ -1,4 +1,4 @@
-{%- comment -%} Cart always shows the GST split: lines and subtotal before GST, GST (18%), total incl. GST. Prices are stored incl. 18% GST. {%- endcomment -%}
+{%- comment -%} Cart lines show GST-inclusive prices; the order summary shows subtotal before GST, GST (18%) and total. Prices are stored incl. 18% GST. {%- endcomment -%}
 {%- assign aa_cart_gst_split = true -%}
 {%- comment -%}
   Cart page — two-column (items + order summary), stacked on mobile.
@@ -149,9 +149,9 @@
                 </div>
               </div>
               <div class="aa-line__price num">
-                <b>{% if aa_cart_gst_split %}{{ item.final_line_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</b>
-                {%- if item.quantity > 1 -%}<small>{% if aa_cart_gst_split %}{{ item.final_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.final_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %} each</small>{%- endif -%}
-                {%- if item.original_line_price > item.final_line_price -%}<small><s>{% if aa_cart_gst_split %}{{ item.original_line_price | divided_by: 118.0 | round | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% else %}{{ item.original_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}{% endif %}</s></small>{%- endif -%}
+                <b>{{ item.final_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</b>
+                {%- if item.quantity > 1 -%}<small>{{ item.final_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }} each</small>{%- endif -%}
+                {%- if item.original_line_price > item.final_line_price -%}<small><s>{{ item.original_line_price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</s></small>{%- endif -%}
               </div>
             </div>
           {%- endfor -%}
