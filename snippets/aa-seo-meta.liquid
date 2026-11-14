@@ -32,18 +32,27 @@
 {%- endif %}
 
 {%- comment -%}
-  Structured data, v2 (14 Nov 2026). One Organization entity on every page; WebSite on the home page;
-  Product offers point to it as seller and carry free-shipping-within-India details and the no-returns policy.
-  Facts approved by Ankit (14 Nov 2026): free delivery within India at serviceable pin codes (remote-location
-  charges, if any, are quoted at delivery); social profiles are @artavenueindia; Ankit Vijaivargia named as founder;
-  no returns or refunds (made to order), defective pieces repaired or replaced.
-  No address is published until the post-Ghitorni studio address is confirmed.
+  Structured data, v3 (14 Nov 2026). Facts approved by Ankit:
+  - head office and factory in Jaipur; showroom in New Delhi (Ghitorni, MG Road, open 11 am–8 pm daily);
+  - free delivery within India at serviceable pin codes (remote-location charges quoted at delivery),
+    usual transit 5–7 working days after dispatch; made-to-order handling time from aav.lead_time;
+  - no returns or refunds (made to order); defective pieces repaired or replaced;
+  - social profiles @artavenueindia; Ankit Vijaivargia named as founder.
+  Entities: /#organization (on every page), /#showroom (department), /#website (home).
+  Products with options are a ProductGroup with one Product per variant; single-variant products stay a Product.
 {%- endcomment -%}
 {%- liquid
   assign aa_site = shop.url
   assign aa_org_id = aa_site | append: '/#organization'
   assign aa_web_id = aa_site | append: '/#website'
 -%}
+{%- capture aa_returns -%}{
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "IN",
+        "returnPolicyCountry": "IN",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+        "merchantReturnLink": {{ aa_site | append: '/policies/refund-policy' | json }}
+      }{%- endcapture -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -57,8 +66,15 @@
       {%- if shop.brand.logo %}
       "logo": {{ shop.brand.logo | image_url: width: 600 | prepend: 'https:' | json }},
       {%- endif %}
-      "description": "Art Avenue is an Indian design house making handcrafted furniture and hand-tufted and hand-knotted wool rugs to order, with interior design for homes in Delhi NCR.",
+      "description": "Art Avenue is an Indian design house that makes handcrafted furniture and hand-tufted and hand-knotted wool rugs to order in its own workshop in Jaipur, with a showroom in New Delhi and interior design for homes in Delhi NCR.",
       "founder": { "@type": "Person", "name": "Ankit Vijaivargia" },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Jaipur",
+        "addressRegion": "Rajasthan",
+        "postalCode": "302029",
+        "addressCountry": "IN"
+      },
       "email": "shop@artavenue.com",
       "telephone": "+91-98280-80095",
       "contactPoint": {
@@ -68,20 +84,37 @@
         "email": "shop@artavenue.com",
         "areaServed": "IN"
       },
+      "department": { "@id": {{ aa_site | append: '/#showroom' | json }} },
       "sameAs": [
         "https://www.instagram.com/artavenueindia/",
         "https://www.facebook.com/artavenueindia",
         "https://www.pinterest.com/artavenueindia/"
       ],
-      "hasMerchantReturnPolicy": { "@id": {{ aa_site | append: '/#returns' | json }} }
+      "hasMerchantReturnPolicy": {{ aa_returns }}
     },
     {
-      "@type": "MerchantReturnPolicy",
-      "@id": {{ aa_site | append: '/#returns' | json }},
-      "applicableCountry": "IN",
-      "returnPolicyCountry": "IN",
-      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
-      "merchantReturnLink": {{ aa_site | append: '/policies/refund-policy' | json }}
+      "@type": "FurnitureStore",
+      "@id": {{ aa_site | append: '/#showroom' | json }},
+      "name": "Art Avenue — New Delhi Showroom",
+      "url": {{ aa_site | append: '/pages/contact' | json }},
+      "parentOrganization": { "@id": {{ aa_org_id | json }} },
+      "telephone": "+91-98280-80095",
+      "email": "shop@artavenue.com",
+      "priceRange": "₹₹₹",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "2nd Floor, Plot No. 844, opp. Metro Pillar 113, MG Road, Ghitorni",
+        "addressLocality": "New Delhi",
+        "addressRegion": "Delhi",
+        "postalCode": "110030",
+        "addressCountry": "IN"
+      },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["https://schema.org/Monday","https://schema.org/Tuesday","https://schema.org/Wednesday","https://schema.org/Thursday","https://schema.org/Friday","https://schema.org/Saturday","https://schema.org/Sunday"],
+        "opens": "11:00",
+        "closes": "20:00"
+      }]
     }
     {%- if request.page_type == 'index' %},
     {
@@ -93,6 +126,43 @@
       "publisher": { "@id": {{ aa_org_id | json }} },
       "inLanguage": "en-IN"
     }
+    {%- elsif request.page_type == 'collection' %},
+    {
+      "@type": "CollectionPage",
+      "@id": {{ canonical_url | append: '#webpage' | json }},
+      "url": {{ canonical_url | json }},
+      "name": {{ collection.title | json }},
+      "isPartOf": { "@id": {{ aa_web_id | json }} },
+      "publisher": { "@id": {{ aa_org_id | json }} },
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": {{ collection.products_count }},
+        "itemListElement": [
+          {%- for p in collection.products limit: 24 -%}
+          { "@type": "ListItem", "position": {{ forloop.index }}, "url": {{ shop.url | append: p.url | json }}, "name": {{ p.title | json }} }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      }
+    }
+    {%- elsif request.page_type == 'page' and page.handle == 'about' %},
+    {
+      "@type": "AboutPage",
+      "@id": {{ canonical_url | append: '#webpage' | json }},
+      "url": {{ canonical_url | json }},
+      "name": {{ page.title | json }},
+      "isPartOf": { "@id": {{ aa_web_id | json }} },
+      "about": { "@id": {{ aa_org_id | json }} },
+      "mainEntity": { "@id": {{ aa_org_id | json }} }
+    }
+    {%- elsif request.page_type == 'page' and page.handle == 'contact' %},
+    {
+      "@type": "ContactPage",
+      "@id": {{ canonical_url | append: '#webpage' | json }},
+      "url": {{ canonical_url | json }},
+      "name": {{ page.title | json }},
+      "isPartOf": { "@id": {{ aa_web_id | json }} },
+      "about": { "@id": {{ aa_site | append: '/#showroom' | json }} }
+    }
     {%- endif %}
   ]
 }
@@ -103,8 +173,8 @@
   assign seo_desc = product.description | strip_html | strip_newlines | truncate: 5000
   comment
     Made-to-order window: the text after the last " in " of aav.lead_time ("Crafted in 6–8 weeks",
-    "... Other sizes crafted in 4–6 weeks"), the same rule the delivery copy in aa-pdp-details uses.
-    Converted to days for handlingTime. Variants in stock (tracked, quantity > 0) get no handling window.
+    "... Other sizes crafted in 4–6 weeks"), the same rule aa-pdp-details uses; converted to days.
+    In-stock variants (tracked, quantity > 0) get handling 0–2 days.
   endcomment
   assign aa_lead = product.metafields.aav.lead_time.value | default: ''
   assign aa_hmin = 0
@@ -117,46 +187,72 @@
       assign aa_hmax = aa_parts[1] | strip | times: 7
     endif
   endif
+  assign aa_multi = false
+  if product.has_only_default_variant == false and product.variants.size > 1
+    assign aa_multi = true
+  endif
+  assign aa_varies = ''
+  for opt in product.options_with_values
+    assign on = opt.name | downcase
+    if on contains 'size'
+      assign aa_varies = aa_varies | append: '"https://schema.org/size",'
+    elsif on contains 'material' or on contains 'construction' or on contains 'leather' or on contains 'fabric'
+      assign aa_varies = aa_varies | append: '"https://schema.org/material",'
+    elsif on contains 'colour' or on contains 'color'
+      assign aa_varies = aa_varies | append: '"https://schema.org/color",'
+    endif
+  endfor
+  assign aa_varies = aa_varies | remove_last: ','
 -%}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "@id": {{ canonical_url | append: '#product' | json }},
-  "name": {{ product.title | json }},
-  "url": {{ canonical_url | json }},
-  {%- if product.featured_media %}
-  "image": [
+{%- capture aa_images -%}{%- if product.featured_media -%}[
     {%- for media in product.media limit: 6 -%}
       {{ media.preview_image | image_url: width: 1600 | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
-  ],
+  ]{%- endif -%}{%- endcapture -%}
+{%- capture aa_brand -%}{ "@type": "Brand", "name": {{ shop.name | json }} }{%- endcapture -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  {%- if aa_multi %}
+  "@type": "ProductGroup",
+  "@id": {{ canonical_url | append: '#product' | json }},
+  "productGroupID": {{ product.id | append: '' | json }},
+  {%- if aa_varies != blank %}
+  "variesBy": [{{ aa_varies }}],
+  {%- endif %}
+  {%- else %}
+  "@type": "Product",
+  "@id": {{ canonical_url | append: '#product' | json }},
+  {%- endif %}
+  "name": {{ product.title | json }},
+  "url": {{ canonical_url | json }},
+  {%- if aa_images != blank %}
+  "image": {{ aa_images }},
   {%- endif %}
   "description": {{ seo_desc | json }},
-  {%- if product.selected_or_first_available_variant.sku != blank %}
-  "sku": {{ product.selected_or_first_available_variant.sku | json }},
-  {%- endif %}
-  "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
+  "brand": {{ aa_brand }},
   {%- if product.type != blank %}
   "category": {{ product.type | json }},
   {%- endif %}
-  "offers": [
+  {%- if aa_multi %}
+  "hasVariant": [
+  {%- else %}
+  {%- if product.selected_or_first_available_variant.sku != blank %}
+  "sku": {{ product.selected_or_first_available_variant.sku | json }},
+  {%- endif %}
+  "offers":
+  {%- endif %}
     {%- for variant in product.variants -%}
     {%- liquid
       assign aa_ready = false
       if variant.inventory_management == 'shopify' and variant.inventory_quantity > 0
         assign aa_ready = true
       endif
+      assign v_url = canonical_url | append: '?variant=' | append: variant.id
     -%}
-    {
+    {%- capture aa_offer -%}{
       "@type": "Offer",
-      "url": {{ canonical_url | append: '?variant=' | append: variant.id | json }},
-      {%- if variant.sku != blank %}
-      "sku": {{ variant.sku | json }},
-      {%- endif %}
-      {%- if variant.title != 'Default Title' %}
-      "name": {{ variant.title | json }},
-      {%- endif %}
+      "url": {{ v_url | json }},
       "price": {{ variant.price | divided_by: 100.0 | json }},
       "priceCurrency": {{ money_fmt | json }},
       "itemCondition": "https://schema.org/NewCondition",
@@ -165,29 +261,84 @@
       "shippingDetails": {
         "@type": "OfferShippingDetails",
         "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "INR" },
-        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" }
-        {%- if aa_ready == false and aa_hmax > 0 %},
+        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" },
         "deliveryTime": {
           "@type": "ShippingDeliveryTime",
-          "handlingTime": { "@type": "QuantitativeValue", "minValue": {{ aa_hmin }}, "maxValue": {{ aa_hmax }}, "unitCode": "DAY" }
+          {%- if aa_ready or aa_hmax == 0 %}
+          "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 2, "unitCode": "DAY" },
+          {%- else %}
+          "handlingTime": { "@type": "QuantitativeValue", "minValue": {{ aa_hmin }}, "maxValue": {{ aa_hmax }}, "unitCode": "DAY" },
+          {%- endif %}
+          "transitTime": { "@type": "QuantitativeValue", "minValue": 5, "maxValue": 7, "unitCode": "DAY" }
         }
-        {%- endif %}
       },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "IN",
-        "returnPolicyCountry": "IN",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
-        "merchantReturnLink": {{ aa_site | append: '/policies/refund-policy' | json }}
-      }
+      "hasMerchantReturnPolicy": {{ aa_returns }}
+    }{%- endcapture -%}
+    {%- if aa_multi %}
+    {
+      "@type": "Product",
+      "@id": {{ v_url | append: '#variant' | json }},
+      "name": {{ product.title | append: ' — ' | append: variant.title | json }},
+      "url": {{ v_url | json }},
+      {%- if variant.sku != blank %}
+      "sku": {{ variant.sku | json }},
+      {%- endif %}
+      {%- if variant.featured_media %}
+      "image": {{ variant.featured_media.preview_image | image_url: width: 1600 | prepend: 'https:' | json }},
+      {%- elsif aa_images != blank %}
+      "image": {{ aa_images }},
+      {%- endif %}
+      "brand": {{ aa_brand }},
+      {%- for opt in product.options_with_values -%}
+        {%- assign on = opt.name | downcase -%}
+        {%- assign ov = variant.options[forloop.index0] -%}
+        {%- if on contains 'size' %}
+      "size": {{ ov | json }},
+        {%- elsif on contains 'material' or on contains 'construction' or on contains 'leather' or on contains 'fabric' %}
+      "material": {{ ov | json }},
+        {%- elsif on contains 'colour' or on contains 'color' %}
+      "color": {{ ov | json }},
+        {%- endif -%}
+      {%- endfor %}
+      "offers": {{ aa_offer }}
     }{% unless forloop.last %},{% endunless %}
+    {%- else -%}
+    {{ aa_offer }}
+    {%- endif -%}
     {%- endfor -%}
+  {%- if aa_multi %}
   ]
+  {%- endif %}
 }
 </script>
 {%- endif %}
 
 {%- if request.page_type == 'product' or request.page_type == 'collection' %}
+{%- liquid
+  comment
+    Breadcrumb: Home › category › product. Product pages use the first matching category collection from a
+    fixed priority list, so canonical /products/ URLs (no collection in the URL) still get a category level.
+  endcomment
+  assign aa_cat = nil
+  if request.page_type == 'product'
+    assign aa_pri = 'sofas,armchairs,beds,wardrobes,tv-units,sideboards,console-tables,coffee-tables,bedside-tables,chests-of-drawers,trunks,side-tables,cabinets,ottomans-benches,chairs-and-ottomans,hand-knotted-rugs,hand-tufted-rugs,rugs,furniture' | split: ','
+    if collection
+      assign aa_cat = collection
+    else
+      for h in aa_pri
+        for c in product.collections
+          if c.handle == h
+            assign aa_cat = c
+            break
+          endif
+        endfor
+        if aa_cat
+          break
+        endif
+      endfor
+    endif
+  endif
+-%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -196,8 +347,8 @@
     { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ shop.url | json }} }
     {%- if request.page_type == 'collection' %},
     { "@type": "ListItem", "position": 2, "name": {{ collection.title | json }}, "item": {{ shop.url | append: collection.url | json }} }
-    {%- elsif collection %},
-    { "@type": "ListItem", "position": 2, "name": {{ collection.title | json }}, "item": {{ shop.url | append: collection.url | json }} },
+    {%- elsif aa_cat %},
+    { "@type": "ListItem", "position": 2, "name": {{ aa_cat.title | json }}, "item": {{ shop.url | append: aa_cat.url | json }} },
     { "@type": "ListItem", "position": 3, "name": {{ product.title | json }}, "item": {{ canonical_url | json }} }
     {%- else %},
     { "@type": "ListItem", "position": 2, "name": {{ product.title | json }}, "item": {{ canonical_url | json }} }
