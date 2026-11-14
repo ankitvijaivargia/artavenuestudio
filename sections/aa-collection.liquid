@@ -219,6 +219,27 @@
 </div>
 </section>
 
+{%- comment -%}
+  Full collection copy (buying guide). The hero above shows only the first 32 words; until Nov 2026
+  the rest of every collection description was never rendered. Shown on page 1 only (paginated
+  pages keep their own titles and don't repeat it), and only when there is more than the hero line.
+{%- endcomment -%}
+{%- assign aa_desc_words = col.description | strip_html | split: ' ' | size -%}
+{%- if paginate.current_page == 1 and aa_desc_words > 32 -%}
+<section class="aa-section aa-colguide" style="padding-top:var(--section-y-tight)">
+  <style>
+    .aa-colguide__inner{max-width:72ch;margin:0 auto}
+    .aa-colguide__inner h2,.aa-colguide__inner h3{font-family:var(--font-serif,inherit);font-weight:400;font-size:clamp(20px,2.2vw,26px);line-height:1.25;margin:40px 0 12px;color:var(--text-primary)}
+    .aa-colguide__inner p{font-size:var(--text-body,16px);line-height:1.75;color:var(--text-secondary,var(--text-primary));margin:0 0 16px}
+    .aa-colguide__inner a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+  </style>
+  <div class="aa-wrap"><div class="aa-colguide__inner">
+    <span class="aa-eyebrow aa-eyebrow--rule">About {{ col.title }}</span>
+    {{ col.description }}
+  </div></div>
+</section>
+{%- endif -%}
+
 {%- comment -%} Related collections — the next three live categories after this one {%- endcomment -%}
 {%- liquid
   assign n = rel.size
