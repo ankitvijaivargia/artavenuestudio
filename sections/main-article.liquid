@@ -1,7 +1,25 @@
-<article class="aa-section"><div class="aa-wrap" style="max-width:760px">
-  <span class="aa-eyebrow aa-eyebrow--rule">{{ article.tags.first | default: 'Journal' }}</span>
+{%- liquid
+  assign aa_words = article.content | strip_html | split: ' ' | size
+  assign aa_mins = aa_words | divided_by: 220 | plus: 1
+-%}
+<style>
+  .aa-article .rte h2{font-family:var(--font-serif,inherit);font-weight:400;font-size:clamp(22px,2.4vw,28px);line-height:1.25;color:var(--text-primary);margin:44px 0 12px}
+  .aa-article .rte h3{font-family:var(--font-serif,inherit);font-weight:400;font-size:22px;color:var(--text-primary);margin:32px 0 10px}
+  .aa-article .rte p{margin:0 0 18px}
+  .aa-article .rte a{color:var(--text-primary);text-decoration:underline;text-underline-offset:3px}
+  .aa-article .rte img{display:block;width:100%;height:auto;max-height:80vh;object-fit:cover;margin:28px 0 8px}
+  .aa-article .rte em{font-size:14px;color:var(--text-muted)}
+  .aa-article__meta{font-size:13px;letter-spacing:.04em;color:var(--text-muted);margin:-8px 0 28px}
+  .aa-article__hero img{display:block;width:100%;height:auto;max-height:78vh;object-fit:cover}
+</style>
+<article class="aa-section aa-article"><div class="aa-wrap" style="max-width:760px">
+  <a class="aa-eyebrow aa-eyebrow--rule" href="{{ blog.url }}" style="color:inherit">{{ blog.title | default: 'Journal' }}</a>
   <h1 class="aa-display-2" style="margin:16px 0 24px">{{ article.title }}</h1>
-  {% if article.image %}<div class="aa-fig" style="aspect-ratio:16/9;margin-bottom:32px"><img src="{{ article.image | image_url: width:1400 }}" alt="{{ article.title }}"></div>{% endif %}
+  <p class="aa-article__meta"><time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%-d %B %Y' }}</time> &middot; {{ aa_mins }} min read{% if article.author != blank %} &middot; {{ article.author }}{% endif %}</p>
+  {%- if article.image -%}
+  <div class="aa-article__hero" style="margin-bottom:32px">{{ article.image | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 800px) 760px, 100vw', alt: article.image.alt | default: article.title, fetchpriority: 'high' }}</div>
+  {%- endif -%}
   <div class="rte" style="line-height:1.72;color:var(--text-secondary)">{{ article.content }}</div>
+  <p style="margin-top:48px"><a href="{{ blog.url }}" style="color:inherit;text-decoration:underline;text-underline-offset:3px">&larr; More from the {{ blog.title | default: 'Journal' }}</a></p>
 </div></article>
 {% schema %}{ "name": "Article", "settings": [] }{% endschema %}
