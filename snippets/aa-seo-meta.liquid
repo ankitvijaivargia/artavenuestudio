@@ -279,6 +279,7 @@
       "@type": "Product",
       "@id": {{ v_url | append: '#variant' | json }},
       "name": {{ product.title | append: ' — ' | append: variant.title | json }},
+      "description": {{ seo_desc | truncate: 300 | json }},
       "url": {{ v_url | json }},
       {%- if variant.sku != blank %}
       "sku": {{ variant.sku | json }},
