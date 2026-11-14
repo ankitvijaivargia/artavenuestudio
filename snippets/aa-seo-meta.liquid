@@ -322,9 +322,27 @@
   assign aa_cat = nil
   if request.page_type == 'product'
     assign aa_pri = 'sofas,armchairs,beds,wardrobes,tv-units,sideboards,console-tables,coffee-tables,bedside-tables,chests-of-drawers,trunks,side-tables,cabinets,ottomans-benches,chairs-and-ottomans,hand-knotted-rugs,hand-tufted-rugs,rugs,furniture' | split: ','
+    assign aa_tl = product.title | downcase
+    assign aa_kw = 'coffee table:coffee-tables|tv unit:tv-units|sideboard:sideboards|console:console-tables|desk:console-tables|bedside:bedside-tables|chest of drawers:chests-of-drawers|wardrobe:wardrobes|sofa:sofas|chair:armchairs|ottoman:ottomans-benches|stool:ottomans-benches|bench:ottomans-benches|cabinet:cabinets|trunk:trunks|bed:beds' | split: '|'
     if collection
       assign aa_cat = collection
     else
+      for kv in aa_kw
+        assign kvp = kv | split: ':'
+        if aa_tl contains kvp[0]
+          for c in product.collections
+            if c.handle == kvp[1]
+              assign aa_cat = c
+              break
+            endif
+          endfor
+        endif
+        if aa_cat
+          break
+        endif
+      endfor
+    endif
+    if aa_cat == nil
       for h in aa_pri
         for c in product.collections
           if c.handle == h
