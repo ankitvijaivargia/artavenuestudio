@@ -1,0 +1,64 @@
+{%- comment -%}
+  Art Avenue — snippets/aa-enquiry-events.liquid
+  Counts enquiries as conversions (owner decision, 14 Nov 2026):
+    1. a click on any WhatsApp link (wa.me / api.whatsapp.com / whatsapp://)
+    2. a successful contact / lead-form submission (Shopify's /contact endpoint)
+
+  The theme does not load GA4 or Meta itself (they run as Shopify app pixels), so this
+  snippet only PUBLISHES a Shopify customer event, `aa_enquiry`. The "Art Avenue — Enquiries"
+  custom pixel (Settings → Customer events) subscribes to it and sends:
+    GA4  → generate_lead   (method: whatsapp | form)
+    Meta → Contact (WhatsApp) / Lead (form)
+  If the pixel is removed, this snippet does nothing visible and sends nothing.
+
+  No personal data is sent: only the method, where on the page the click happened,
+  the page type and path, and the product title/SKU when on a product page.
+{%- endcomment -%}
+<script>
+(function () {
+  var A = window.Shopify && window.Shopify.analytics;
+  if (!A || typeof A.publish !== 'function') return;
+  var base = {
+    page_type: {{ request.page_type | json }},
+    page_path: location.pathname{% if product %},
+    product_title: {{ product.title | json }},
+    product_sku: {{ product.selected_or_first_available_variant.sku | json }}{% endif %}
+  };
+  function send(method, where, leadType) {
+    var p = {}; for (var k in base) p[k] = base[k];
+    p.method = method; p.location = where || ''; if (leadType) p.lead_type = leadType;
+    try { A.publish('aa_enquiry', p); } catch (e) {}
+  }
+  function placeOf(el) {
+    if (el.closest('header, .aa-header, .aa-drawer')) return 'header';
+    if (el.closest('footer, .aa-footer')) return 'footer';
+    if (el.closest('.aa-buybox, .aa-product, [data-aa-config]')) return 'product';
+    if (el.closest('form, .aa-cart, [data-cart]')) return 'cart';
+    return 'body';
+  }
+  // 1. WhatsApp clicks (any link, including ones rendered later by the configurators)
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (/(^|\/\/)(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\b|^whatsapp:/i.test(h)) {
+      var m = h.match(/[?&]text=([^&]*)/), t = '';
+      if (m) { try { t = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch (x) {} }
+      var lt = /pricing/i.test(t) ? 'pricing' : /sample/i.test(t) ? 'samples' : /custom/i.test(t) ? 'custom'
+             : /project/i.test(t) ? 'project' : /trade/i.test(t) ? 'trade' : /shipping quote/i.test(t) ? 'shipping' : 'general';
+      send('whatsapp', placeOf(a), lt);
+    }
+  }, true);
+  // 2. Contact-form success: Shopify reloads the page with ?contact_posted=true
+  //    (and the lead form shows [data-aa-lead-success]). Count once per page load.
+  function formDone() {
+    var ok = /[?&]contact_posted=true/.test(location.search) || document.querySelector('[data-aa-lead-success]');
+    if (!ok) return;
+    var key = 'aa_enq_' + location.pathname + location.search;
+    try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, '1'); } catch (x) {}
+    var f = document.querySelector('[data-aa-lead-type]');
+    send('form', 'form', f ? f.value : 'contact');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', formDone); else formDone();
+})();
+</script>
