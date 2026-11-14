@@ -31,45 +31,93 @@
 <meta name="twitter:description" content="{{ og_desc | escape }}">
 {%- endif %}
 
-{%- if request.page_type == 'index' %}
+{%- comment -%}
+  Structured data, v2 (14 Nov 2026). One Organization entity on every page; WebSite on the home page;
+  Product offers point to it as seller and carry free-shipping-within-India details and the no-returns policy.
+  Facts approved by Ankit (14 Nov 2026): free delivery within India at serviceable pin codes (remote-location
+  charges, if any, are quoted at delivery); social profiles are @artavenueindia; Ankit Vijaivargia named as founder;
+  no returns or refunds (made to order), defective pieces repaired or replaced.
+  No address is published until the post-Ghitorni studio address is confirmed.
+{%- endcomment -%}
+{%- liquid
+  assign aa_site = shop.url
+  assign aa_org_id = aa_site | append: '/#organization'
+  assign aa_web_id = aa_site | append: '/#website'
+-%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
-      "@id": {{ shop.url | append: '/#organization' | json }},
+      "@id": {{ aa_org_id | json }},
       "name": {{ shop.name | json }},
-      "url": {{ shop.url | json }}
-      {%- if shop.brand.logo %},
-      "logo": {{ shop.brand.logo | image_url: width: 600 | prepend: 'https:' | json }}
+      "alternateName": "Art Avenue Design House",
+      "url": {{ aa_site | json }},
+      {%- if shop.brand.logo %}
+      "logo": {{ shop.brand.logo | image_url: width: 600 | prepend: 'https:' | json }},
       {%- endif %}
-      {%- if shop.phone != blank %},
-      "telephone": {{ shop.phone | json }}
-      {%- endif %}
-      {%- if shop.email != blank %},
-      "email": {{ shop.email | json }}
-      {%- endif %}
+      "description": "Art Avenue is an Indian design house making handcrafted furniture and hand-tufted and hand-knotted wool rugs to order, with interior design for homes in Delhi NCR.",
+      "founder": { "@type": "Person", "name": "Ankit Vijaivargia" },
+      "email": "shop@artavenue.com",
+      "telephone": "+91-98280-80095",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "telephone": "+91-98280-80095",
+        "email": "shop@artavenue.com",
+        "areaServed": "IN"
+      },
+      "sameAs": [
+        "https://www.instagram.com/artavenueindia/",
+        "https://www.facebook.com/artavenueindia",
+        "https://www.pinterest.com/artavenueindia/"
+      ],
+      "hasMerchantReturnPolicy": { "@id": {{ aa_site | append: '/#returns' | json }} }
     },
     {
-      "@type": "WebSite",
-      "@id": {{ shop.url | append: '/#website' | json }},
-      "name": {{ shop.name | json }},
-      "url": {{ shop.url | json }},
-      "publisher": { "@id": {{ shop.url | append: '/#organization' | json }} },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "{{ shop.url }}/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "@type": "MerchantReturnPolicy",
+      "@id": {{ aa_site | append: '/#returns' | json }},
+      "applicableCountry": "IN",
+      "returnPolicyCountry": "IN",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+      "merchantReturnLink": {{ aa_site | append: '/policies/refund-policy' | json }}
     }
+    {%- if request.page_type == 'index' %},
+    {
+      "@type": "WebSite",
+      "@id": {{ aa_web_id | json }},
+      "name": {{ shop.name | json }},
+      "alternateName": "Art Avenue Design House",
+      "url": {{ aa_site | json }},
+      "publisher": { "@id": {{ aa_org_id | json }} },
+      "inLanguage": "en-IN"
+    }
+    {%- endif %}
   ]
 }
 </script>
-{%- endif %}
 
 {%- if request.page_type == 'product' %}
-{%- assign seo_desc = product.description | strip_html | strip_newlines | truncate: 5000 -%}
+{%- liquid
+  assign seo_desc = product.description | strip_html | strip_newlines | truncate: 5000
+  comment
+    Made-to-order window: the text after the last " in " of aav.lead_time ("Crafted in 6–8 weeks",
+    "... Other sizes crafted in 4–6 weeks"), the same rule the delivery copy in aa-pdp-details uses.
+    Converted to days for handlingTime. Variants in stock (tracked, quantity > 0) get no handling window.
+  endcomment
+  assign aa_lead = product.metafields.aav.lead_time.value | default: ''
+  assign aa_hmin = 0
+  assign aa_hmax = 0
+  if aa_lead contains ' in '
+    assign aa_win = aa_lead | split: ' in ' | last | downcase | remove: 'weeks' | remove: 'week' | remove: '.' | strip | replace: '–', '-' | replace: '—', '-'
+    assign aa_parts = aa_win | split: '-'
+    if aa_parts.size == 2
+      assign aa_hmin = aa_parts[0] | strip | times: 7
+      assign aa_hmax = aa_parts[1] | strip | times: 7
+    endif
+  endif
+-%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -94,6 +142,12 @@
   {%- endif %}
   "offers": [
     {%- for variant in product.variants -%}
+    {%- liquid
+      assign aa_ready = false
+      if variant.inventory_management == 'shopify' and variant.inventory_quantity > 0
+        assign aa_ready = true
+      endif
+    -%}
     {
       "@type": "Offer",
       "url": {{ canonical_url | append: '?variant=' | append: variant.id | json }},
@@ -107,7 +161,25 @@
       "priceCurrency": {{ money_fmt | json }},
       "itemCondition": "https://schema.org/NewCondition",
       "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
-      "seller": { "@type": "Organization", "name": {{ shop.name | json }} }
+      "seller": { "@type": "Organization", "@id": {{ aa_org_id | json }}, "name": {{ shop.name | json }} },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "INR" },
+        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" }
+        {%- if aa_ready == false and aa_hmax > 0 %},
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": { "@type": "QuantitativeValue", "minValue": {{ aa_hmin }}, "maxValue": {{ aa_hmax }}, "unitCode": "DAY" }
+        }
+        {%- endif %}
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "IN",
+        "returnPolicyCountry": "IN",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+        "merchantReturnLink": {{ aa_site | append: '/policies/refund-policy' | json }}
+      }
     }{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ]
