@@ -1,0 +1,26 @@
+/* Art Avenue — brand layer (Split Star identity, Nov 2026).
+   Loaded after aa.css; overrides only brand tokens, the header wordmark and the footer brand block.
+   Mark: jaali star cut by a dovetail joint, drawn as a CSS mask so it takes the element's colour. */
+:root{
+  --aa-noir:#1E1A17; --aa-brass:#B8975F; --aa-brass-deep:#8A6838; --aa-madder:#8A3A2A; --aa-madder-ivory:#F3E9D8;
+  --aa-espresso:#1E1A17; --aa-bronze-soft:#B8975F;
+  --font-logo:"Marcellus","Cormorant Garamond",Georgia,serif;
+  --aa-mark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='8.6 8.6 82.8 82.8'%3E%3Cpath d='M79.3 37.9 79.3 20.7 62.1 20.7 50.0 8.6 37.9 20.7 20.7 20.7 20.7 37.9 10.1 48.5 39.8 48.5 35.8 38.5 64.2 38.5 60.2 48.5 89.9 48.5ZM20.7 62.1 20.7 79.3 37.9 79.3 50.0 91.4 62.1 79.3 79.3 79.3 79.3 62.1 89.9 51.5 55.8 51.5 59.8 41.5 40.2 41.5 44.2 51.5 10.1 51.5Z'/%3E%3C/svg%3E");
+}
+
+/* Header lockup: mark + name, centred */
+.aa-wordmark{display:inline-grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:12px;align-items:center;justify-content:center;justify-self:center;text-align:left;line-height:1;}
+.aa-wordmark::before{content:"";grid-row:1 / span 2;width:34px;height:34px;background:var(--aa-brass-deep);-webkit-mask:var(--aa-mark) center / contain no-repeat;mask:var(--aa-mark) center / contain no-repeat;}
+.aa-wordmark b{grid-column:2;font-family:var(--font-logo);font-weight:400;font-size:20px;letter-spacing:.28em;margin-right:-.28em;}
+.aa-wordmark small{grid-column:2;font-size:8px;letter-spacing:.42em;margin-top:6px;}
+
+/* Footer brand block */
+.aa-footer__brand::before{content:"";display:block;width:44px;height:44px;margin-bottom:18px;background:var(--aa-brass);-webkit-mask:var(--aa-mark) center / contain no-repeat;mask:var(--aa-mark) center / contain no-repeat;}
+.aa-footer__brand b{font-family:var(--font-logo);font-weight:400;font-size:22px;letter-spacing:.28em;}
+
+@media (max-width:782px){
+  .aa-wordmark{column-gap:9px;}
+  .aa-wordmark::before{width:26px;height:26px;}
+  .aa-wordmark b{font-size:16px;letter-spacing:.24em;margin-right:-.24em;}
+  .aa-wordmark small{font-size:7px;margin-top:5px;}
+}
