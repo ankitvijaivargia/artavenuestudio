@@ -15,8 +15,8 @@
 .aa-wordmark small{grid-column:2;font-size:8px;letter-spacing:.42em;margin-top:6px;}
 
 /* Footer brand block */
-.aa-footer__brand::before{content:"";display:block;width:44px;height:44px;margin-bottom:18px;background:var(--aa-brass);-webkit-mask:var(--aa-mark) center / contain no-repeat;mask:var(--aa-mark) center / contain no-repeat;}
-.aa-footer__brand b{font-family:var(--font-logo);font-weight:400;font-size:22px;letter-spacing:.28em;}
+.aa-footer__brand::before{content:"";display:inline-block;vertical-align:middle;width:34px;height:34px;margin-right:14px;background:var(--aa-brass);-webkit-mask:var(--aa-mark) center / contain no-repeat;mask:var(--aa-mark) center / contain no-repeat;}
+.aa-footer__brand b{display:inline-block;vertical-align:middle;font-family:var(--font-logo);font-weight:400;font-size:22px;letter-spacing:.28em;line-height:1;}
 
 @media (max-width:782px){
   .aa-wordmark{column-gap:9px;}
