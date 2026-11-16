@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FAF6EF">
+  <link rel="icon" type="image/svg+xml" href="{{ 'aa-favicon.svg' | asset_url }}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{{ 'aa-favicon-48.png' | asset_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ 'aa-favicon-32.png' | asset_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ 'aa-favicon-16.png' | asset_url }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ 'aa-apple-touch-icon.png' | asset_url }}">
   <link rel="canonical" href="{{ canonical_url }}">
   {%- comment -%} SEO: a collection with no live products is a thin page — keep it out of search until products are added (self-healing: the tag disappears with the first live product). {%- endcomment -%}
   {%- comment -%} SEO: a collection can also be kept out of search on purpose (e.g. it duplicates another collection's grid) by setting the collection metafield aav.noindex = true. It stays in navigation for shoppers. Tag-filtered views (/collections/<handle>/<tag>, the "Refine by" chips) are also noindexed: they repeat the parent grid. {%- endcomment -%}
@@ -13,7 +18,7 @@
   {% if page_description %}<meta name="description" content="{% if current_page > 1 %}Page {{ current_page }}: {% endif %}{{ page_description | escape }}">{% endif %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marcellus&family=Jost:wght@300;400;500;600&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
@@ -21,6 +26,7 @@
   {{ 'aa-sofa-dims.css' | asset_url | stylesheet_tag }}
   {{ 'aa-czm-mobile.css' | asset_url | stylesheet_tag }}
   {{ 'aa-card-ratio.css' | asset_url | stylesheet_tag }}
+  {{ 'aa-brand.css' | asset_url | stylesheet_tag }}
   {% render 'aa-seo-meta' %}
   {{ content_for_header }}
 </head>
